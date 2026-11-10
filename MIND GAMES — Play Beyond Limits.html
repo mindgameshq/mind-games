@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!-- saved from url=(0064)file:///C:/Users/ONILE%20Taminal/Downloads/mind-games-index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090909">
+<title>MIND GAMES — Play Beyond Limits</title>
+<style>
+:root{--gold:#d6ad58;--gold2:#f0d58d;--bg:#090909;--panel:#151515;--muted:#a99b7d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -20%,#302411 0,#090909 42%);color:#f6f0e4;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:24px 18px 16px;text-align:center;border-bottom:1px solid #4b3a1d}
+.logo{font-size:clamp(30px,8vw,48px);font-weight:900;letter-spacing:5px;color:var(--gold2);text-shadow:0 0 22px #b8863655}
+.tag{color:var(--muted);font-size:11px;letter-spacing:4px;margin-top:5px}
+nav{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:16px}
+button{font:inherit;cursor:pointer}
+.tab,.action{border:1px solid #715627;background:#17130c;color:var(--gold2);padding:10px 15px;border-radius:10px}
+.tab.active,.action{background:linear-gradient(135deg,#f0d58d,#b88636);color:#171109;border:0;font-weight:800}
+main{width:min(920px,92%);margin:10px auto 50px}
+.hero{text-align:center;padding:26px 12px 20px}
+h1{font-size:clamp(25px,6vw,38px);margin:0 0 8px}
+.hero p,.muted{color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}
+.card,.game{background:linear-gradient(145deg,#1b1b1b,#101010);border:1px solid #49391f;border-radius:16px;padding:19px}
+.card h2{color:var(--gold2);margin:8px 0}.emoji{font-size:34px}
+.game{display:none;margin-top:16px;text-align:center}.game.show{display:block}
+.game h2{color:var(--gold2)}
+.board{display:grid;grid-template-columns:repeat(3, minmax(65px,90px));gap:8px;justify-content:center;margin:20px auto}
+.cell{height:78px;border-radius:12px;border:1px solid #6e5429;background:#0b0b0b;color:var(--gold2);font-size:34px;font-weight:800}
+input{width:min(220px,65%);padding:12px;border-radius:9px;border:1px solid #80612d;background:#090909;color:white;font-size:17px}
+.memory{display:grid;grid-template-columns:repeat(4,minmax(52px,72px));gap:8px;justify-content:center;margin:20px auto}
+.mem{height:68px;border:1px solid #715627;background:#211a0e;color:var(--gold2);border-radius:10px;font-size:25px}
+.status{min-height:26px;color:var(--gold2);margin:12px}
+footer{text-align:center;color:#7e725c;border-top:1px solid #302719;padding:22px;font-size:12px}
+</style>
+</head>
+<body>
+<header><div class="logo">MIND GAMES</div><div class="tag">THINK • PLAY • CONQUER</div></header>
+<nav>
+<button class="tab active" data-target="home">Home</button>
+<button class="tab" data-target="tic">Tic-Tac-Toe</button>
+<button class="tab" data-target="guess">Guess Number</button>
+<button class="tab" data-target="memory">Memory Match</button>
+</nav>
+<main>
+<section id="home">
+<div class="hero"><h1>PLAY BEYOND LIMITS.</h1><p>Welcome to your arena. Sharpen your mind, challenge yourself and chase a new high score.</p><button class="action" onclick="show(&#39;tic&#39;)">START PLAYING</button></div>
+<div class="cards">
+<div class="card"><div class="emoji">✕</div><h2>Tic-Tac-Toe</h2><p class="muted">Challenge a friend on the same device.</p><button class="tab" onclick="show(&#39;tic&#39;)">Play now</button></div>
+<div class="card"><div class="emoji">🔢</div><h2>Guess the Number</h2><p class="muted">Can you find the secret number?</p><button class="tab" onclick="show(&#39;guess&#39;)">Play now</button></div>
+<div class="card"><div class="emoji">◆</div><h2>Memory Match</h2><p class="muted">Match every pair using your memory.</p><button class="tab" onclick="show(&#39;memory&#39;)">Play now</button></div>
+</div>
+</section>
+<section id="tic" class="game"><h2>TIC-TAC-TOE</h2><p class="muted">Two players • Take turns • Get three in a row</p><div class="board" id="board"></div><div class="status" id="ticStatus">X plays first</div><button class="action" onclick="resetTic()">New round</button></section>
+<section id="guess" class="game"><h2>GUESS THE NUMBER</h2><p class="muted">I'm thinking of a number from 1 to 100.</p><input id="guessInput" type="number" min="1" max="100" placeholder="Your guess"><p><button class="action" onclick="makeGuess()">GUESS</button> <button class="tab" onclick="newGuess()">Restart</button></p><div class="status" id="guessStatus">Make your first guess.</div><p class="muted" id="guessCount">Attempts: 0</p></section>
+<section id="memory" class="game"><h2>MEMORY MATCH</h2><p class="muted">Find all matching pairs.</p><div class="memory" id="memoryBoard"></div><div class="status" id="memoryStatus">Moves: 0</div><button class="action" onclick="newMemory()">Shuffle cards</button></section>
+</main>
+<footer>© <span id="year"></span> MIND GAMES • THINK DIFFERENT. PLAY SMART.</footer>
+<script>
+function show(id){document.querySelectorAll('main>section').forEach(s=>s.style.display=s.id===id?(id==='home'?'block':'block'):'none');document.querySelectorAll('.tab[data-target]').forEach(b=>b.classList.toggle('active',b.dataset.target===id));window.scrollTo({top:0,behavior:'smooth'})}
+document.getElementById('year').textContent=new Date().getFullYear();
+// Tic tac toe
+let cells=Array(9).fill(''),turn='X',finished=false;
+function drawTic(){const board=document.getElementById('board');board.innerHTML='';cells.forEach((v,i)=>{let b=document.createElement('button');b.className='cell';b.textContent=v;b.onclick=()=>playCell(i);board.appendChild(b)})}
+function playCell(i){if(cells[i]||finished)return;cells[i]=turn;drawTic();let wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];let line=wins.find(a=>a.every(n=>cells[n]===turn));if(line){document.getElementById('ticStatus').textContent=turn+' wins! 👑';finished=true}else if(cells.every(Boolean)){document.getElementById('ticStatus').textContent="It's a draw!";finished=true}else{turn=turn==='X'?'O':'X';document.getElementById('ticStatus').textContent=turn+"'s turn"}}
+function resetTic(){cells=Array(9).fill('');turn='X';finished=false;document.getElementById('ticStatus').textContent='X plays first';drawTic()}resetTic();
+// Guess number
+let secret,attempts;
+function newGuess(){secret=Math.floor(Math.random()*100)+1;attempts=0;document.getElementById('guessInput').value='';document.getElementById('guessStatus').textContent='New number chosen. Good luck!';document.getElementById('guessCount').textContent='Attempts: 0'} 
+function makeGuess(){let v=Number(document.getElementById('guessInput').value);if(!v||v<1||v>100){document.getElementById('guessStatus').textContent='Enter a number from 1 to 100.';return}attempts++;document.getElementById('guessCount').textContent='Attempts: '+attempts;document.getElementById('guessStatus').textContent=v===secret?'Correct! You got it in '+attempts+' attempts. 🏆':v<secret?'Too low — try a higher number.':'Too high — try a lower number.'}newGuess();
+// Memory match
+const symbols=['♛','♞','♦','♠','♥','♣','★','☀'];let first=null,lock=false,moves=0,matched=0;
+function newMemory(){let deck=[...symbols,...symbols].sort(()=>Math.random()-.5);first=null;lock=false;moves=0;matched=0;document.getElementById('memoryStatus').textContent='Moves: 0';let root=document.getElementById('memoryBoard');root.innerHTML='';deck.forEach((sym,i)=>{let b=document.createElement('button');b.className='mem';b.textContent='?';b.dataset.sym=sym;b.onclick=()=>flip(b);root.appendChild(b)})}
+function flip(b){if(lock||b.textContent!=='?'||b.dataset.matched)return;b.textContent=b.dataset.sym;if(!first){first=b;return}moves++;document.getElementById('memoryStatus').textContent='Moves: '+moves;if(first.dataset.sym===b.dataset.sym){first.dataset.matched='1';b.dataset.matched='1';matched+=2;first=null;if(matched===16)document.getElementById('memoryStatus').textContent='You matched every pair in '+moves+' moves! 🏆'}else{lock=true;let prev=first;first=null;setTimeout(()=>{prev.textContent='?';b.textContent='?';lock=false},700)}}}newMemory();
+</script>
+
+</body></html>

@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#080808">
-<title>MIND GAMES | Think • Play • Conquer</title>
-<style>
+
 :root{--gold:#d7ad52;--gold2:#f3d88b;--bg:#080808;--panel:#121212;--muted:#a7a7a7;--line:#302719}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#211a0d 0,#080808 42%);color:#f5f1e8;font-family:Arial,Helvetica,sans-serif;min-height:100vh}
 header{display:flex;justify-content:space-between;align-items:center;padding:18px 6%;border-bottom:1px solid var(--line);position:sticky;top:0;background:#090909ed;backdrop-filter:blur(12px);z-index:5}
@@ -27,6 +22,21 @@ footer{text-align:center;color:#777;font-size:11px;padding:25px;border-top:1px s
 </style>
 </head>
 <body>
+  <div id="auth-overlay">
+  <div class="auth-container">
+    <h1>🧠 MIND GAMES</h1>
+    <p>Unlock your mind. Enter the game.</p>
+
+    <input id="player-name" placeholder="Your player name">
+    <input id="player-email" type="email" placeholder="Email address">
+    <input id="player-password" type="password" placeholder="Password">
+
+    <button id="signup-btn">CREATE ACCOUNT</button>
+    <button id="login-btn">SIGN IN</button>
+
+    <p id="auth-message"></p>
+  </div>
+</div>
 <header><div class="brand">MIND GAMES<span>THINK • PLAY • CONQUER</span></div><div><span id="headerUser" class="small"></span> <button id="logoutBtn" class="secondary hidden">Log out</button></div></header>
 <main>
 <section class="hero"><div class="eyebrow">WELCOME TO THE ARENA</div><h1>PLAY <span class="gold">BEYOND</span><br>LIMITS.</h1><p>Challenge your mind, sharpen your skills and make every move count. Create your player account to enter the arena.</p></section>
@@ -68,7 +78,11 @@ async function loadProfile(user){
   const {data,error}=await db.from('profiles').select('username,total_points,games_played').eq('id',user.id).maybeSingle();
   if(error){console.error(error);return}
   profile=data;
-  $('authPanel').classList.add('hidden');$('playerPanel').classList.remove('hidden');$('logoutBtn').classList.remove('hidden');
+  $('authPanel').classList.add('hidden');
+$('playerPanel').classList.remove('hidden');
+$('gameCentre').classList.remove('hidden');
+  $('td-game').classList.remove('hidden');
+$('logoutBtn').classList.remove('hidden');
   $('headerUser').textContent=data?.username || user.email;
   $('welcomeName').textContent='Welcome, '+(data?.username || 'Player');
   $('gamesCount').textContent=data?.games_played ?? 0;$('pointsCount').textContent=data?.total_points ?? 0;
@@ -91,8 +105,19 @@ $('loginBtn').onclick=async()=>{
  if(error){msg('loginStatus',error.message);return}
  await loadProfile(data.user);msg('loginStatus','You are logged in.');
 };
-$('logoutBtn').onclick=async()=>{await db.auth.signOut();currentUser=null;profile=null;$('playerPanel').classList.add('hidden');$('authPanel').classList.remove('hidden');$('logoutBtn').classList.add('hidden');$('headerUser').textContent=''};
-db.auth.getSession().then(({data})=>{if(data.session)loadProfile(data.session.user)});
+$('logoutBtn').onclick=async()=>{
+await db.auth.signOut();
+currentUser=null;
+profile=null;
+$('playerPanel').classList.add('hidden');
+$('authPanel').classList.remove('hidden');
+$('gameCentre').classList.add('hidden');
+$('td-game').classList.add('hidden');
+$('logoutBtn').classList.add('hidden');
+$('headerUser').textContent='';
+};
+db.auth.getSession().then(({data})=>{if(data.session)loadProfile(data.session.user)});                                                                                                                                                                          
+
 db.auth.onAuthStateChange((_event,session)=>{if(session&&!currentUser)loadProfile(session.user)});
 
 function showGame(which){
@@ -123,7 +148,7 @@ function renderMemory(a){
 }
 </script>
   <!-- MIND GAMES: TRUTH OR DARE -->
-<section id="td-game" style="background:linear-gradient(145deg,#160713,#3b0925,#170b20);color:white;padding:28px 18px;border-radius:20px;margin:25px auto;max-width:850px;font-family:Arial,sans-serif;text-align:center;border:1px solid #b52b68;">
+<section id="td-game" class="hidden" style="background:linear-gradient(145deg,#160713,#3b0925,#170b20);color:white;padding:28px 18px;border-radius:20px;margin:25px auto;max-width:850px;font-family:Arial,sans-serif;text-align:center;border:1px solid #b52b68;">
   <h2 style="color:#ff5b9d;font-size:30px;">🔥 TRUTH OR DARE</h2>
   <p style="color:#f5b7d1;">How bold are you willing to get?</p>
 
@@ -327,4 +352,6 @@ renderPlayers();
 })();
 </script>
 <!-- END MIND GAMES: TRUTH OR DARE -->
+  
+
 </body></html>

@@ -1,186 +1,354 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080808">
 <title>MIND GAMES | Think • Play • Conquer</title>
+
 <style>
-:root{--gold:#d7ad52;--gold2:#f3d88b;--bg:#080808;--panel:#121212;--muted:#a7a7a7;--line:#302719}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#211a0d 0,#080808 42%);color:#f5f1e8;font-family:Arial,Helvetica,sans-serif;min-height:100vh}
-header{display:flex;justify-content:space-between;align-items:center;padding:18px 6%;border-bottom:1px solid var(--line);position:sticky;top:0;background:#090909ed;backdrop-filter:blur(12px);z-index:5}
-.brand{font-weight:900;letter-spacing:3px;color:var(--gold2);font-size:19px}.brand span{display:block;font-size:9px;letter-spacing:4px;color:#aaa;margin-top:5px}
-button,.btn{border:1px solid var(--gold);background:linear-gradient(135deg,#f2d88e,#b98932);color:#111;font-weight:800;padding:11px 16px;border-radius:8px;cursor:pointer}
-button.secondary{background:transparent;color:var(--gold2)}button:disabled{opacity:.45;cursor:not-allowed}
-main{max-width:1100px;margin:auto;padding:34px 5% 70px}.hero{text-align:center;padding:48px 12px 35px}.eyebrow{color:var(--gold);letter-spacing:4px;font-size:11px;font-weight:bold}
-h1{font-size:clamp(38px,8vw,70px);margin:15px 0 8px;letter-spacing:3px}.gold{color:var(--gold2)}.hero p{color:#bbb;line-height:1.7;max-width:580px;margin:12px auto 23px}
-.panel{background:linear-gradient(145deg,#171717,#0d0d0d);border:1px solid var(--line);border-radius:16px;padding:22px;margin:18px 0;box-shadow:0 12px 35px #0007}
-h2{font-size:20px;margin:0 0 15px;color:var(--gold2)}h3{margin:8px 0;color:#f5e5bd}
-.auth-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.field{width:100%;padding:13px;margin:7px 0 12px;border:1px solid #403725;background:#080808;color:white;border-radius:8px;font-size:15px}
-.small{font-size:12px;color:var(--muted);line-height:1.6}.status{margin-top:10px;color:var(--gold2);font-size:13px;min-height:18px}.hidden{display:none!important}
-.profilebar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.stats{display:flex;gap:12px;flex-wrap:wrap}.stat{background:#090909;border:1px solid #342b1c;border-radius:10px;padding:12px 16px;min-width:110px}.stat strong{display:block;color:var(--gold2);font-size:21px}.stat span{font-size:11px;color:#aaa}
-.games{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.game-card{background:#0a0a0a;border:1px solid #3a2d18;border-radius:13px;padding:18px;display:flex;flex-direction:column;min-height:180px}.game-card p{color:#aaa;font-size:13px;line-height:1.5;flex:1}
-.game-area{margin-top:16px;padding-top:18px;border-top:1px solid var(--line)}.board{display:grid;grid-template-columns:repeat(3, minmax(60px,90px));gap:7px;justify-content:center;margin:16px auto}.cell{height:78px;background:#17130c;border:1px solid #725522;color:var(--gold2);font-size:30px;border-radius:9px}
-.memory-grid{display:grid;grid-template-columns:repeat(4, minmax(45px,65px));gap:8px;justify-content:center;margin:16px auto}.memory-grid button{height:58px;font-size:22px;padding:0;background:#19150e;color:var(--gold2);border:1px solid #745a27}
-footer{text-align:center;color:#777;font-size:11px;padding:25px;border-top:1px solid var(--line);letter-spacing:2px}
-@media(max-width:720px){.auth-grid,.games{grid-template-columns:1fr}.hero{padding-top:30px}header{padding:14px 5%}.brand{font-size:16px}.panel{padding:17px}.profilebar{align-items:flex-start}}
+:root {
+ --gold:#d7ad52;
+ --gold2:#f3d88b;
+ --bg:#080808;
+ --panel:#121212;
+ --muted:#aaa;
+ --line:#302719;
+ --pink:#ff4f99;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;background:radial-gradient(circle at top,#211a0d,#080808 48%);
+ color:#f5f1e8;font-family:Arial,sans-serif;min-height:100vh
+}
+button{cursor:pointer;font-weight:bold;border-radius:9px;padding:12px 17px}
+button:disabled{opacity:.5}
+.gold{color:var(--gold2)}
+.hidden{display:none!important}
+header{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:17px 6%;border-bottom:1px solid var(--line);
+ background:#090909ed;position:sticky;top:0;z-index:5
+}
+.brand{font-weight:900;letter-spacing:3px;color:var(--gold2)}
+.brand small{display:block;font-size:9px;color:#aaa;margin-top:5px}
+main{max-width:1100px;margin:auto;padding:30px 5% 60px}
+.hero{text-align:center;padding:40px 10px}
+.hero h1{font-size:clamp(38px,8vw,70px);letter-spacing:3px}
+.hero p{color:#bbb;line-height:1.7;max-width:600px;margin:auto}
+.eyebrow{color:var(--gold);letter-spacing:4px;font-size:11px;font-weight:bold}
+.panel{
+ background:linear-gradient(145deg,#171717,#0d0d0d);
+ border:1px solid var(--line);border-radius:16px;
+ padding:22px;margin:18px 0;box-shadow:0 12px 35px #0007
+}
+h2{color:var(--gold2)}
+h3{color:#f5e5bd}
+.field{
+ width:100%;padding:13px;margin:7px 0 12px;
+ border:1px solid #403725;background:#080808;color:white;
+ border-radius:8px;font-size:15px
+}
+.btn{
+ border:1px solid var(--gold);
+ background:linear-gradient(135deg,#f2d88e,#b98932);
+ color:#111
+}
+.secondary{background:transparent;border:1px solid var(--gold);color:var(--gold2)}
+.status{color:var(--gold2);font-size:13px;min-height:20px}
+.small{font-size:12px;color:var(--muted);line-height:1.6}
+.auth-screen{
+ min-height:100vh;display:grid;place-items:center;padding:20px
+}
+.auth-card{
+ width:min(430px,100%);padding:30px;text-align:center;
+ background:linear-gradient(145deg,#211a11,#100e0c);
+ border:1px solid #85662f;border-radius:20px;
+ box-shadow:0 20px 80px #000b
+}
+.auth-card h1{font-size:35px;color:var(--gold2)}
+.auth-card button{width:100%;margin:6px 0}
+.auth-tabs{display:flex;gap:8px;margin:20px 0}
+.auth-tabs button{flex:1}
+.games{
+ display:grid;grid-template-columns:repeat(3,1fr);gap:15px
+}
+.game-card{
+ background:#0b0b0b;border:1px solid #48381e;
+ border-radius:14px;padding:18px;display:flex;
+ flex-direction:column;min-height:190px
+}
+.game-card p{color:#aaa;font-size:13px;line-height:1.6;flex:1}
+.game-card button{margin-top:10px}
+.game-card.featured{
+ background:linear-gradient(145deg,#290d20,#4b1030,#160b20);
+ border-color:#d73e83
+}
+.game-card.featured h3{color:#ff76b2}
+.game-area{
+ margin-top:22px;padding:22px;border-top:1px solid var(--line);
+ border-radius:14px;background:#100e0d
+}
+.board{
+ display:grid;grid-template-columns:repeat(3,minmax(60px,90px));
+ gap:7px;justify-content:center;margin:18px auto
+}
+.cell{
+ height:78px;background:#17130c;border:1px solid #725522;
+ color:var(--gold2);font-size:30px
+}
+.memory-grid{
+ display:grid;grid-template-columns:repeat(4,minmax(45px,65px));
+ gap:8px;justify-content:center;margin:16px auto
+}
+.memory-grid button{
+ height:58px;font-size:22px;padding:0;
+ background:#19150e;color:var(--gold2);
+ border:1px solid #745a27
+}
+#td-game{
+ background:linear-gradient(145deg,#160713,#3b0925,#170b20);
+ color:white;padding:25px 16px;border-radius:18px;
+ border:1px solid #b52b68;text-align:center;margin-top:20px
+}
+.td-btn{
+ background:#d92e78;color:white;border:0;
+ margin:5px;padding:14px 20px;font-size:15px
+}
+#td-card{
+ background:#290d22;border:1px solid #e84b8a;
+ border-radius:15px;padding:25px;min-height:120px;
+ display:flex;align-items:center;justify-content:center;
+ flex-direction:column;font-size:19px;color:#ffd6e7;
+ line-height:1.6;margin:18px 0
+}
+#td-players{color:#ffb6d3;margin:15px}
+footer{text-align:center;color:#777;font-size:11px;padding:25px}
+@media(max-width:720px){
+ .games{grid-template-columns:1fr}
+ header{padding:14px 5%}
+ .panel{padding:16px}
+}
 </style>
 </head>
+
 <body>
-  <div id="auth-overlay">
-  <div class="auth-container">
-    <h1>🧠 MIND GAMES</h1>
-    <p>Unlock your mind. Enter the game.</p>
 
-    <input id="player-name" placeholder="Your player name">
-    <input id="player-email" type="email" placeholder="Email address">
-    <input id="player-password" type="password" placeholder="Password">
+<!-- LOGIN GATE -->
+<section id="authScreen" class="auth-screen">
+ <div class="auth-card">
+  <div class="eyebrow">YOUR MIND. YOUR RULES.</div>
+  <h1>🧠 MIND GAMES</h1>
+  <p class="small">Think • Play • Conquer</p>
 
-    <button id="signup-btn">CREATE ACCOUNT</button>
-    <button id="login-btn">SIGN IN</button>
-
-    <p id="auth-message"></p>
+  <div class="auth-tabs">
+   <button id="loginTab" class="btn" onclick="setMode('login')">SIGN IN</button>
+   <button id="signupTab" class="secondary" onclick="setMode('signup')">CREATE ACCOUNT</button>
   </div>
-</div>
-<header><div class="brand">MIND GAMES<span>THINK • PLAY • CONQUER</span></div><div><span id="headerUser" class="small"></span> <button id="logoutBtn" class="secondary hidden">Log out</button></div></header>
+
+  <input id="authName" class="field hidden" placeholder="Choose username">
+  <input id="authEmail" class="field" type="email" placeholder="Email address">
+  <input id="authPassword" class="field" type="password" placeholder="Password (6+ characters)">
+
+  <button id="authSubmit" class="btn" onclick="authenticate()">UNLOCK MIND GAMES</button>
+  <div id="authMessage" class="status"></div>
+
+  <p class="small">Your entrance unlocks after successful login.</p>
+ </div>
+</section>
+
+<!-- EVERYTHING BEHIND THE WALL -->
+<div id="app" class="hidden">
+
+<header>
+ <div class="brand">MIND GAMES
+  <small>THINK • PLAY • CONQUER</small>
+ </div>
+ <div>
+  <span id="headerUser" class="small"></span>
+  <button class="secondary" onclick="logout()">Log out</button>
+ </div>
+</header>
+
 <main>
-<section class="hero"><div class="eyebrow">WELCOME TO THE ARENA</div><h1>PLAY <span class="gold">BEYOND</span><br>LIMITS.</h1><p>Challenge your mind, sharpen your skills and make every move count. Create your player account to enter the arena.</p></section>
 
-<section id="authPanel" class="panel">
-<h2>PLAYER ACCESS</h2>
-<div class="auth-grid">
-<div><h3>Create your account</h3><input class="field" id="signupName" placeholder="Choose a username" maxlength="24"><input class="field" id="signupEmail" type="email" placeholder="Email address"><input class="field" id="signupPassword" type="password" placeholder="Password (at least 6 characters)"><button id="signupBtn">Create account</button><div id="signupStatus" class="status"></div></div>
-<div><h3>Welcome back</h3><input class="field" id="loginEmail" type="email" placeholder="Email address"><input class="field" id="loginPassword" type="password" placeholder="Password"><button id="loginBtn" class="secondary">Log in</button><div id="loginStatus" class="status"></div></div>
-</div><p class="small">If email confirmation is enabled, check your inbox after signing up and confirm your email before logging in.</p>
+<section class="hero">
+ <div class="eyebrow">WELCOME TO THE ARENA</div>
+ <h1>PLAY <span class="gold">BEYOND</span><br>LIMITS.</h1>
+ <p>Challenge your mind, sharpen your skills and make every move count.</p>
 </section>
 
-<section id="playerPanel" class="panel hidden">
-<div class="profilebar"><div><div class="eyebrow">PLAYER PROFILE</div><h2 id="welcomeName">Welcome, player</h2></div><div class="stats"><div class="stat"><strong id="gamesCount">0</strong><span>GAMES PLAYED</span></div><div class="stat"><strong id="pointsCount">0</strong><span>POINTS</span></div></div></div>
-<p class="small">Your account is connected. Play the games below. Your profile is stored in the MIND GAMES database.</p>
+<section class="panel">
+ <div class="eyebrow">PLAYER PROFILE</div>
+ <h2 id="welcomeName">Welcome, Player</h2>
+ <p class="small">Your personal gaming arena is ready.</p>
+ <div class="small">Games played: <strong id="gamesCount">0</strong></div>
+ <div class="small">Points: <strong id="pointsCount">0</strong></div>
 </section>
 
-<section class="panel"><div class="eyebrow">THE GAME CENTRE</div><h2>CHOOSE YOUR CHALLENGE</h2>
-<div class="games">
-<div class="game-card"><h3>Tic-Tac-Toe</h3><p>Challenge a friend on the same device. Get three marks in a row to win.</p><button class="secondary" onclick="showGame('ttt')">Play now</button></div>
-<div class="game-card"><h3>Guess the Number</h3><p>Find the hidden number between 1 and 100 with as few guesses as possible.</p><button class="secondary" onclick="showGame('guess')">Play now</button></div>
-<div class="game-card"><h3>Memory Match</h3><p>Flip the cards and find all matching pairs. Test your memory.</p><button class="secondary" onclick="showGame('memory')">Play now</button></div>
-</div>
-<div id="gameArea" class="game-area hidden"></div>
+<section class="panel" id="gameCentre">
+ <div class="eyebrow">THE GAME CENTRE</div>
+ <h2>CHOOSE YOUR CHALLENGE</h2>
+
+ <div class="games">
+
+  <div class="game-card featured">
+   <div class="eyebrow">18+ PARTY MODE</div>
+   <h3>🔥 TRUTH OR DARE</h3>
+   <p>Bold questions, daring challenges and unforgettable moments.</p>
+   <button class="td-btn" onclick="showGame('truth')">PLAY NOW</button>
+  </div>
+
+  <div class="game-card">
+   <h3>⭕ Tic-Tac-Toe</h3>
+   <p>Challenge a friend. Get three marks in a row.</p>
+   <button class="secondary" onclick="showGame('ttt')">Play now</button>
+  </div>
+
+  <div class="game-card">
+   <h3>🎯 Guess the Number</h3>
+   <p>Find the hidden number between 1 and 100.</p>
+   <button class="secondary" onclick="showGame('guess')">Play now</button>
+  </div>
+
+  <div class="game-card">
+   <h3>🧩 Memory Match</h3>
+   <p>Flip the cards and discover matching pairs.</p>
+   <button class="secondary" onclick="showGame('memory')">Play now</button>
+  </div>
+
+ </div>
+
+ <div id="gameArea" class="game-area hidden"></div>
+
 </section>
-<section class="panel"><h2>COMING SOON</h2><p class="small">Global leaderboard • Online multiplayer • Chess • Sudoku • Achievements</p></section>
+
+<section class="panel">
+ <h2>COMING SOON</h2>
+ <p class="small">Monopoly • WHOT • Online Multiplayer • Global Leaderboard • Achievements</p>
+</section>
+
 </main>
 <footer>MIND GAMES © 2026 — THINK • PLAY • CONQUER</footer>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-const SUPABASE_URL = "https://pnatjqwplyxhpcfqhgcm.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_lbUX7xkFk96kxH1ZP_Zk6A_zWvXT6AD";
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-const $ = id => document.getElementById(id);
-let currentUser=null, profile=null;
-function msg(id,text){$(id).textContent=text}
-async function loadProfile(user){
-  currentUser=user;
-  const {data,error}=await db.from('profiles').select('username,total_points,games_played').eq('id',user.id).maybeSingle();
-  if(error){console.error(error);return}
-  profile=data;
-  $('authPanel').classList.add('hidden');
-$('playerPanel').classList.remove('hidden');
-$('gameCentre').classList.remove('hidden');
-  $('td-game').classList.remove('hidden');
-$('logoutBtn').classList.remove('hidden');
-  $('headerUser').textContent=data?.username || user.email;
-  $('welcomeName').textContent='Welcome, '+(data?.username || 'Player');
-  $('gamesCount').textContent=data?.games_played ?? 0;$('pointsCount').textContent=data?.total_points ?? 0;
+const SUPABASE_URL="https://pnatjqwplyxhpcfqhgcm.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_lbUX7xkFk96kxH1ZP_Zk6A_zWvXT6AD";
+
+const db=window.supabase.createClient(
+ SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
+);
+
+const $=id=>document.getElementById(id);
+let currentUser=null;
+let authMode="login";
+
+function setMode(mode){
+ authMode=mode;
+ $("authName").classList.toggle("hidden",mode!=="signup");
+ $("loginTab").className=mode==="login"?"btn":"secondary";
+ $("signupTab").className=mode==="signup"?"btn":"secondary";
+ $("authSubmit").textContent=mode==="login"?"UNLOCK MIND GAMES":"CREATE ACCOUNT";
+ $("authMessage").textContent="";
 }
-$('signupBtn').onclick=async()=>{
- const username=$('signupName').value.trim(),email=$('signupEmail').value.trim(),password=$('signupPassword').value;
- if(!username||!email||password.length<6){msg('signupStatus','Enter a username, valid email and password of at least 6 characters.');return}
- $('signupBtn').disabled=true;msg('signupStatus','Creating your account...');
- const {data,error}=await db.auth.signUp({email,password,options:{data:{username}}});
- $('signupBtn').disabled=false;
- if(error){msg('signupStatus',error.message);return}
- if(data.session){await loadProfile(data.user);msg('signupStatus','Account created. Welcome!')}
- else msg('signupStatus','Account created. Check your email to confirm, then log in.');
-};
-$('loginBtn').onclick=async()=>{
- const email=$('loginEmail').value.trim(),password=$('loginPassword').value;
- $('loginBtn').disabled=true;msg('loginStatus','Logging in...');
- const {data,error}=await db.auth.signInWithPassword({email,password});
- $('loginBtn').disabled=false;
- if(error){msg('loginStatus',error.message);return}
- await loadProfile(data.user);msg('loginStatus','You are logged in.');
-};
-$('logoutBtn').onclick=async()=>{
-await db.auth.signOut();
-currentUser=null;
-profile=null;
-$('playerPanel').classList.add('hidden');
-$('authPanel').classList.remove('hidden');
-$('gameCentre').classList.add('hidden');
-$('td-game').classList.add('hidden');
-$('logoutBtn').classList.add('hidden');
-$('headerUser').textContent='';
-};
-db.auth.getSession().then(({data})=>{if(data.session)loadProfile(data.session.user)});                                                                                                                                                                          
 
-db.auth.onAuthStateChange((_event,session)=>{if(session&&!currentUser)loadProfile(session.user)});
+function enterApp(user){
+ currentUser=user;
+ $("authScreen").classList.add("hidden");
+ $("app").classList.remove("hidden");
 
+ const username=user.user_metadata?.username||user.email.split("@")[0];
+
+ $("headerUser").textContent=username;
+ $("welcomeName").textContent="Welcome, "+username;
+}
+
+async function authenticate(){
+ const email=$("authEmail").value.trim();
+ const password=$("authPassword").value;
+ const username=$("authName").value.trim();
+
+ if(!email||password.length<6){
+  $("authMessage").textContent="Enter a valid email and password of at least 6 characters.";
+  return;
+ }
+
+ if(authMode==="signup"&&!username){
+  $("authMessage").textContent="Choose a username first.";
+  return;
+ }
+
+ $("authSubmit").disabled=true;
+ $("authMessage").textContent="Please wait...";
+
+ try{
+  if(authMode==="signup"){
+   const {data,error}=await db.auth.signUp({
+    email,password,
+    options:{data:{username}}
+   });
+
+   if(error)throw error;
+
+   if(data.session){
+    enterApp(data.user);
+   }else{
+    $("authMessage").textContent="Account created! Confirm your email, then sign in.";
+   }
+  }else{
+   const {data,error}=await db.auth.signInWithPassword({
+    email,password
+   });
+
+   if(error)throw error;
+   enterApp(data.user);
+  }
+ }catch(error){
+  $("authMessage").textContent=error.message;
+ }finally{
+  $("authSubmit").disabled=false;
+ }
+}
+
+async function logout(){
+ await db.auth.signOut();
+ currentUser=null;
+ $("app").classList.add("hidden");
+ $("authScreen").classList.remove("hidden");
+ $("authMessage").textContent="You have signed out.";
+}
+
+db.auth.getSession().then(({data})=>{
+ if(data.session)enterApp(data.session.user);
+});
+
+db.auth.onAuthStateChange((event,session)=>{
+ if(session&&!currentUser)enterApp(session.user);
+ if(!session&&currentUser){
+  currentUser=null;
+  $("app").classList.add("hidden");
+  $("authScreen").classList.remove("hidden");
+ }
+});
+
+// GAME NAVIGATION
 function showGame(which){
- const a=$('gameArea');a.classList.remove('hidden');
- if(which==='ttt') renderTTT(a); if(which==='guess') renderGuess(a);if(which==='memory')renderMemory(a);
- a.scrollIntoView({behavior:'smooth',block:'nearest'});
+ const area=$("gameArea");
+ area.classList.remove("hidden");
+
+ if(which==="truth")renderTruth(area);
+ if(which==="ttt")renderTTT(area);
+ if(which==="guess")renderGuess(area);
+ if(which==="memory")renderMemory(area);
+
+ area.scrollIntoView({behavior:"smooth",block:"nearest"});
 }
-function renderTTT(a){
- let board=Array(9).fill(''),turn='X',done=false;
- a.innerHTML='<h3>Tic-Tac-Toe</h3><p class="small" id="tttStatus">X goes first</p><div class="board" id="tttBoard"></div><button class="secondary" id="tttReset">Restart</button>';
- const b=$('tttBoard');
- function draw(){b.innerHTML='';board.forEach((v,i)=>{let x=document.createElement('button');x.className='cell';x.textContent=v;x.onclick=()=>{if(done||v)return;board[i]=turn;if(check()){ $('tttStatus').textContent=turn+' wins!';done=true}else if(board.every(Boolean)){ $('tttStatus').textContent='It is a draw!';done=true}else{turn=turn==='X'?'O':'X';$('tttStatus').textContent=turn+"'s turn"}draw()};b.appendChild(x)})}
- function check(){return [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]].some(line=>line.every(i=>board[i]===turn))}
- $('tttReset').onclick=()=>{board=Array(9).fill('');turn='X';done=false;$('tttStatus').textContent='X goes first';draw()};draw();
-}
-function renderGuess(a){
- const secret=Math.floor(Math.random()*100)+1;let tries=0;
- a.innerHTML='<h3>Guess the Number</h3><p class="small">I have picked a number from 1 to 100.</p><input class="field" id="guessInput" type="number" min="1" max="100" placeholder="Your guess"><button id="guessBtn">Check guess</button><p class="status" id="guessStatus"></p><button class="secondary" id="guessNew">New game</button>';
- $('guessBtn').onclick=()=>{const n=Number($('guessInput').value);if(!Number.isInteger(n)||n<1||n>100){msg('guessStatus','Enter a whole number from 1 to 100.');return}tries++;msg('guessStatus',n===secret?'Correct! You got it in '+tries+' guesses.':n<secret?'Too low. Try higher!':'Too high. Try lower!')};
- $('guessNew').onclick=()=>renderGuess(a);
-}
-function renderMemory(a){
- const icons=['♠','♣','♥','♦','★','☀','☂','♫'];let cards=[...icons,...icons].sort(()=>Math.random()-.5),open=[],matched=0,locked=false;
- a.innerHTML='<h3>Memory Match</h3><p class="small" id="memoryStatus">Find all 8 pairs.</p><div class="memory-grid" id="memoryGrid"></div><button class="secondary" id="memoryReset">Shuffle again</button>';
- const g=$('memoryGrid');
- cards.forEach((v,i)=>{const c=document.createElement('button');c.textContent='?';c.dataset.v=v;c.onclick=()=>{if(locked||c.classList.contains('matched')||open.includes(c))return;c.textContent=v;open.push(c);if(open.length===2){locked=true;if(open[0].dataset.v===open[1].dataset.v){open.forEach(x=>x.classList.add('matched'));matched++;open=[];locked=false;$('memoryStatus').textContent=matched===8?'You matched every pair!':'Pairs found: '+matched+'/8'}else{setTimeout(()=>{open.forEach(x=>x.textContent='?');open=[];locked=false},650)}}};g.appendChild(c)});
- $('memoryReset').onclick=()=>renderMemory(a);
-}
-</script>
-  <!-- MIND GAMES: TRUTH OR DARE -->
-<section id="td-game" class="hidden" style="background:linear-gradient(145deg,#160713,#3b0925,#170b20);color:white;padding:28px 18px;border-radius:20px;margin:25px auto;max-width:850px;font-family:Arial,sans-serif;text-align:center;border:1px solid #b52b68;">
-  <h2 style="color:#ff5b9d;font-size:30px;">🔥 TRUTH OR DARE</h2>
-  <p style="color:#f5b7d1;">How bold are you willing to get?</p>
 
-  <input id="td-player" placeholder="Enter player's name" style="padding:13px;border-radius:10px;border:1px solid #ff5b9d;background:#250d20;color:white;width:80%;max-width:300px;">
-  <button onclick="tdAddPlayer()" style="padding:12px;background:#e52e79;color:white;border:0;border-radius:10px;margin:8px;">Add Player</button>
-
-  <div id="td-players" style="margin:12px;color:#ffb6d3;">No players yet</div>
-
-  <div style="margin:20px auto;">
-    <button onclick="tdPick('truth')" style="padding:16px 25px;background:#a91d59;color:white;border:0;border-radius:12px;font-size:17px;margin:5px;">💗 TRUTH</button>
-    <button onclick="tdPick('dare')" style="padding:16px 25px;background:#e34270;color:white;border:0;border-radius:12px;font-size:17px;margin:5px;">🔥 DARE</button>
-  </div>
-
-  <div id="td-card" style="background:#290d22;border:1px solid #e84b8a;border-radius:16px;padding:25px;min-height:100px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#ffd6e7;">
-    Add players, then choose Truth or Dare.
-  </div>
-
-  <p id="td-turn" style="color:#ff9fc5;"></p>
-
-  <button onclick="tdNext()" style="padding:12px 22px;background:#ff5b9d;color:#240817;border:0;border-radius:10px;margin:10px;">Next Player ↻</button>
-  <button onclick="tdPass()" style="padding:12px 22px;background:#54213e;color:white;border:0;border-radius:10px;margin:10px;">Pass / Skip</button>
-  <button onclick="tdSound()" style="padding:10px;background:#321329;color:white;border:1px solid #ff5b9d;border-radius:10px;">🔊 Sound On/Off</button>
-</section>
-
-<script>
-(function(){
-const truths = [
+// TRUTH OR DARE
+const truths=[
 "What's your biggest romantic red flag?",
 "Who was your last crush?",
 "Have you ever stalked someone's profile?",
@@ -233,7 +401,7 @@ const truths = [
 "What's your biggest relationship fear?"
 ];
 
-const dares = [
+const dares=[
 "Give your best flirty pickup line.",
 "Do your funniest dance for 20 seconds.",
 "Let the group choose your next profile picture.",
@@ -286,75 +454,273 @@ const dares = [
 "Make up a short rap about the group."
 ];
 
-let players = [];
-let current = 0;
-let soundOn = true;
+let tdPlayers=[];
+let tdCurrent=0;
+let tdSoundOn=true;
 
-function renderPlayers(){
- document.getElementById("td-players").textContent =
- players.length ? "Players: " + players.join(" • ") : "No players yet";
- document.getElementById("td-turn").textContent =
- players.length ? "It's " + players[current] + "'s turn!" : "";
+function renderTruth(area){
+ area.innerHTML=`
+ <div id="td-game">
+  <div class="eyebrow">18+ PARTY MODE</div>
+  <h2 style="color:#ff5b9d;font-size:30px">🔥 TRUTH OR DARE</h2>
+  <p style="color:#f5b7d1">How bold are you willing to get?</p>
+
+  <input id="td-player" class="field"
+   placeholder="Enter player's name"
+   style="max-width:300px;background:#250d20">
+
+  <button class="td-btn" onclick="tdAddPlayer()">Add Player</button>
+
+  <div id="td-players">No players yet</div>
+  <p id="td-turn"></p>
+
+  <div style="margin:20px">
+   <button class="td-btn" onclick="tdPick('truth')">💗 TRUTH</button>
+   <button class="td-btn" onclick="tdPick('dare')">🔥 DARE</button>
+  </div>
+
+  <div id="td-card">
+   Add players, then choose Truth or Dare.
+  </div>
+
+  <button class="td-btn" onclick="tdNext()">Next Player ↻</button>
+  <button class="td-btn" onclick="tdPass()">Pass / Skip</button>
+  <button class="td-btn" onclick="tdSound()">🔊 Sound On/Off</button>
+
+  <p class="small">Everyone can pass any challenge. Respect boundaries and keep the game fun.</p>
+ </div>
+ `;
+ tdPlayers=[];
+ tdCurrent=0;
+ renderTDPlayers();
 }
 
-window.tdAddPlayer = function(){
- const input = document.getElementById("td-player");
- const name = input.value.trim();
- if(!name) return alert("Enter a player's name first!");
- if(players.some(p=>p.toLowerCase()===name.toLowerCase())) return alert("That player is already added!");
- players.push(name);
- input.value = "";
- renderPlayers();
-};
+function renderTDPlayers(){
+ const list=$("td-players");
+ const turn=$("td-turn");
+ if(!list||!turn)return;
 
-function playSound(){
- if(!soundOn) return;
+ list.textContent=tdPlayers.length?
+ "Players: "+tdPlayers.join(" • "):
+ "No players yet";
+
+ turn.textContent=tdPlayers.length?
+ "It's "+tdPlayers[tdCurrent]+"'s turn!":"";
+}
+
+function tdAddPlayer(){
+ const input=$("td-player");
+ const name=input.value.trim();
+
+ if(!name)return alert("Enter a player's name first!");
+
+ if(tdPlayers.some(p=>p.toLowerCase()===name.toLowerCase())){
+  return alert("That player is already added!");
+ }
+
+ tdPlayers.push(name);
+ input.value="";
+ renderTDPlayers();
+ tdPlaySound();
+}
+
+function tdPlaySound(){
+ if(!tdSoundOn)return;
+
  try{
-  const audio = new (window.AudioContext || window.webkitAudioContext)();
-  const oscillator = audio.createOscillator();
-  const gain = audio.createGain();
+  const audio=new(window.AudioContext||window.webkitAudioContext)();
+  const oscillator=audio.createOscillator();
+  const gain=audio.createGain();
+
   oscillator.connect(gain);
   gain.connect(audio.destination);
-  oscillator.frequency.value = 660;
-  gain.gain.setValueAtTime(0.12,audio.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001,audio.currentTime+0.2);
+  oscillator.frequency.value=660;
+  gain.gain.setValueAtTime(.12,audio.currentTime);
+  gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.2);
   oscillator.start();
-  oscillator.stop(audio.currentTime+0.2);
+  oscillator.stop(audio.currentTime+.2);
  }catch(e){}
 }
 
-window.tdPick = function(type){
- if(!players.length) return alert("Add at least one player first!");
- const list = type === "truth" ? truths : dares;
- const prompt = list[Math.floor(Math.random()*list.length)];
- document.getElementById("td-card").innerHTML =
- "<strong style='color:#ff72ad;display:block;margin-bottom:12px;'>" +
- (type==="truth"?"💗 TRUTH":"🔥 DARE") +
- "</strong>" + prompt;
- renderPlayers();
- playSound();
-};
+function tdPick(type){
+ if(!tdPlayers.length){
+  return alert("Add at least one player first!");
+ }
 
-window.tdNext = function(){
- if(!players.length) return alert("Add players first!");
- current = (current+1)%players.length;
- document.getElementById("td-card").textContent = "Choose Truth or Dare!";
- renderPlayers();
- playSound();
-};
+ const list=type==="truth"?truths:dares;
+ const prompt=list[Math.floor(Math.random()*list.length)];
 
-window.tdPass = function(){
- document.getElementById("td-card").textContent = "⏭️ Challenge skipped. No pressure!";
+ $("td-card").innerHTML=
+ `<strong style="color:#ff72ad;margin-bottom:12px">
+ ${type==="truth"?"💗 TRUTH":"🔥 DARE"}
+ </strong>${prompt}`;
+
+ renderTDPlayers();
+ tdPlaySound();
+}
+
+function tdNext(){
+ if(!tdPlayers.length)return alert("Add players first!");
+
+ tdCurrent=(tdCurrent+1)%tdPlayers.length;
+ $("td-card").textContent="Choose Truth or Dare!";
+ renderTDPlayers();
+ tdPlaySound();
+}
+
+function tdPass(){
+ if(!tdPlayers.length)return alert("Add players first!");
+
+ $("td-card").textContent="⏭️ Challenge skipped. No pressure!";
  tdNext();
-};
+}
 
-window.tdSound = function(){
- soundOn = !soundOn;
- document.getElementById("td-card").textContent =
- soundOn ? "🔊 Sound is on!" : "🔇 Sound is off!";
-};
-renderPlayers();
-})();
+function tdSound(){
+ tdSoundOn=!tdSoundOn;
+ $("td-card").textContent=tdSoundOn?
+ "🔊 Sound is on!":"🔇 Sound is off!";
+}
+
+// TIC TAC TOE
+function renderTTT(area){
+ let board=Array(9).fill("");
+ let turn="X",done=false;
+
+ area.innerHTML=`
+ <h3>Tic-Tac-Toe</h3>
+ <p id="tttStatus" class="small">X goes first</p>
+ <div class="board" id="tttBoard"></div>
+ <button class="secondary" id="tttReset">Restart</button>`;
+
+ const b=$("tttBoard");
+
+ function draw(){
+  b.innerHTML="";
+  board.forEach((v,i)=>{
+   let x=document.createElement("button");
+   x.className="cell";
+   x.textContent=v;
+   x.onclick=()=>{
+    if(done||v)return;
+    board[i]=turn;
+
+    if(check()){
+     $("tttStatus").textContent=turn+" wins!";
+     done=true;
+    }else if(board.every(Boolean)){
+     $("tttStatus").textContent="It's a draw!";
+     done=true;
+    }else{
+     turn=turn==="X"?"O":"X";
+     $("tttStatus").textContent=turn+"'s turn";
+    }
+    draw();
+   };
+   b.appendChild(x);
+  });
+ }
+
+ function check(){
+  return [
+   [0,1,2],[3,4,5],[6,7,8],
+   [0,3,6],[1,4,7],[2,5,8],
+   [0,4,8],[2,4,6]
+  ].some(line=>line.every(i=>board[i]===turn));
+ }
+
+ $("tttReset").onclick=()=>{
+  board=Array(9).fill("");
+  turn="X";
+  done=false;
+  $("tttStatus").textContent="X goes first";
+  draw();
+ };
+ draw();
+}
+
+// GUESS THE NUMBER
+function renderGuess(area){
+ let secret=Math.floor(Math.random()*100)+1;
+ let tries=0;
+
+ area.innerHTML=`
+ <h3>Guess the Number</h3>
+ <p class="small">Find the number between 1 and 100.</p>
+ <input class="field" id="guessInput" type="number" min="1" max="100">
+ <button id="guessBtn" class="btn">Check guess</button>
+ <p class="status" id="guessStatus"></p>
+ <button class="secondary" id="guessNew">New game</button>`;
+
+ $("guessBtn").onclick=()=>{
+  const n=Number($("guessInput").value);
+
+  if(!Number.isInteger(n)||n<1||n>100){
+   $("guessStatus").textContent="Enter a number between 1 and 100.";
+   return;
+  }
+
+  tries++;
+  $("guessStatus").textContent=
+   n===secret?"Correct! You got it in "+tries+" guesses.":
+   n<secret?"Too low. Try higher!":"Too high. Try lower!";
+ };
+
+ $("guessNew").onclick=()=>renderGuess(area);
+}
+
+// MEMORY MATCH
+function renderMemory(area){
+ const icons=["♠","♣","♥","♦","★","☀","☂","♫"];
+ let cards=[...icons,...icons].sort(()=>Math.random()-.5);
+ let open=[],matched=0,locked=false;
+
+ area.innerHTML=`
+ <h3>Memory Match</h3>
+ <p class="small" id="memoryStatus">Find all 8 pairs.</p>
+ <div class="memory-grid" id="memoryGrid"></div>
+ <button class="secondary" id="memoryReset">Shuffle again</button>`;
+
+ const grid=$("memoryGrid");
+
+ cards.forEach(value=>{
+  const card=document.createElement("button");
+  card.textContent="?";
+  card.dataset.value=value;
+
+  card.onclick=()=>{
+   if(locked||card.classList.contains("matched")||open.includes(card))return;
+
+   card.textContent=value;
+   open.push(card);
+
+   if(open.length===2){
+    locked=true;
+
+    if(open[0].dataset.value===open[1].dataset.value){
+     open.forEach(c=>c.classList.add("matched"));
+     matched++;
+     open=[];
+     locked=false;
+
+     $("memoryStatus").textContent=
+      matched===8?"You matched every pair! 🎉":
+      "Pairs found: "+matched+"/8";
+    }else{
+     setTimeout(()=>{
+      open.forEach(c=>c.textContent="?"); 
+      open=[];
+      locked=false;
+     },650);
+    }
+   }
+  };
+
+  grid.appendChild(card);
+ });
+
+ $("memoryReset").onclick=()=>renderMemory(area);
+}
+
 </script>
-<!-- END MIND GAMES: TRUTH OR DARE -->
-</body></html>
+</body>
+</html>

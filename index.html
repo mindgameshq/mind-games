@@ -2,725 +2,702 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080808">
 <title>MIND GAMES | Think • Play • Conquer</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-:root {
- --gold:#d7ad52;
- --gold2:#f3d88b;
- --bg:#080808;
- --panel:#121212;
- --muted:#aaa;
- --line:#302719;
- --pink:#ff4f99;
+:root{
+--gold:#d7ad52;--gold2:#f3d88b;--bg:#080808;
+--panel:#151515;--muted:#aaa;--line:rgba(215,173,82,.25);
 }
 *{box-sizing:border-box}
-body{
- margin:0;background:radial-gradient(circle at top,#211a0d,#080808 48%);
- color:#f5f1e8;font-family:Arial,sans-serif;min-height:100vh
-}
-button{cursor:pointer;font-weight:bold;border-radius:9px;padding:12px 17px}
-button:disabled{opacity:.5}
-.gold{color:var(--gold2)}
+body{margin:0;background:var(--bg);color:#fff;font-family:Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
 .hidden{display:none!important}
-header{
- display:flex;justify-content:space-between;align-items:center;
- padding:17px 6%;border-bottom:1px solid var(--line);
- background:#090909ed;position:sticky;top:0;z-index:5
+button:disabled{opacity:.4;cursor:not-allowed}
+
+/* LOGIN WALL */
+#auth-overlay{
+position:fixed;inset:0;z-index:10000;display:flex;
+align-items:center;justify-content:center;padding:20px;
+background:radial-gradient(circle at 50% 10%,#392b1055,transparent 45%),#080808
 }
-.brand{font-weight:900;letter-spacing:3px;color:var(--gold2)}
-.brand small{display:block;font-size:9px;color:#aaa;margin-top:5px}
-main{max-width:1100px;margin:auto;padding:30px 5% 60px}
-.hero{text-align:center;padding:40px 10px}
-.hero h1{font-size:clamp(38px,8vw,70px);letter-spacing:3px}
-.hero p{color:#bbb;line-height:1.7;max-width:600px;margin:auto}
-.eyebrow{color:var(--gold);letter-spacing:4px;font-size:11px;font-weight:bold}
-.panel{
- background:linear-gradient(145deg,#171717,#0d0d0d);
- border:1px solid var(--line);border-radius:16px;
- padding:22px;margin:18px 0;box-shadow:0 12px 35px #0007
+.auth-box{
+width:min(430px,100%);padding:30px 23px;text-align:center;
+border:1px solid var(--line);border-radius:24px;background:#111;
+box-shadow:0 20px 80px #000,0 0 30px #d7ad5215
 }
-h2{color:var(--gold2)}
-h3{color:#f5e5bd}
-.field{
- width:100%;padding:13px;margin:7px 0 12px;
- border:1px solid #403725;background:#080808;color:white;
- border-radius:8px;font-size:15px
+.logo{font-size:clamp(30px,8vw,43px);font-weight:1000;color:var(--gold2);letter-spacing:2px}
+.tagline{color:#aaa;letter-spacing:2px;margin:9px 0 25px}
+.tabs{display:flex;gap:8px;margin-bottom:15px}
+.tabs button{flex:1;padding:12px;border:1px solid #333;border-radius:10px;background:#222;color:#aaa}
+.tabs button.active{background:var(--gold);color:#111;font-weight:bold}
+.auth-input{
+width:100%;padding:14px;margin:7px 0;background:#080808;
+color:white;border:1px solid #333;border-radius:10px;outline:none
 }
-.btn{
- border:1px solid var(--gold);
- background:linear-gradient(135deg,#f2d88e,#b98932);
- color:#111
+.auth-input:focus{border-color:var(--gold)}
+.gold-btn{
+width:100%;padding:15px;margin-top:12px;border:0;border-radius:11px;
+background:linear-gradient(120deg,var(--gold),var(--gold2));color:#111;font-weight:900
 }
-.secondary{background:transparent;border:1px solid var(--gold);color:var(--gold2)}
-.status{color:var(--gold2);font-size:13px;min-height:20px}
-.small{font-size:12px;color:var(--muted);line-height:1.6}
-.auth-screen{
- min-height:100vh;display:grid;place-items:center;padding:20px
-}
-.auth-card{
- width:min(430px,100%);padding:30px;text-align:center;
- background:linear-gradient(145deg,#211a11,#100e0c);
- border:1px solid #85662f;border-radius:20px;
- box-shadow:0 20px 80px #000b
-}
-.auth-card h1{font-size:35px;color:var(--gold2)}
-.auth-card button{width:100%;margin:6px 0}
-.auth-tabs{display:flex;gap:8px;margin:20px 0}
-.auth-tabs button{flex:1}
-.games{
- display:grid;grid-template-columns:repeat(3,1fr);gap:15px
-}
+#auth-message{color:var(--gold2);font-size:13px;line-height:1.5;margin-top:12px}
+#auth-error{color:#ff728b;font-size:13px;margin-top:10px}
+.auth-small{color:#888;font-size:12px;line-height:1.5;margin-top:18px}
+
+/* MAIN APP */
+#app{max-width:1250px;margin:auto;padding:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 0 18px;border-bottom:1px solid var(--line)}
+.brand{font-size:23px;font-weight:1000;color:var(--gold2)}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+.small-btn{padding:10px 13px;background:#1c1c1c;color:#fff;border:1px solid var(--line);border-radius:10px}
+.hero{margin:20px 0;padding:28px 20px;border-radius:20px;border:1px solid var(--line);background:linear-gradient(120deg,#2a200d,#111 60%,#211908)}
+.hero h1{font-size:clamp(27px,6vw,43px);margin:0 0 10px}
+.hero p{color:#c4b99d;line-height:1.6}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:17px 0}
+.stat{padding:14px;background:#151515;border:1px solid var(--line);border-radius:13px}
+.stat span{font-size:12px;color:#999}
+.stat strong{display:block;color:var(--gold2);font-size:22px;margin-top:7px}
+.broadcast{padding:15px;border:1px solid #70551d;border-radius:13px;background:linear-gradient(100deg,#291e09,#15120c);color:var(--gold2);line-height:1.5}
+.section-title{color:var(--gold2);margin:28px 0 14px}
+.game-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
 .game-card{
- background:#0b0b0b;border:1px solid #48381e;
- border-radius:14px;padding:18px;display:flex;
- flex-direction:column;min-height:190px
+min-height:155px;padding:18px;border-radius:17px;border:1px solid #ffffff20;
+display:flex;flex-direction:column;justify-content:space-between;
+transition:.2s;cursor:pointer
 }
-.game-card p{color:#aaa;font-size:13px;line-height:1.6;flex:1}
-.game-card button{margin-top:10px}
-.game-card.featured{
- background:linear-gradient(145deg,#290d20,#4b1030,#160b20);
- border-color:#d73e83
-}
-.game-card.featured h3{color:#ff76b2}
-.game-area{
- margin-top:22px;padding:22px;border-top:1px solid var(--line);
- border-radius:14px;background:#100e0d
-}
-.board{
- display:grid;grid-template-columns:repeat(3,minmax(60px,90px));
- gap:7px;justify-content:center;margin:18px auto
-}
-.cell{
- height:78px;background:#17130c;border:1px solid #725522;
- color:var(--gold2);font-size:30px
-}
-.memory-grid{
- display:grid;grid-template-columns:repeat(4,minmax(45px,65px));
- gap:8px;justify-content:center;margin:16px auto
-}
-.memory-grid button{
- height:58px;font-size:22px;padding:0;
- background:#19150e;color:var(--gold2);
- border:1px solid #745a27
-}
-#td-game{
- background:linear-gradient(145deg,#160713,#3b0925,#170b20);
- color:white;padding:25px 16px;border-radius:18px;
- border:1px solid #b52b68;text-align:center;margin-top:20px
-}
-.td-btn{
- background:#d92e78;color:white;border:0;
- margin:5px;padding:14px 20px;font-size:15px
-}
-#td-card{
- background:#290d22;border:1px solid #e84b8a;
- border-radius:15px;padding:25px;min-height:120px;
- display:flex;align-items:center;justify-content:center;
- flex-direction:column;font-size:19px;color:#ffd6e7;
- line-height:1.6;margin:18px 0
-}
-#td-players{color:#ffb6d3;margin:15px}
-footer{text-align:center;color:#777;font-size:11px;padding:25px}
-@media(max-width:720px){
- .games{grid-template-columns:1fr}
- header{padding:14px 5%}
- .panel{padding:16px}
+.game-card:hover{transform:translateY(-4px);border-color:#fff8}
+.game-card h3{font-size:20px;margin:8px 0}
+.game-card p{font-size:12px;color:#ddd;line-height:1.5}
+.game-card button{padding:10px;border:0;border-radius:9px;background:#ffffff20;color:white;font-weight:bold}
+.c1{background:linear-gradient(140deg,#3a1120,#160b13)}
+.c2{background:linear-gradient(140deg,#102c40,#08131e)}
+.c3{background:linear-gradient(140deg,#2b210b,#151005)}
+.c4{background:linear-gradient(140deg,#142e25,#09140f)}
+.c5{background:linear-gradient(140deg,#332018,#160c09)}
+.c6{background:linear-gradient(140deg,#2b1641,#10091c)}
+.c7{background:linear-gradient(140deg,#153b3b,#071515)}
+.c8{background:linear-gradient(140deg,#402014,#1b0c07)}
+.c9{background:linear-gradient(140deg,#3b1930,#170a13)}
+.panel{margin-top:18px;padding:20px;border:1px solid var(--line);border-radius:18px;background:#121212}
+.panel h2{color:var(--gold2)}
+.game-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.action{padding:11px 15px;border:0;border-radius:10px;background:var(--gold);color:#111;font-weight:bold;margin:5px}
+.secondary{padding:11px 15px;border:1px solid var(--line);border-radius:10px;background:#222;color:white;margin:5px}
+.game-output{margin:15px 0;padding:18px;border-radius:13px;background:#080808;border:1px solid #333;min-height:85px;line-height:1.6}
+.game-input{padding:12px;background:#080808;border:1px solid #555;border-radius:9px;color:white;width:100%;max-width:260px}
+.big-number{font-size:40px;color:var(--gold2);font-weight:bold}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;max-width:330px;margin:18px auto}
+.cell{aspect-ratio:1;background:#202020;border:1px solid var(--line);border-radius:12px;color:var(--gold2);font-size:35px;font-weight:bold}
+.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:390px;margin:15px auto}
+.memory-card{aspect-ratio:1;border:1px solid var(--line);border-radius:10px;background:#242018;color:white;font-size:25px}
+.mono-board{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:15px 0}
+.mono-space{min-height:82px;padding:8px 3px;text-align:center;font-size:11px;background:#26221a;border:1px solid #92783b;border-radius:7px}
+.mono-space strong{display:block;color:var(--gold2);margin-bottom:5px}
+.mono-token{font-size:19px}
+.player-row{padding:10px;margin:7px 0;border:1px solid #333;border-radius:9px;display:flex;justify-content:space-between}
+footer{text-align:center;color:#777;font-size:12px;padding:30px 0}
+@media(max-width:600px){
+.stats{grid-template-columns:repeat(2,1fr)}
+#app{padding:12px}
+.hero{padding:22px 16px}
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN GATE -->
-<section id="authScreen" class="auth-screen">
- <div class="auth-card">
-  <div class="eyebrow">YOUR MIND. YOUR RULES.</div>
-  <h1>🧠 MIND GAMES</h1>
-  <p class="small">Think • Play • Conquer</p>
+<!-- THE ENTRANCE WALL: GAME CONTENT REMAINS HIDDEN UNTIL LOGIN -->
+<div id="auth-overlay">
+ <div class="auth-box">
+  <div class="logo">🧠 MIND GAMES</div>
+  <div class="tagline">THINK • PLAY • CONQUER</div>
 
-  <div class="auth-tabs">
-   <button id="loginTab" class="btn" onclick="setMode('login')">SIGN IN</button>
-   <button id="signupTab" class="secondary" onclick="setMode('signup')">CREATE ACCOUNT</button>
+  <div class="tabs">
+   <button id="login-tab" class="active" onclick="showAuth('login')">LOGIN</button>
+   <button id="signup-tab" onclick="showAuth('signup')">CREATE ACCOUNT</button>
   </div>
 
-  <input id="authName" class="field hidden" placeholder="Choose username">
-  <input id="authEmail" class="field" type="email" placeholder="Email address">
-  <input id="authPassword" class="field" type="password" placeholder="Password (6+ characters)">
-
-  <button id="authSubmit" class="btn" onclick="authenticate()">UNLOCK MIND GAMES</button>
-  <div id="authMessage" class="status"></div>
-
-  <p class="small">Your entrance unlocks after successful login.</p>
+  <form id="auth-form">
+   <input id="auth-email" class="auth-input" type="email" placeholder="Email address" required>
+   <input id="auth-password" class="auth-input" type="password" placeholder="Password" minlength="6" required>
+   <button class="gold-btn" id="auth-submit" type="submit">UNLOCK MIND GAMES</button>
+  </form>
+  <div id="auth-message"></div>
+  <div id="auth-error"></div>
+  <div class="auth-small">Your next challenge begins here.<br>Sign in or create an account to unlock the games.</div>
  </div>
-</section>
+</div>
 
-<!-- EVERYTHING BEHIND THE WALL -->
-<div id="app" class="hidden">
-
+<main id="app" class="hidden">
 <header>
- <div class="brand">MIND GAMES
-  <small>THINK • PLAY • CONQUER</small>
- </div>
- <div>
-  <span id="headerUser" class="small"></span>
-  <button class="secondary" onclick="logout()">Log out</button>
+ <div class="brand">🧠 MIND GAMES</div>
+ <div class="header-actions">
+  <button class="small-btn" onclick="toggleSound()" id="sound-btn">🔊 SOUND ON</button>
+  <button class="small-btn" onclick="showDashboard()">📊 ACTIVITY</button>
+  <button class="small-btn" onclick="logout()">LOG OUT</button>
  </div>
 </header>
 
-<main>
-
 <section class="hero">
- <div class="eyebrow">WELCOME TO THE ARENA</div>
- <h1>PLAY <span class="gold">BEYOND</span><br>LIMITS.</h1>
- <p>Challenge your mind, sharpen your skills and make every move count.</p>
+ <h1>Welcome to <span class="gold">MIND GAMES.</span></h1>
+ <p>Challenge your mind. Test your courage. Outsmart your friends.<br>
+ Every game is another chance to think, play and conquer.</p>
 </section>
 
-<section class="panel">
- <div class="eyebrow">PLAYER PROFILE</div>
- <h2 id="welcomeName">Welcome, Player</h2>
- <p class="small">Your personal gaming arena is ready.</p>
- <div class="small">Games played: <strong id="gamesCount">0</strong></div>
- <div class="small">Points: <strong id="pointsCount">0</strong></div>
+<section class="stats">
+ <div class="stat"><span>VIRTUAL BALANCE</span><strong id="balance">₦10,000</strong></div>
+ <div class="stat"><span>GAMES PLAYED</span><strong id="games-count">0</strong></div>
+ <div class="stat"><span>POINTS EARNED</span><strong id="points-count">0</strong></div>
+ <div class="stat"><span>PLAY TIME</span><strong id="minutes-count">0 min</strong></div>
 </section>
 
-<section class="panel" id="gameCentre">
- <div class="eyebrow">THE GAME CENTRE</div>
- <h2>CHOOSE YOUR CHALLENGE</h2>
-
- <div class="games">
-
-  <div class="game-card featured">
-   <div class="eyebrow">18+ PARTY MODE</div>
-   <h3>🔥 TRUTH OR DARE</h3>
-   <p>Bold questions, daring challenges and unforgettable moments.</p>
-   <button class="td-btn" onclick="showGame('truth')">PLAY NOW</button>
-  </div>
-
-  <div class="game-card">
-   <h3>⭕ Tic-Tac-Toe</h3>
-   <p>Challenge a friend. Get three marks in a row.</p>
-   <button class="secondary" onclick="showGame('ttt')">Play now</button>
-  </div>
-
-  <div class="game-card">
-   <h3>🎯 Guess the Number</h3>
-   <p>Find the hidden number between 1 and 100.</p>
-   <button class="secondary" onclick="showGame('guess')">Play now</button>
-  </div>
-
-  <div class="game-card">
-   <h3>🧩 Memory Match</h3>
-   <p>Flip the cards and discover matching pairs.</p>
-   <button class="secondary" onclick="showGame('memory')">Play now</button>
-  </div>
-
- </div>
-
- <div id="gameArea" class="game-area hidden"></div>
-
-</section>
-
-<section class="panel">
- <h2>COMING SOON</h2>
- <p class="small">Monopoly • WHOT • Online Multiplayer • Global Leaderboard • Achievements</p>
-</section>
-
-</main>
-<footer>MIND GAMES © 2026 — THINK • PLAY • CONQUER</footer>
+<div class="broadcast">
+ <strong>🎁 PLAY GUESS THE NUMBER TO EARN!</strong><br>
+ Guess the secret number before Round 10 and collect ₦2,000 game money.
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<h2 class="section-title">🎮 THE GAME CENTRE</h2>
+<div class="game-grid">
+ <div class="game-card c1"><div><div>🔥 ❤️</div><h3>Truth or Dare</h3><p>Bold questions and daring challenges. Play with your friends.</p></div><button onclick="openGame('truth')">PLAY NOW</button></div>
+ <div class="game-card c2"><div><div>⭕ ❌</div><h3>Tic-Tac-Toe</h3><p>A classic battle of strategy. Two players, one winner.</p></div><button onclick="openGame('tic')">PLAY NOW</button></div>
+ <div class="game-card c3"><div><div>🔢 💰</div><h3>Guess the Number</h3><p>Find the secret number before Round 10 to win ₦2,000.</p></div><button onclick="openGame('guess')">PLAY NOW</button></div>
+ <div class="game-card c4"><div><div>🧠 🃏</div><h3>Memory Match</h3><p>Test your memory. Match every pair.</p></div><button onclick="openGame('memory')">PLAY NOW</button></div>
+ <div class="game-card c5"><div><div>🏦 🎩</div><h3>Monopoly</h3><p>Buy properties, collect rent and build your empire.</p></div><button onclick="openGame('monopoly')">PLAY NOW</button></div>
+ <div class="game-card c6"><div><div>🃏 ⭐</div><h3>WHOT!</h3><p>Match shapes and numbers. Be the first to finish your cards.</p></div><button onclick="openGame('whot')">PLAY NOW</button></div>
+ <div class="game-card c7"><div><div>🍾 💋</div><h3>Spin the Bottle</h3><p>Spin and see who gets picked.</p></div><button onclick="openGame('spin')">PLAY NOW</button></div>
+ <div class="game-card c8"><div><div>👀 😂</div><h3>Most Likely To</h3><p>Find out who your friends think is most likely to...</p></div><button onclick="openGame('likely')">PLAY NOW</button></div>
+ <div class="game-card c9"><div><div>⏱️ ⚡</div><h3>60-Second Challenges</h3><p>Beat the clock with quick-fire challenges.</p></div><button onclick="openGame('challenge')">PLAY NOW</button></div>
+</div>
+
+<section id="game-area" class="panel hidden">
+ <div class="game-top">
+  <h2 id="game-title">Game</h2>
+  <button class="secondary" onclick="closeGame()">✕ CLOSE GAME</button>
+ </div>
+ <div id="game-content"></div>
+</section>
+
+<section id="dashboard" class="panel hidden">
+ <div class="game-top">
+  <h2>📊 Player Activity</h2>
+  <button class="secondary" onclick="hideDashboard()">CLOSE</button>
+ </div>
+ <div id="activity-content"></div>
+</section>
+
+<footer>© MIND GAMES • THINK • PLAY • CONQUER</footer>
+</main>
 
 <script>
+/* SUPABASE AUTHENTICATION */
 const SUPABASE_URL="https://pnatjqwplyxhpcfqhgcm.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY="sb_publishable_lbUX7xkFk96kxH1ZP_Zk6A_zWvXT6AD";
+const SUPABASE_KEY="sb_publishable_lbUX7xkFk96kxH1ZP_Zk6A_zWvXT6AD";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const db=window.supabase.createClient(
- SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY
-);
-
-const $=id=>document.getElementById(id);
 let currentUser=null;
 let authMode="login";
+let soundOn=true;
+let activeGame=null;
+let gameStartedAt=0;
 
-function setMode(mode){
+function showAuth(mode){
  authMode=mode;
- $("authName").classList.toggle("hidden",mode!=="signup");
- $("loginTab").className=mode==="login"?"btn":"secondary";
- $("signupTab").className=mode==="signup"?"btn":"secondary";
- $("authSubmit").textContent=mode==="login"?"UNLOCK MIND GAMES":"CREATE ACCOUNT";
- $("authMessage").textContent="";
+ document.getElementById("login-tab").classList.toggle("active",mode==="login");
+ document.getElementById("signup-tab").classList.toggle("active",mode==="signup");
+ document.getElementById("auth-submit").textContent=mode==="login"?"UNLOCK MIND GAMES":"CREATE MY ACCOUNT";
+ document.getElementById("auth-message").textContent="";
+ document.getElementById("auth-error").textContent="";
 }
-
-function enterApp(user){
- currentUser=user;
- $("authScreen").classList.add("hidden");
- $("app").classList.remove("hidden");
-
- const username=user.user_metadata?.username||user.email.split("@")[0];
-
- $("headerUser").textContent=username;
- $("welcomeName").textContent="Welcome, "+username;
-}
-
-async function authenticate(){
- const email=$("authEmail").value.trim();
- const password=$("authPassword").value;
- const username=$("authName").value.trim();
-
- if(!email||password.length<6){
-  $("authMessage").textContent="Enter a valid email and password of at least 6 characters.";
-  return;
- }
-
- if(authMode==="signup"&&!username){
-  $("authMessage").textContent="Choose a username first.";
-  return;
- }
-
- $("authSubmit").disabled=true;
- $("authMessage").textContent="Please wait...";
-
+document.getElementById("auth-form").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const email=document.getElementById("auth-email").value.trim();
+ const password=document.getElementById("auth-password").value;
+ const msg=document.getElementById("auth-message");
+ const err=document.getElementById("auth-error");
+ const btn=document.getElementById("auth-submit");
+ btn.disabled=true;err.textContent="";msg.textContent="Please wait...";
  try{
   if(authMode==="signup"){
-   const {data,error}=await db.auth.signUp({
-    email,password,
-    options:{data:{username}}
+   const {data,error}=await supabaseClient.auth.signUp({
+    email,password,options:{emailRedirectTo:window.location.origin}
    });
-
    if(error)throw error;
-
-   if(data.session){
-    enterApp(data.user);
-   }else{
-    $("authMessage").textContent="Account created! Confirm your email, then sign in.";
-   }
+   if(data.session){await enterApp(data.user)}
+   else{msg.textContent="Account created! Check your email and click the verification link before logging in."}
   }else{
-   const {data,error}=await db.auth.signInWithPassword({
-    email,password
-   });
-
+   const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
    if(error)throw error;
-   enterApp(data.user);
+   await enterApp(data.user);
   }
- }catch(error){
-  $("authMessage").textContent=error.message;
- }finally{
-  $("authSubmit").disabled=false;
- }
-}
+ }catch(error){err.textContent=error.message||"Authentication failed."}
+ finally{btn.disabled=false;if(msg.textContent==="Please wait...")msg.textContent=""}
+});
 
+async function enterApp(user){
+ currentUser=user;
+ document.getElementById("auth-overlay").classList.add("hidden");
+ document.getElementById("app").classList.remove("hidden");
+ loadStats();
+}
 async function logout(){
- await db.auth.signOut();
+ await supabaseClient.auth.signOut();
  currentUser=null;
- $("app").classList.add("hidden");
- $("authScreen").classList.remove("hidden");
- $("authMessage").textContent="You have signed out.";
+ document.getElementById("app").classList.add("hidden");
+ document.getElementById("auth-overlay").classList.remove("hidden");
 }
-
-db.auth.getSession().then(({data})=>{
- if(data.session)enterApp(data.session.user);
+supabaseClient.auth.onAuthStateChange(async(event,session)=>{
+ if(session?.user)await enterApp(session.user);
 });
+(async()=>{
+ const {data}=await supabaseClient.auth.getSession();
+ if(data.session?.user)await enterApp(data.session.user);
+})();
 
-db.auth.onAuthStateChange((event,session)=>{
- if(session&&!currentUser)enterApp(session.user);
- if(!session&&currentUser){
-  currentUser=null;
-  $("app").classList.add("hidden");
-  $("authScreen").classList.remove("hidden");
- }
-});
-
-// GAME NAVIGATION
-function showGame(which){
- const area=$("gameArea");
- area.classList.remove("hidden");
-
- if(which==="truth")renderTruth(area);
- if(which==="ttt")renderTTT(area);
- if(which==="guess")renderGuess(area);
- if(which==="memory")renderMemory(area);
-
- area.scrollIntoView({behavior:"smooth",block:"nearest"});
+/* LOCAL PLAYER PROFILE */
+function storageKey(){return currentUser?"mindgames_"+currentUser.id:"mindgames_guest"}
+function getStats(){
+ let data;
+ try{data=JSON.parse(localStorage.getItem(storageKey())||"null")}catch(e){}
+ if(!data)data={balance:10000,games:0,points:0,minutes:0,activity:[]};
+ if(typeof data.balance!=="number")data.balance=10000;
+ return data;
+}
+function saveStats(data){localStorage.setItem(storageKey(),JSON.stringify(data));loadStats()}
+function loadStats(){
+ const s=getStats();
+ document.getElementById("balance").textContent="₦"+s.balance.toLocaleString();
+ document.getElementById("games-count").textContent=s.games;
+ document.getElementById("points-count").textContent=s.points;
+ document.getElementById("minutes-count").textContent=s.minutes+" min";
+}
+function finishGame(points=10){
+ if(!activeGame)return;
+ const elapsed=Math.max(1,Math.round((Date.now()-gameStartedAt)/60000));
+ const s=getStats();
+ s.games++;s.points+=points;s.minutes+=elapsed;
+ s.activity.unshift({game:activeGame,time:new Date().toLocaleString(),minutes:elapsed,points});
+ s.activity=s.activity.slice(0,100);
+ saveStats(s);
+ activeGame=null;
 }
 
-// TRUTH OR DARE
-const truths=[
-"What's your biggest romantic red flag?",
-"Who was your last crush?",
-"Have you ever stalked someone's profile?",
-"What is your most embarrassing love story?",
-"Have you ever pretended to be busy to avoid someone?",
-"What's a secret you've never told your friends?",
-"What's the boldest message you've ever sent?",
-"Have you ever liked two people at once?",
-"What instantly attracts you to someone?",
-"What's your biggest turn-off?",
-"Have you ever lied to impress someone?",
-"What's your most awkward date experience?",
-"Who here would you trust with your biggest secret?",
-"What's something you find attractive but rarely admit?",
-"Have you ever regretted kissing someone?",
-"What's your most unforgettable romantic moment?",
-"Have you ever sent a message to the wrong person?",
-"What's the longest you've had a crush on someone?",
-"Have you ever been caught flirting?",
-"What's one thing you wish people knew about you?",
-"Have you ever ghosted someone?",
-"What's your most unreasonable jealousy moment?",
-"Would you date someone your friends dislike?",
-"What's the funniest excuse you've used to escape a date?",
-"Have you ever fallen for a close friend?",
-"What's your guilty pleasure?",
-"What's the most daring thing you've done?",
-"Have you ever hidden a relationship?",
-"What's your biggest insecurity?",
-"Who was your first kiss?",
-"What's one thing you would never forgive in a relationship?",
-"Have you ever reread old romantic messages?",
-"What's your idea of a perfect night out?",
-"Have you ever had a crush on a friend's ex?",
-"What's the sweetest thing someone has done for you?",
-"Have you ever flirted just for fun?",
-"What's one thing that makes you blush?",
-"Would you rather confess feelings or keep them secret?",
-"What's your most awkward secret?",
-"Have you ever been jealous but pretended not to be?",
-"What's your favourite compliment?",
-"Have you ever had a secret admirer?",
-"What's your most spontaneous decision?",
-"What's something you find hard to admit?",
-"Have you ever broken someone's heart?",
-"What's the biggest misunderstanding you've had in love?",
-"Who here has the best smile?",
-"What's one thing you would change about your dating history?",
-"Have you ever fallen in love at first sight?",
-"What's your biggest relationship fear?"
-];
-
-const dares=[
-"Give your best flirty pickup line.",
-"Do your funniest dance for 20 seconds.",
-"Let the group choose your next profile picture.",
-"Speak in an accent for the next two rounds.",
-"Give someone here a genuine compliment.",
-"Sing the chorus of your favourite love song.",
-"Do your best runway walk.",
-"Recreate your most dramatic movie scene.",
-"Make a funny confession to the group.",
-"Try not to laugh for 30 seconds.",
-"Give a dramatic proposal to an imaginary person.",
-"Do your best celebrity impression.",
-"Describe your crush using only three words.",
-"Let another player give you a nickname.",
-"Talk like a news presenter for one minute.",
-"Show your best dance move.",
-"Make up a romantic poem on the spot.",
-"Do ten dramatic poses.",
-"Tell a joke without smiling.",
-"Act like you're in a romantic movie.",
-"Give the person opposite you a sincere compliment.",
-"Do your best evil laugh.",
-"Imitate another player's walking style kindly.",
-"Make a dramatic entrance into the room.",
-"Sing everything you say for one minute.",
-"Try to flirt using only emojis.",
-"Do a 15-second freestyle dance.",
-"Describe your dream date dramatically.",
-"Speak without using the letter A for 30 seconds.",
-"Do your best villain speech.",
-"Give a fake award acceptance speech.",
-"Balance a book on your head for 20 seconds.",
-"Do a silly dance without music.",
-"Make three people laugh in 30 seconds.",
-"Act like a celebrity being interviewed.",
-"Say the alphabet backwards as far as you can.",
-"Do your funniest impression of a teacher.",
-"Give someone a new nickname.",
-"Do a slow-motion action scene.",
-"Tell a story using only five words.",
-"Do your best robot dance.",
-"Make a dramatic face for 15 seconds.",
-"Try to say a tongue twister three times.",
-"Give a motivational speech to a chair.",
-"Act like you're walking on a fashion runway.",
-"Do a funny animal impression.",
-"Compliment everyone in the room.",
-"Speak in a whisper for one round.",
-"Do your best victory celebration.",
-"Make up a short rap about the group."
-];
-
-let tdPlayers=[];
-let tdCurrent=0;
-let tdSoundOn=true;
-
-function renderTruth(area){
- area.innerHTML=`
- <div id="td-game">
-  <div class="eyebrow">18+ PARTY MODE</div>
-  <h2 style="color:#ff5b9d;font-size:30px">🔥 TRUTH OR DARE</h2>
-  <p style="color:#f5b7d1">How bold are you willing to get?</p>
-
-  <input id="td-player" class="field"
-   placeholder="Enter player's name"
-   style="max-width:300px;background:#250d20">
-
-  <button class="td-btn" onclick="tdAddPlayer()">Add Player</button>
-
-  <div id="td-players">No players yet</div>
-  <p id="td-turn"></p>
-
-  <div style="margin:20px">
-   <button class="td-btn" onclick="tdPick('truth')">💗 TRUTH</button>
-   <button class="td-btn" onclick="tdPick('dare')">🔥 DARE</button>
-  </div>
-
-  <div id="td-card">
-   Add players, then choose Truth or Dare.
-  </div>
-
-  <button class="td-btn" onclick="tdNext()">Next Player ↻</button>
-  <button class="td-btn" onclick="tdPass()">Pass / Skip</button>
-  <button class="td-btn" onclick="tdSound()">🔊 Sound On/Off</button>
-
-  <p class="small">Everyone can pass any challenge. Respect boundaries and keep the game fun.</p>
- </div>
- `;
- tdPlayers=[];
- tdCurrent=0;
- renderTDPlayers();
-}
-
-function renderTDPlayers(){
- const list=$("td-players");
- const turn=$("td-turn");
- if(!list||!turn)return;
-
- list.textContent=tdPlayers.length?
- "Players: "+tdPlayers.join(" • "):
- "No players yet";
-
- turn.textContent=tdPlayers.length?
- "It's "+tdPlayers[tdCurrent]+"'s turn!":"";
-}
-
-function tdAddPlayer(){
- const input=$("td-player");
- const name=input.value.trim();
-
- if(!name)return alert("Enter a player's name first!");
-
- if(tdPlayers.some(p=>p.toLowerCase()===name.toLowerCase())){
-  return alert("That player is already added!");
- }
-
- tdPlayers.push(name);
- input.value="";
- renderTDPlayers();
- tdPlaySound();
-}
-
-function tdPlaySound(){
- if(!tdSoundOn)return;
-
+/* SOUND */
+let audioContext;
+function beep(freq=440,duration=.12){
+ if(!soundOn)return;
  try{
-  const audio=new(window.AudioContext||window.webkitAudioContext)();
-  const oscillator=audio.createOscillator();
-  const gain=audio.createGain();
-
-  oscillator.connect(gain);
-  gain.connect(audio.destination);
-  oscillator.frequency.value=660;
-  gain.gain.setValueAtTime(.12,audio.currentTime);
-  gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.2);
-  oscillator.start();
-  oscillator.stop(audio.currentTime+.2);
+  audioContext=audioContext||new(window.AudioContext||window.webkitAudioContext)();
+  const osc=audioContext.createOscillator(),gain=audioContext.createGain();
+  osc.frequency.value=freq;gain.gain.value=.045;
+  osc.connect(gain);gain.connect(audioContext.destination);
+  osc.start();osc.stop(audioContext.currentTime+duration);
  }catch(e){}
 }
-
-function tdPick(type){
- if(!tdPlayers.length){
-  return alert("Add at least one player first!");
- }
-
- const list=type==="truth"?truths:dares;
- const prompt=list[Math.floor(Math.random()*list.length)];
-
- $("td-card").innerHTML=
- `<strong style="color:#ff72ad;margin-bottom:12px">
- ${type==="truth"?"💗 TRUTH":"🔥 DARE"}
- </strong>${prompt}`;
-
- renderTDPlayers();
- tdPlaySound();
+function toggleSound(){
+ soundOn=!soundOn;
+ document.getElementById("sound-btn").textContent=soundOn?"🔊 SOUND ON":"🔇 SOUND OFF";
+ beep(550);
 }
 
-function tdNext(){
- if(!tdPlayers.length)return alert("Add players first!");
+/* GAME NAVIGATION */
+function openGame(name){
+ closeGame(false);
+ activeGame=name;gameStartedAt=Date.now();
+ document.getElementById("dashboard").classList.add("hidden");
+ document.getElementById("game-area").classList.remove("hidden");
+ document.getElementById("game-area").scrollIntoView({behavior:"smooth"});
+ const titles={truth:"🔥 Truth or Dare",tic:"⭕ Tic-Tac-Toe",guess:"🔢 Guess the Number",memory:"🧠 Memory Match",monopoly:"🏦 Monopoly",whot:"🃏 WHOT!",spin:"🍾 Spin the Bottle",likely:"👀 Most Likely To",challenge:"⏱️ 60-Second Challenges"};
+ document.getElementById("game-title").textContent=titles[name];
+ const functions={truth:truthGame,tic:ticGame,guess:guessGame,memory:memoryGame,monopoly:monopolyGame,whot:whotGame,spin:spinGame,likely:likelyGame,challenge:challengeGame};
+ functions[name]();
+}
+function closeGame(complete=true){
+ if(complete&&activeGame)finishGame(10);
+ document.getElementById("game-area").classList.add("hidden");
+}
+function showDashboard(){
+ document.getElementById("game-area").classList.add("hidden");
+ document.getElementById("dashboard").classList.remove("hidden");
+ const s=getStats();
+ let html="<p>Activity recorded on this device for this account.</p>";
+ html+="<div class='player-row'><strong>Total games</strong><span>"+s.games+"</span></div>";
+ html+="<div class='player-row'><strong>Total minutes</strong><span>"+s.minutes+"</span></div>";
+ html+="<div class='player-row'><strong>Total points</strong><span>"+s.points+"</span></div>";
+ html+="<h3 class='gold'>Recent activity</h3>";
+ if(!s.activity.length)html+="<p class='muted'>No games recorded yet.</p>";
+ s.activity.forEach(a=>{html+="<div class='player-row'><span>"+a.game+"<br><small class='muted'>"+a.time+"</small></span><span>"+a.minutes+" min<br>"+a.points+" pts</span></div>"});
+ document.getElementById("activity-content").innerHTML=html;
+}
+function hideDashboard(){document.getElementById("dashboard").classList.add("hidden")}
 
- tdCurrent=(tdCurrent+1)%tdPlayers.length;
- $("td-card").textContent="Choose Truth or Dare!";
- renderTDPlayers();
- tdPlaySound();
+/* TRUTH OR DARE */
+const truths=[
+"What's the biggest secret you've kept from your friends?",
+"Who was your first crush?",
+"Have you ever pretended to like someone?",
+"What is the most embarrassing thing you've done?",
+"What's one thing you wish people knew about you?",
+"Have you ever stalked someone's social media?",
+"What's the biggest lie you've told?",
+"Who in this room knows you best?",
+"What's your biggest relationship red flag?",
+"Have you ever had a crush on a friend's friend?",
+"What is something you are afraid to admit?",
+"What's the most awkward date you've had?",
+"Have you ever sent a message to the wrong person?",
+"What is your most irrational fear?",
+"Who would you call at 3am?",
+"What is one thing you regret?",
+"Have you ever been caught lying?",
+"What's the most spontaneous thing you've done?",
+"What is your biggest guilty pleasure?",
+"Who was the last person you searched online?"
+];
+const dares=[
+"Do your funniest dance for 20 seconds.",
+"Speak in an accent for the next two rounds.",
+"Let the group choose a funny nickname for you.",
+"Sing the chorus of your favourite song.",
+"Do ten dramatic jumping jacks.",
+"Give everyone in the room a compliment.",
+"Act like a celebrity for 30 seconds.",
+"Tell a joke without laughing.",
+"Do your best runway walk.",
+"Talk like a news presenter for one minute.",
+"Make a funny face and hold it for 15 seconds.",
+"Imitate an animal chosen by the group.",
+"Do your best movie villain laugh.",
+"Try to rap for 20 seconds.",
+"Tell a story using only five words.",
+"Do a slow-motion action scene.",
+"Make up a short song about the person beside you.",
+"Balance an object on your head for 20 seconds.",
+"Let the group pick your next dance move.",
+"Give a dramatic acceptance speech."
+];
+function truthGame(){
+ document.getElementById("game-content").innerHTML=`
+ <p class="muted">Choose honestly. You can always pass a question or challenge. Respect everyone's boundaries.</p>
+ <button class="action" onclick="truthPick('truth')">TRUTH</button>
+ <button class="action" onclick="truthPick('dare')">DARE</button>
+ <div id="truth-output" class="game-output">Ready? Pick your challenge.</div>
+ <button class="secondary" onclick="truthPick('truth')">Next Truth</button>
+ <button class="secondary" onclick="truthPick('dare')">Next Dare</button>`;
+}
+function truthPick(type){
+ const arr=type==="truth"?truths:dares;
+ document.getElementById("truth-output").innerHTML="<strong>"+type.toUpperCase()+"</strong><br>"+arr[Math.floor(Math.random()*arr.length)];
+ beep(520);
 }
 
-function tdPass(){
- if(!tdPlayers.length)return alert("Add players first!");
-
- $("td-card").textContent="⏭️ Challenge skipped. No pressure!";
- tdNext();
+/* TIC TAC TOE */
+let ticBoard,ticTurn,ticOver;
+function ticGame(){
+ document.getElementById("game-content").innerHTML=`
+ <p class="muted">Two players • X goes first.</p>
+ <div id="tic-status" class="game-output">Player X's turn</div>
+ <div class="board" id="tic-board"></div>
+ <button class="action" onclick="ticGame()">RESTART</button>`;
+ ticBoard=Array(9).fill("");ticTurn="X";ticOver=false;drawTic();
 }
-
-function tdSound(){
- tdSoundOn=!tdSoundOn;
- $("td-card").textContent=tdSoundOn?
- "🔊 Sound is on!":"🔇 Sound is off!";
-}
-
-// TIC TAC TOE
-function renderTTT(area){
- let board=Array(9).fill("");
- let turn="X",done=false;
-
- area.innerHTML=`
- <h3>Tic-Tac-Toe</h3>
- <p id="tttStatus" class="small">X goes first</p>
- <div class="board" id="tttBoard"></div>
- <button class="secondary" id="tttReset">Restart</button>`;
-
- const b=$("tttBoard");
-
- function draw(){
-  b.innerHTML="";
-  board.forEach((v,i)=>{
-   let x=document.createElement("button");
-   x.className="cell";
-   x.textContent=v;
-   x.onclick=()=>{
-    if(done||v)return;
-    board[i]=turn;
-
-    if(check()){
-     $("tttStatus").textContent=turn+" wins!";
-     done=true;
-    }else if(board.every(Boolean)){
-     $("tttStatus").textContent="It's a draw!";
-     done=true;
-    }else{
-     turn=turn==="X"?"O":"X";
-     $("tttStatus").textContent=turn+"'s turn";
-    }
-    draw();
-   };
-   b.appendChild(x);
-  });
- }
-
- function check(){
-  return [
-   [0,1,2],[3,4,5],[6,7,8],
-   [0,3,6],[1,4,7],[2,5,8],
-   [0,4,8],[2,4,6]
-  ].some(line=>line.every(i=>board[i]===turn));
- }
-
- $("tttReset").onclick=()=>{
-  board=Array(9).fill("");
-  turn="X";
-  done=false;
-  $("tttStatus").textContent="X goes first";
-  draw();
- };
- draw();
-}
-
-// GUESS THE NUMBER
-function renderGuess(area){
- let secret=Math.floor(Math.random()*100)+1;
- let tries=0;
-
- area.innerHTML=`
- <h3>Guess the Number</h3>
- <p class="small">Find the number between 1 and 100.</p>
- <input class="field" id="guessInput" type="number" min="1" max="100">
- <button id="guessBtn" class="btn">Check guess</button>
- <p class="status" id="guessStatus"></p>
- <button class="secondary" id="guessNew">New game</button>`;
-
- $("guessBtn").onclick=()=>{
-  const n=Number($("guessInput").value);
-
-  if(!Number.isInteger(n)||n<1||n>100){
-   $("guessStatus").textContent="Enter a number between 1 and 100.";
-   return;
-  }
-
-  tries++;
-  $("guessStatus").textContent=
-   n===secret?"Correct! You got it in "+tries+" guesses.":
-   n<secret?"Too low. Try higher!":"Too high. Try lower!";
- };
-
- $("guessNew").onclick=()=>renderGuess(area);
-}
-
-// MEMORY MATCH
-function renderMemory(area){
- const icons=["♠","♣","♥","♦","★","☀","☂","♫"];
- let cards=[...icons,...icons].sort(()=>Math.random()-.5);
- let open=[],matched=0,locked=false;
-
- area.innerHTML=`
- <h3>Memory Match</h3>
- <p class="small" id="memoryStatus">Find all 8 pairs.</p>
- <div class="memory-grid" id="memoryGrid"></div>
- <button class="secondary" id="memoryReset">Shuffle again</button>`;
-
- const grid=$("memoryGrid");
-
- cards.forEach(value=>{
-  const card=document.createElement("button");
-  card.textContent="?";
-  card.dataset.value=value;
-
-  card.onclick=()=>{
-   if(locked||card.classList.contains("matched")||open.includes(card))return;
-
-   card.textContent=value;
-   open.push(card);
-
-   if(open.length===2){
-    locked=true;
-
-    if(open[0].dataset.value===open[1].dataset.value){
-     open.forEach(c=>c.classList.add("matched"));
-     matched++;
-     open=[];
-     locked=false;
-
-     $("memoryStatus").textContent=
-      matched===8?"You matched every pair! 🎉":
-      "Pairs found: "+matched+"/8";
-    }else{
-     setTimeout(()=>{
-      open.forEach(c=>c.textContent="?"); 
-      open=[];
-      locked=false;
-     },650);
-    }
-   }
-  };
-
-  grid.appendChild(card);
+function drawTic(){
+ const board=document.getElementById("tic-board");
+ board.innerHTML="";
+ ticBoard.forEach((v,i)=>{
+  const b=document.createElement("button");b.className="cell";b.textContent=v;
+  b.onclick=()=>ticMove(i);board.appendChild(b);
  });
-
- $("memoryReset").onclick=()=>renderMemory(area);
+}
+function ticMove(i){
+ if(ticBoard[i]||ticOver)return;
+ ticBoard[i]=ticTurn;beep(400);drawTic();
+ const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+ if(wins.some(w=>w.every(n=>ticBoard[n]===ticTurn))){
+  ticOver=true;document.getElementById("tic-status").textContent="🎉 Player "+ticTurn+" wins!";
+  finishGame(20);return;
+ }
+ if(ticBoard.every(Boolean)){
+  ticOver=true;document.getElementById("tic-status").textContent="It's a draw!";
+  finishGame(5);return;
+ }
+ ticTurn=ticTurn==="X"?"O":"X";
+ document.getElementById("tic-status").textContent="Player "+ticTurn+"'s turn";
 }
 
+/* GUESS THE NUMBER */
+let secretNumber,guessRound,guessRewarded,guessFinished;
+function guessGame(){
+ secretNumber=Math.floor(Math.random()*100)+1;
+ guessRound=1;guessRewarded=false;guessFinished=false;
+ document.getElementById("game-content").innerHTML=`
+ <div class="game-output">
+ <strong class="gold">GUESS THE NUMBER</strong><br>
+ I'm thinking of a number between 1 and 100.<br>
+ Guess it before Round 10 and win ₦2,000 virtual game money!
+ </div>
+ <p>Round: <strong id="guess-round">1</strong> / 10</p>
+ <input id="guess-input" class="game-input" type="number" min="1" max="100" placeholder="Enter your guess">
+ <button class="action" onclick="makeGuess()">SUBMIT GUESS</button>
+ <div id="guess-output" class="game-output">Your challenge starts now.</div>
+ <button class="secondary" onclick="guessGame()">NEW GAME</button>`;
+}
+function makeGuess(){
+ if(guessFinished)return;
+ const input=document.getElementById("guess-input");
+ const n=Number(input.value);
+ if(!n||n<1||n>100){document.getElementById("guess-output").textContent="Enter a number between 1 and 100.";return}
+ if(n===secretNumber){
+  guessFinished=true;
+  let message="🎉 CORRECT! You found the secret number!";
+  if(guessRound<10&&!guessRewarded){
+   const s=getStats();s.balance+=2000;saveStats(s);guessRewarded=true;
+   message+="<br><strong class='gold'>₦2,000 VIRTUAL GAME MONEY REWARDED!</strong>";
+  }else{message+="<br>You got it, but the Round 10 reward window has passed."}
+  document.getElementById("guess-output").innerHTML=message;
+  finishGame(25);beep(800,.25);return;
+ }
+ guessRound++;
+ document.getElementById("guess-round").textContent=guessRound;
+ if(guessRound>10){
+  guessFinished=true;
+  document.getElementById("guess-output").textContent="Game over! The number was "+secretNumber+". Try again!";
+  finishGame(0);return;
+ }
+ document.getElementById("guess-output").textContent=n<secretNumber?"Too low! Try a higher number.":"Too high! Try a lower number.";
+ input.value="";beep(300);
+}
+
+/* MEMORY MATCH */
+const memorySymbols=["🍒","🍋","🍇","🍉","⭐","💎","🎲","👑"];
+let memoryDeck=[],memoryFirst=null,memoryLock=false,memoryPairs=0;
+function memoryGame(){
+ memoryDeck=[...memorySymbols,...memorySymbols].sort(()=>Math.random()-.5);
+ memoryFirst=null;memoryLock=false;memoryPairs=0;
+ document.getElementById("game-content").innerHTML=`
+ <p class="muted">Find all eight matching pairs.</p>
+ <div id="memory-status" class="game-output">Pairs found: 0 / 8</div>
+ <div class="memory-grid" id="memory-grid"></div>
+ <button class="action" onclick="memoryGame()">RESTART</button>`;
+ drawMemory();
+}
+function drawMemory(){
+ const grid=document.getElementById("memory-grid");grid.innerHTML="";
+ memoryDeck.forEach((item,i)=>{
+  const b=document.createElement("button");b.className="memory-card";
+  b.textContent=item.open||item.matched?item.symbol:"?";
+  b.onclick=()=>flipMemory(i);grid.appendChild(b);
+ });
+}
+function flipMemory(i){
+ if(memoryLock||memoryDeck[i].matched||memoryDeck[i].open)return;
+ memoryDeck[i]={symbol:memoryDeck[i].symbol||memoryDeck[i],open:true};
+ drawMemory();
+ if(memoryFirst===null){memoryFirst=i;return}
+ const first=memoryFirst;memoryFirst=null;
+ if(memoryDeck[first].symbol===memoryDeck[i].symbol){
+  memoryDeck[first].matched=true;memoryDeck[i].matched=true;
+  memoryPairs++;document.getElementById("memory-status").textContent="Pairs found: "+memoryPairs+" / 8";
+  if(memoryPairs===8){document.getElementById("memory-status").textContent="🏆 You matched every pair!";finishGame(20)}
+ }else{
+  memoryLock=true;setTimeout(()=>{
+   memoryDeck[first].open=false;memoryDeck[i].open=false;
+   memoryLock=false;drawMemory();
+  },750);
+ }
+}
+
+/* MONOPOLY - LOCAL STARTER GAME */
+const monoNames=["START","Lagos Island","Community Chest","Abuja","TAX","Port Harcourt","Chance","Ibadan","JAIL","Kano","Enugu","Free Parking","Lekki","Kaduna","Luxury Tax","Magboro"];
+const monoPrices=[0,600,0,800,200,700,0,500,0,650,550,0,1000,450,100,400];
+let monoPlayers=[],monoTurn=0,monoOwner={},monoPosition=[];
+function monopolyGame(){
+ monoPlayers=[{name:"Player 1",cash:1500,token:"🎩"},{name:"Player 2",cash:1500,token:"🚗"}];
+ monoTurn=0;monoOwner={};monoPosition=[0,0];
+ document.getElementById("game-content").innerHTML=`
+ <p class="muted">Local two-player Monopoly starter. Pass the device between players.</p>
+ <div class="game-output" id="mono-status">Player 1's turn. Roll the dice!</div>
+ <div class="mono-board" id="mono-board"></div>
+ <div id="mono-players"></div>
+ <button class="action" onclick="monoRoll()">🎲 ROLL DICE</button>
+ <button class="secondary" onclick="monopolyGame()">NEW GAME</button>
+ <p class="muted">Buy properties when you land on them. Pay rent when another player owns the space.</p>`;
+ drawMono();
+}
+function drawMono(){
+ const board=document.getElementById("mono-board");board.innerHTML="";
+ monoNames.forEach((name,i)=>{
+  const owner=monoOwner[i];
+  const occupants=monoPosition.map((p,n)=>p===i?monoPlayers[n].token:"").join("");
+  const div=document.createElement("div");div.className="mono-space";
+  div.innerHTML="<strong>"+name+"</strong>"+(monoPrices[i]?"₦"+monoPrices[i]:"")+
+  "<br>"+(owner!==undefined?"Owned":"")+
+  "<div class='mono-token'>"+occupants+"</div>";
+  board.appendChild(div);
+ });
+ document.getElementById("mono-players").innerHTML=monoPlayers.map((p,i)=>
+ `<div class="player-row"><span>${p.token} ${p.name} ${i===monoTurn?"(TURN)":""}</span><strong>₦${p.cash}</strong></div>`
+ ).join("");
+}
+function monoRoll(){
+ const p=monoPlayers[monoTurn],dice=Math.floor(Math.random()*6)+1;
+ let pos=(monoPosition[monoTurn]+dice)%monoNames.length;
+ if(pos<monoPosition[monoTurn]){p.cash+=200;document.getElementById("mono-status").textContent="You passed START and collected ₦200!"}
+ monoPosition[monoTurn]=pos;
+ const owner=monoOwner[pos],price=monoPrices[pos];
+ if(owner!==undefined&&owner!==monoTurn){
+  const rent=Math.max(50,Math.round(price*.2));
+  p.cash-=rent;monoPlayers[owner].cash+=rent;
+  document.getElementById("mono-status").textContent="🎲 "+dice+"! "+p.name+" landed on "+monoNames[pos]+". Paid ₦"+rent+" rent.";
+ }else if(price>0&&owner===undefined){
+  document.getElementById("mono-status").innerHTML="🎲 "+dice+"! "+p.name+" landed on "+monoNames[pos]+". <button class='action' onclick='monoBuy("+pos+")'>BUY FOR ₦"+price+"</button>";
+ }else{
+  document.getElementById("mono-status").textContent="🎲 "+dice+"! "+p.name+" landed on "+monoNames[pos]+".";
+ }
+ if(pos===4||pos===14){const tax=pos===4?200:100;p.cash-=tax;document.getElementById("mono-status").textContent+=" Tax paid: ₦"+tax}
+ if(pos===2||pos===6){const bonus=100;p.cash+=bonus;document.getElementById("mono-status").textContent+=" Bonus: ₦100"}
+ drawMono();beep(500);
+}
+function monoBuy(pos){
+ const p=monoPlayers[monoTurn],price=monoPrices[pos];
+ if(p.cash<price){document.getElementById("mono-status").textContent="Not enough money to buy this property.";return}
+ p.cash-=price;monoOwner[pos]=monoTurn;
+ document.getElementById("mono-status").textContent=p.name+" bought "+monoNames[pos]+"!";
+ drawMono();
+}
+function monoNext(){monoTurn=(monoTurn+1)%monoPlayers.length;drawMono()}
+
+/* WHOT - SIMPLE LOCAL CARD MATCH */
+const whotShapes=["○","△","□","☆","✕"];
+let whotHands=[],whotDeck=[],whotTop=0,whotTurn=0;
+function whotGame(){
+ const deck=[];
+ for(let i=1;i<=14;i++)for(let s=0;s<5;s++)deck.push({n:i,s});
+ deck.sort(()=>Math.random()-.5);
+ whotHands=[deck.splice(0,5),deck.splice(0,5)];
+ whotDeck=deck;whotTop=whotDeck.pop();whotTurn=0;
+ renderWhot();
+}
+function renderWhot(){
+ const p=whotHands[whotTurn];
+ document.getElementById("game-content").innerHTML=`
+ <div class="game-output">Top card: <span class="big-number">${whotTop.n===20?"WHOT":whotTop.n+" "+whotShapes[whotTop.s]}</span><br>Player ${whotTurn+1}'s turn. Match the number or shape.</div>
+ <div>Your cards:</div>
+ <div id="whot-hand"></div>
+ <button class="action" onclick="whotDraw()">DRAW CARD</button>`;
+ const hand=document.getElementById("whot-hand");
+ p.forEach((c,i)=>{
+  const b=document.createElement("button");b.className="action";
+  b.textContent=c.n+" "+whotShapes[c.s];b.onclick=()=>whotPlay(i);hand.appendChild(b);
+ });
+}
+function whotPlay(i){
+ const card=whotHands[whotTurn][i];
+ if(card.n!==whotTop.n&&card.s!==whotTop.s&&card.n!==20&&whotTop.n!==20){
+  alert("That card does not match the top card.");return;
+ }
+ whotTop=card;whotHands[whotTurn].splice(i,1);
+ if(!whotHands[whotTurn].length){
+  document.getElementById("game-content").innerHTML="<h2 class='gold'>🏆 Player "+(whotTurn+1)+" wins WHOT!</h2><button class='action' onclick='whotGame()'>PLAY AGAIN</button>";
+  finishGame(20);return;
+ }
+ whotTurn=1-whotTurn;renderWhot();
+}
+function whotDraw(){
+ if(!whotDeck.length){alert("No more cards in the deck.");return}
+ whotHands[whotTurn].push(whotDeck.pop());whotTurn=1-whotTurn;renderWhot();
+}
+
+/* SPIN THE BOTTLE */
+function spinGame(){
+ document.getElementById("game-content").innerHTML=`
+ <p class="muted">Add players' names, separated by commas.</p>
+ <input class="game-input" id="spin-names" placeholder="Ayo, Tobi, Sarah, ...">
+ <button class="action" onclick="spinBottle()">🍾 SPIN</button>
+ <div id="spin-output" class="game-output">Who will the bottle choose?</div>`;
+}
+function spinBottle(){
+ const names=document.getElementById("spin-names").value.split(",").map(x=>x.trim()).filter(Boolean);
+ if(names.length<2){document.getElementById("spin-output").textContent="Enter at least two names.";return}
+ const out=document.getElementById("spin-output");
+ out.innerHTML="<div class='big-number'>🍾</div>Spinning...";
+ setTimeout(()=>{
+  out.innerHTML="<div class='big-number'>👉 "+names[Math.floor(Math.random()*names.length)]+"</div> has been chosen!";
+  beep(700,.25);
+ },1300);
+}
+
+/* MOST LIKELY TO */
+const likelyQuestions=[
+"Who is most likely to become famous?",
+"Who is most likely to forget someone's birthday?",
+"Who is most likely to get married first?",
+"Who is most likely to travel the world?",
+"Who is most likely to laugh at the wrong time?",
+"Who is most likely to become a millionaire?",
+"Who is most likely to fall asleep at a party?",
+"Who is most likely to keep a secret?",
+"Who is most likely to send a risky text?",
+"Who is most likely to survive on a deserted island?",
+"Who is most likely to become a celebrity?",
+"Who is most likely to arrive late?",
+"Who is most likely to start a business?",
+"Who is most likely to dance in public?",
+"Who is most likely to get lost even with directions?",
+"Who is most likely to become a movie star?",
+"Who is most likely to spend all their money shopping?",
+"Who is most likely to make everyone laugh?",
+"Who is most likely to fall in love quickly?",
+"Who is most likely to win an argument?"
+];
+function likelyGame(){
+ document.getElementById("game-content").innerHTML=`
+ <div class="game-output" id="likely-output">Who's most likely to...?</div>
+ <button class="action" onclick="nextLikely()">NEXT QUESTION</button>`;
+ nextLikely();
+}
+function nextLikely(){
+ document.getElementById("likely-output").textContent=likelyQuestions[Math.floor(Math.random()*likelyQuestions.length)];
+}
+
+/* 60 SECOND CHALLENGES */
+const challenges=[
+"Name 10 countries in 60 seconds.",
+"Say five words that rhyme with light.",
+"Name 10 football clubs without repeating.",
+"List 10 fruits in 60 seconds.",
+"Name 10 movies as quickly as possible.",
+"Say the alphabet backwards as far as you can.",
+"Name 8 things you can find in a kitchen.",
+"List 10 animals in 60 seconds.",
+"Name 10 musicians without repeating.",
+"Say 10 words that begin with the letter B."
+];
+let challengeTimer=null,challengeLeft=60;
+function challengeGame(){
+ clearInterval(challengeTimer);
+ document.getElementById("game-content").innerHTML=`
+ <div id="challenge-output" class="game-output">Press start to receive your challenge.</div>
+ <div class="big-number" id="challenge-clock">60</div>
+ <button class="action" onclick="startChallenge()">START CHALLENGE</button>
+ <button class="secondary" onclick="clearInterval(challengeTimer)">STOP</button>`;
+}
+function startChallenge(){
+ clearInterval(challengeTimer);challengeLeft=60;
+ document.getElementById("challenge-output").textContent=challenges[Math.floor(Math.random()*challenges.length)];
+ document.getElementById("challenge-clock").textContent=60;
+ challengeTimer=setInterval(()=>{
+  challengeLeft--;document.getElementById("challenge-clock").textContent=challengeLeft;
+  if(challengeLeft<=0){
+   clearInterval(challengeTimer);
+   document.getElementById("challenge-output").textContent="⏰ TIME'S UP!";
+   beep(200,.5);finishGame(10);
+  }
+ },1000);
+}
 </script>
 </body>
 </html>

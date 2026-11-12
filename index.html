@@ -2,702 +2,783 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080808">
 <title>MIND GAMES | Think • Play • Conquer</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 :root{
---gold:#d7ad52;--gold2:#f3d88b;--bg:#080808;
---panel:#151515;--muted:#aaa;--line:rgba(215,173,82,.25);
+ --gold:#d7ad52;--gold2:#f3d88b;--bg:#080808;
+ --panel:#141414;--muted:#999;--white:#f7f4ed;
+ --line:rgba(215,173,82,.25);--green:#39c98a;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:#fff;font-family:Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--white);
+ font-family:Arial,Helvetica,sans-serif;min-height:100vh}
 button,input,select{font:inherit}
 button{cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
 .hidden{display:none!important}
-button:disabled{opacity:.4;cursor:not-allowed}
-
-/* LOGIN WALL */
-#auth-overlay{
-position:fixed;inset:0;z-index:10000;display:flex;
-align-items:center;justify-content:center;padding:20px;
-background:radial-gradient(circle at 50% 10%,#392b1055,transparent 45%),#080808
-}
-.auth-box{
-width:min(430px,100%);padding:30px 23px;text-align:center;
-border:1px solid var(--line);border-radius:24px;background:#111;
-box-shadow:0 20px 80px #000,0 0 30px #d7ad5215
-}
-.logo{font-size:clamp(30px,8vw,43px);font-weight:1000;color:var(--gold2);letter-spacing:2px}
-.tagline{color:#aaa;letter-spacing:2px;margin:9px 0 25px}
-.tabs{display:flex;gap:8px;margin-bottom:15px}
-.tabs button{flex:1;padding:12px;border:1px solid #333;border-radius:10px;background:#222;color:#aaa}
-.tabs button.active{background:var(--gold);color:#111;font-weight:bold}
-.auth-input{
-width:100%;padding:14px;margin:7px 0;background:#080808;
-color:white;border:1px solid #333;border-radius:10px;outline:none
-}
-.auth-input:focus{border-color:var(--gold)}
-.gold-btn{
-width:100%;padding:15px;margin-top:12px;border:0;border-radius:11px;
-background:linear-gradient(120deg,var(--gold),var(--gold2));color:#111;font-weight:900
-}
-#auth-message{color:var(--gold2);font-size:13px;line-height:1.5;margin-top:12px}
-#auth-error{color:#ff728b;font-size:13px;margin-top:10px}
-.auth-small{color:#888;font-size:12px;line-height:1.5;margin-top:18px}
-
-/* MAIN APP */
-#app{max-width:1250px;margin:auto;padding:16px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 0 18px;border-bottom:1px solid var(--line)}
-.brand{font-size:23px;font-weight:1000;color:var(--gold2)}
-.header-actions{display:flex;gap:8px;flex-wrap:wrap}
-.small-btn{padding:10px 13px;background:#1c1c1c;color:#fff;border:1px solid var(--line);border-radius:10px}
-.hero{margin:20px 0;padding:28px 20px;border-radius:20px;border:1px solid var(--line);background:linear-gradient(120deg,#2a200d,#111 60%,#211908)}
-.hero h1{font-size:clamp(27px,6vw,43px);margin:0 0 10px}
-.hero p{color:#c4b99d;line-height:1.6}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:17px 0}
-.stat{padding:14px;background:#151515;border:1px solid var(--line);border-radius:13px}
-.stat span{font-size:12px;color:#999}
-.stat strong{display:block;color:var(--gold2);font-size:22px;margin-top:7px}
-.broadcast{padding:15px;border:1px solid #70551d;border-radius:13px;background:linear-gradient(100deg,#291e09,#15120c);color:var(--gold2);line-height:1.5}
-.section-title{color:var(--gold2);margin:28px 0 14px}
-.game-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
-.game-card{
-min-height:155px;padding:18px;border-radius:17px;border:1px solid #ffffff20;
-display:flex;flex-direction:column;justify-content:space-between;
-transition:.2s;cursor:pointer
-}
-.game-card:hover{transform:translateY(-4px);border-color:#fff8}
-.game-card h3{font-size:20px;margin:8px 0}
-.game-card p{font-size:12px;color:#ddd;line-height:1.5}
-.game-card button{padding:10px;border:0;border-radius:9px;background:#ffffff20;color:white;font-weight:bold}
-.c1{background:linear-gradient(140deg,#3a1120,#160b13)}
-.c2{background:linear-gradient(140deg,#102c40,#08131e)}
-.c3{background:linear-gradient(140deg,#2b210b,#151005)}
-.c4{background:linear-gradient(140deg,#142e25,#09140f)}
-.c5{background:linear-gradient(140deg,#332018,#160c09)}
-.c6{background:linear-gradient(140deg,#2b1641,#10091c)}
-.c7{background:linear-gradient(140deg,#153b3b,#071515)}
-.c8{background:linear-gradient(140deg,#402014,#1b0c07)}
-.c9{background:linear-gradient(140deg,#3b1930,#170a13)}
-.panel{margin-top:18px;padding:20px;border:1px solid var(--line);border-radius:18px;background:#121212}
-.panel h2{color:var(--gold2)}
-.game-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.action{padding:11px 15px;border:0;border-radius:10px;background:var(--gold);color:#111;font-weight:bold;margin:5px}
-.secondary{padding:11px 15px;border:1px solid var(--line);border-radius:10px;background:#222;color:white;margin:5px}
-.game-output{margin:15px 0;padding:18px;border-radius:13px;background:#080808;border:1px solid #333;min-height:85px;line-height:1.6}
-.game-input{padding:12px;background:#080808;border:1px solid #555;border-radius:9px;color:white;width:100%;max-width:260px}
-.big-number{font-size:40px;color:var(--gold2);font-weight:bold}
-.board{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;max-width:330px;margin:18px auto}
-.cell{aspect-ratio:1;background:#202020;border:1px solid var(--line);border-radius:12px;color:var(--gold2);font-size:35px;font-weight:bold}
-.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:390px;margin:15px auto}
-.memory-card{aspect-ratio:1;border:1px solid var(--line);border-radius:10px;background:#242018;color:white;font-size:25px}
-.mono-board{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin:15px 0}
-.mono-space{min-height:82px;padding:8px 3px;text-align:center;font-size:11px;background:#26221a;border:1px solid #92783b;border-radius:7px}
-.mono-space strong{display:block;color:var(--gold2);margin-bottom:5px}
-.mono-token{font-size:19px}
-.player-row{padding:10px;margin:7px 0;border:1px solid #333;border-radius:9px;display:flex;justify-content:space-between}
-footer{text-align:center;color:#777;font-size:12px;padding:30px 0}
-@media(max-width:600px){
-.stats{grid-template-columns:repeat(2,1fr)}
-#app{padding:12px}
-.hero{padding:22px 16px}
+.gold{color:var(--gold)}
+.muted{color:var(--muted)}
+.wrap{width:min(1120px,94%);margin:auto}
+header{display:flex;align-items:center;justify-content:space-between;
+ padding:18px 3%;border-bottom:1px solid var(--line);gap:12px}
+.logo{font-size:23px;font-weight:900;letter-spacing:3px;color:var(--gold)}
+.logo small{display:block;font-size:9px;letter-spacing:4px;color:#aaa;margin-top:4px}
+button.primary,.primary{background:linear-gradient(135deg,var(--gold),var(--gold2));
+ color:#17120a;border:0;border-radius:10px;padding:13px 19px;font-weight:800}
+button.secondary{background:#202020;color:white;border:1px solid var(--line);
+ border-radius:10px;padding:12px 16px}
+button.danger{background:#3b1717;color:#ffb5b5;border:1px solid #743333;
+ border-radius:10px;padding:11px 15px}
+input,select{background:#090909;border:1px solid #38332a;color:white;
+ border-radius:9px;padding:13px;width:100%;outline:none}
+input:focus,select:focus{border-color:var(--gold)}
+label{font-size:12px;color:#bbb;display:block;margin:12px 0 6px}
+h1,h2,h3{line-height:1.15}
+h1{font-size:clamp(30px,6vw,58px);margin:10px 0}
+h2{font-size:27px}
+p{line-height:1.55}
+#authScreen{min-height:100vh;display:grid;place-items:center;padding:22px;
+ background:radial-gradient(ellipse at 50% 30%,#29200e 0%,#100e0a 35%,#050505 75%)}
+.auth-card{width:min(440px,100%);background:rgba(15,15,15,.96);
+ border:1px solid var(--line);border-radius:22px;padding:30px;
+ box-shadow:0 20px 80px #000}
+.auth-card .logo{text-align:center;font-size:30px}
+.auth-card h2{text-align:center;margin:25px 0 6px}
+.auth-card p{text-align:center;color:#999;font-size:13px}
+.auth-card button{width:100%;margin-top:14px}
+#authMessage,#message{font-size:13px;color:var(--gold);margin-top:12px;min-height:18px}
+#app{min-height:100vh}
+.top-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.balance{color:var(--gold);font-weight:800;font-size:13px}
+main{padding:28px 0 60px}
+.hero{padding:28px 0 25px}
+.eyebrow{font-size:11px;letter-spacing:4px;color:var(--gold);font-weight:800}
+.hero p{color:#aaa;max-width:600px}
+.promo{border:1px solid var(--line);background:linear-gradient(100deg,#251d0d,#111);
+ border-radius:15px;padding:16px;margin:22px 0;color:#f2d58f;font-weight:700}
+.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
+.game-card{border:1px solid #30291d;border-radius:16px;padding:20px;
+ background:linear-gradient(145deg,#1b1a17,#101010);min-height:170px;
+ transition:.2s;cursor:pointer}
+.game-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+.game-icon{font-size:35px}
+.game-card h3{margin:12px 0 5px}
+.game-card p{font-size:12px;color:#999;margin:0}
+.panel{background:var(--panel);border:1px solid var(--line);
+ border-radius:16px;padding:20px;margin:16px 0}
+.back{margin-bottom:18px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.mode-card{background:#111;border:1px solid #393124;border-radius:14px;
+ padding:18px;text-align:left;color:white}
+.mode-card:hover{border-color:var(--gold)}
+.mode-card strong{display:block;color:var(--gold);margin:8px 0}
+.mode-card span{font-size:12px;color:#aaa;line-height:1.5}
+.game-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px}
+.game-board{min-height:280px;background:#101010;border:1px solid var(--line);
+ border-radius:16px;padding:18px}
+.side-panel{background:#131313;border:1px solid var(--line);
+ border-radius:16px;padding:18px;height:max-content}
+.board-grid{display:grid;grid-template-columns:repeat(3, minmax(65px,100px));
+ justify-content:center;gap:9px;margin:22px auto}
+.cell{aspect-ratio:1;border:1px solid #5c4925;border-radius:12px;
+ background:#1b1915;color:var(--gold);font-size:36px;font-weight:900}
+.cell:hover{background:#292316}
+.big-number{font-size:45px;color:var(--gold);font-weight:900;text-align:center}
+.action-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.action-row button{flex:1}
+.memory-grid{display:grid;grid-template-columns:repeat(4,minmax(50px,85px));
+ gap:9px;justify-content:center;margin:20px auto}
+.memory-card{aspect-ratio:1;background:#282113;border:1px solid var(--gold);
+ border-radius:10px;color:var(--gold);font-size:26px}
+.memory-card.open{background:#eee0b6;color:#18130b}
+.memory-card.matched{opacity:.35}
+.whot-hand{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:20px 0}
+.whot-card{background:#f5e8c6;color:#19140b;border:3px solid var(--gold);
+ border-radius:10px;width:62px;height:88px;font-weight:900;font-size:20px}
+.whot-card:disabled{opacity:.4}
+.monopoly-track{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.property{background:#252017;border:1px solid #9c7936;border-radius:8px;
+ padding:12px 5px;text-align:center;font-size:11px;min-height:65px}
+.property strong{display:block;color:var(--gold);font-size:13px}
+.player-list{font-size:13px;line-height:2}
+.room-code{font-size:28px;letter-spacing:6px;color:var(--gold);font-weight:900}
+footer{text-align:center;color:#666;font-size:11px;padding:25px}
+@media(max-width:760px){
+ .game-layout{grid-template-columns:1fr}
+ header{align-items:flex-start}
+ .logo{font-size:18px}
+ .top-actions{justify-content:flex-end}
 }
 </style>
 </head>
-
 <body>
 
-<!-- THE ENTRANCE WALL: GAME CONTENT REMAINS HIDDEN UNTIL LOGIN -->
-<div id="auth-overlay">
- <div class="auth-box">
-  <div class="logo">🧠 MIND GAMES</div>
-  <div class="tagline">THINK • PLAY • CONQUER</div>
-
-  <div class="tabs">
-   <button id="login-tab" class="active" onclick="showAuth('login')">LOGIN</button>
-   <button id="signup-tab" onclick="showAuth('signup')">CREATE ACCOUNT</button>
+<!-- LOGIN WALL -->
+<section id="authScreen">
+ <div class="auth-card">
+  <div class="logo">MIND GAMES<small>THINK • PLAY • CONQUER</small></div>
+  <h2>Enter the arena.</h2>
+  <p>Your next challenge is waiting. Sign in to unlock the games.</p>
+  <div id="signupFields" class="hidden">
+   <label>Choose a username</label>
+   <input id="username" maxlength="24" placeholder="Your player name">
   </div>
-
-  <form id="auth-form">
-   <input id="auth-email" class="auth-input" type="email" placeholder="Email address" required>
-   <input id="auth-password" class="auth-input" type="password" placeholder="Password" minlength="6" required>
-   <button class="gold-btn" id="auth-submit" type="submit">UNLOCK MIND GAMES</button>
-  </form>
-  <div id="auth-message"></div>
-  <div id="auth-error"></div>
-  <div class="auth-small">Your next challenge begins here.<br>Sign in or create an account to unlock the games.</div>
+  <label>Email address</label>
+  <input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+  <label>Password</label>
+  <input id="password" type="password" autocomplete="current-password" placeholder="Your password">
+  <button class="primary" id="authSubmit" onclick="submitAuth()">SIGN IN</button>
+  <button class="secondary" id="authToggle" onclick="toggleAuth()">Create an account</button>
+  <div id="authMessage"></div>
  </div>
+</section>
+
+<!-- APP AFTER LOGIN -->
+<div id="app" class="hidden">
+ <header>
+  <div class="logo">MIND GAMES<small>THINK • PLAY • CONQUER</small></div>
+  <div class="top-actions">
+   <span class="balance" id="balance">₦10,000</span>
+   <button class="secondary" onclick="showDashboard()">My activity</button>
+   <button class="secondary" onclick="signOut()">Sign out</button>
+  </div>
+ </header>
+ <main class="wrap">
+  <section id="homePage">
+   <div class="hero">
+    <div class="eyebrow">WELCOME TO THE ARENA</div>
+    <h1>Think sharper.<br><span class="gold">Play smarter.</span></h1>
+    <p>Challenge yourself, take on the computer, play with friends or create an online room and compete with real players.</p>
+   </div>
+   <div class="promo">📣 PLAY GUESS THE NUMBER TO EARN! Guess the secret number before Round 10 and collect ₦2,000 game money.</div>
+   <div class="section-head"><h2>Choose your game</h2><span class="muted">9 games</span></div>
+   <div class="games-grid" id="gamesGrid"></div>
+  </section>
+
+  <section id="gamePage" class="hidden">
+   <button class="secondary back" onclick="goHome()">← All games</button>
+   <div class="eyebrow" id="gameCategory">MIND GAMES</div>
+   <h1 id="gameTitle">Game</h1>
+   <p class="muted" id="gameDescription"></p>
+   <div id="modePicker" class="panel">
+    <h2>Choose how to play</h2>
+    <div class="modes">
+     <button class="mode-card" onclick="startComputer()"><div class="game-icon">🤖</div><strong>Play Computer</strong><span>Challenge a virtual opponent. Difficulty depends on the game.</span></button>
+     <button class="mode-card" onclick="showOnline()"><div class="game-icon">🌐</div><strong>Play Online</strong><span>Create a room or join a real player using an invite code.</span></button>
+     <button class="mode-card" onclick="startFriends()"><div class="game-icon">👥</div><strong>Play Friends</strong><span>Play together on the same device.</span></button>
+    </div>
+   </div>
+   <div id="onlinePanel" class="panel hidden">
+    <h2>Online multiplayer</h2>
+    <p class="muted">Create a room and share its code, or join a friend's room.</p>
+    <label>Player name</label><input id="onlineName" maxlength="24" placeholder="Your player name">
+    <label>Room size</label>
+    <select id="roomSize"><option value="2">2 players</option><option value="4">4 players</option><option value="6">6 players</option><option value="8">8 players</option></select>
+    <div class="action-row">
+     <button class="primary" onclick="createOnlineRoom()">Create room</button>
+    </div>
+    <label>Have an invite code?</label>
+    <input id="joinCode" maxlength="6" placeholder="6-character code">
+    <button class="secondary" style="width:100%;margin-top:10px" onclick="joinOnlineRoom()">Join room</button>
+    <div id="onlineMessage"></div>
+   </div>
+   <div id="roomPanel" class="panel hidden">
+    <div class="eyebrow">ONLINE ROOM</div>
+    <div class="room-code" id="roomCodeDisplay">------</div>
+    <p class="muted">Share this code with your friend.</p>
+    <button class="secondary" onclick="copyRoomCode()">Copy invite code</button>
+    <h3>Players in this room</h3>
+    <div class="player-list" id="roomPlayers">Waiting for players…</div>
+    <div id="roomStatus" class="muted">Waiting for another player to join.</div>
+    <div class="action-row">
+     <button class="primary" onclick="beginOnlineGame()">Start game</button>
+     <button class="danger" onclick="leaveOnlineRoom()">Leave room</button>
+    </div>
+   </div>
+   <div id="playPanel" class="hidden">
+    <div class="game-layout">
+     <div class="game-board">
+      <div id="gameStatus" class="gold">Game ready</div>
+      <div id="board"></div>
+      <div class="action-row">
+       <button class="secondary" onclick="resetGame()">Restart</button>
+       <button class="secondary" onclick="goModes()">Change mode</button>
+      </div>
+     </div>
+     <aside class="side-panel">
+      <h3>Game details</h3>
+      <div id="gameInfo" class="muted">Let's play.</div>
+      <hr style="border-color:#333">
+      <div class="muted">Mode</div><strong id="modeLabel">Computer</strong>
+      <p class="muted" id="opponentLabel"></p>
+     </aside>
+    </div>
+   </div>
+  </section>
+
+  <section id="dashboardPage" class="hidden">
+   <button class="secondary back" onclick="goHome()">← Back</button>
+   <h1>Player activity</h1>
+   <div class="panel">
+    <h3 id="dashName">Your account</h3>
+    <div class="big-number" id="dashBalance">₦10,000</div>
+    <p class="muted">Virtual game money</p>
+    <p id="dashStats" class="muted">Your activity on this device is recorded here.</p>
+   </div>
+   <div class="panel"><h3>Recent games</h3><div id="activityList" class="muted">No games played yet.</div></div>
+  </section>
+  <div id="message"></div>
+ </main>
+ <footer>MIND GAMES • THINK • PLAY • CONQUER<br>Virtual game currency has no cash value.</footer>
 </div>
-
-<main id="app" class="hidden">
-<header>
- <div class="brand">🧠 MIND GAMES</div>
- <div class="header-actions">
-  <button class="small-btn" onclick="toggleSound()" id="sound-btn">🔊 SOUND ON</button>
-  <button class="small-btn" onclick="showDashboard()">📊 ACTIVITY</button>
-  <button class="small-btn" onclick="logout()">LOG OUT</button>
- </div>
-</header>
-
-<section class="hero">
- <h1>Welcome to <span class="gold">MIND GAMES.</span></h1>
- <p>Challenge your mind. Test your courage. Outsmart your friends.<br>
- Every game is another chance to think, play and conquer.</p>
-</section>
-
-<section class="stats">
- <div class="stat"><span>VIRTUAL BALANCE</span><strong id="balance">₦10,000</strong></div>
- <div class="stat"><span>GAMES PLAYED</span><strong id="games-count">0</strong></div>
- <div class="stat"><span>POINTS EARNED</span><strong id="points-count">0</strong></div>
- <div class="stat"><span>PLAY TIME</span><strong id="minutes-count">0 min</strong></div>
-</section>
-
-<div class="broadcast">
- <strong>🎁 PLAY GUESS THE NUMBER TO EARN!</strong><br>
- Guess the secret number before Round 10 and collect ₦2,000 game money.
-</div>
-
-<h2 class="section-title">🎮 THE GAME CENTRE</h2>
-<div class="game-grid">
- <div class="game-card c1"><div><div>🔥 ❤️</div><h3>Truth or Dare</h3><p>Bold questions and daring challenges. Play with your friends.</p></div><button onclick="openGame('truth')">PLAY NOW</button></div>
- <div class="game-card c2"><div><div>⭕ ❌</div><h3>Tic-Tac-Toe</h3><p>A classic battle of strategy. Two players, one winner.</p></div><button onclick="openGame('tic')">PLAY NOW</button></div>
- <div class="game-card c3"><div><div>🔢 💰</div><h3>Guess the Number</h3><p>Find the secret number before Round 10 to win ₦2,000.</p></div><button onclick="openGame('guess')">PLAY NOW</button></div>
- <div class="game-card c4"><div><div>🧠 🃏</div><h3>Memory Match</h3><p>Test your memory. Match every pair.</p></div><button onclick="openGame('memory')">PLAY NOW</button></div>
- <div class="game-card c5"><div><div>🏦 🎩</div><h3>Monopoly</h3><p>Buy properties, collect rent and build your empire.</p></div><button onclick="openGame('monopoly')">PLAY NOW</button></div>
- <div class="game-card c6"><div><div>🃏 ⭐</div><h3>WHOT!</h3><p>Match shapes and numbers. Be the first to finish your cards.</p></div><button onclick="openGame('whot')">PLAY NOW</button></div>
- <div class="game-card c7"><div><div>🍾 💋</div><h3>Spin the Bottle</h3><p>Spin and see who gets picked.</p></div><button onclick="openGame('spin')">PLAY NOW</button></div>
- <div class="game-card c8"><div><div>👀 😂</div><h3>Most Likely To</h3><p>Find out who your friends think is most likely to...</p></div><button onclick="openGame('likely')">PLAY NOW</button></div>
- <div class="game-card c9"><div><div>⏱️ ⚡</div><h3>60-Second Challenges</h3><p>Beat the clock with quick-fire challenges.</p></div><button onclick="openGame('challenge')">PLAY NOW</button></div>
-</div>
-
-<section id="game-area" class="panel hidden">
- <div class="game-top">
-  <h2 id="game-title">Game</h2>
-  <button class="secondary" onclick="closeGame()">✕ CLOSE GAME</button>
- </div>
- <div id="game-content"></div>
-</section>
-
-<section id="dashboard" class="panel hidden">
- <div class="game-top">
-  <h2>📊 Player Activity</h2>
-  <button class="secondary" onclick="hideDashboard()">CLOSE</button>
- </div>
- <div id="activity-content"></div>
-</section>
-
-<footer>© MIND GAMES • THINK • PLAY • CONQUER</footer>
-</main>
 
 <script>
-/* SUPABASE AUTHENTICATION */
-const SUPABASE_URL="https://pnatjqwplyxhpcfqhgcm.supabase.co";
-const SUPABASE_KEY="sb_publishable_lbUX7xkFk96kxH1ZP_Zk6A_zWvXT6AD";
-const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+/* MIND GAMES CONFIGURATION */
+const SUPABASE_URL = "https://pnatjqwplyxhpcfqhgcm.supabase.co";
+const SUPABASE_KEY = "sb_publishable_lbUX7xkFk96kxH1ZP_Zk6A_zWvXT6AD";
 
-let currentUser=null;
-let authMode="login";
-let soundOn=true;
-let activeGame=null;
-let gameStartedAt=0;
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function showAuth(mode){
- authMode=mode;
- document.getElementById("login-tab").classList.toggle("active",mode==="login");
- document.getElementById("signup-tab").classList.toggle("active",mode==="signup");
- document.getElementById("auth-submit").textContent=mode==="login"?"UNLOCK MIND GAMES":"CREATE MY ACCOUNT";
- document.getElementById("auth-message").textContent="";
- document.getElementById("auth-error").textContent="";
-}
-document.getElementById("auth-form").addEventListener("submit",async e=>{
- e.preventDefault();
- const email=document.getElementById("auth-email").value.trim();
- const password=document.getElementById("auth-password").value;
- const msg=document.getElementById("auth-message");
- const err=document.getElementById("auth-error");
- const btn=document.getElementById("auth-submit");
- btn.disabled=true;err.textContent="";msg.textContent="Please wait...";
- try{
-  if(authMode==="signup"){
-   const {data,error}=await supabaseClient.auth.signUp({
-    email,password,options:{emailRedirectTo:window.location.origin}
-   });
-   if(error)throw error;
-   if(data.session){await enterApp(data.user)}
-   else{msg.textContent="Account created! Check your email and click the verification link before logging in."}
-  }else{
-   const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
-   if(error)throw error;
-   await enterApp(data.user);
-  }
- }catch(error){err.textContent=error.message||"Authentication failed."}
- finally{btn.disabled=false;if(msg.textContent==="Please wait...")msg.textContent=""}
-});
-
-async function enterApp(user){
- currentUser=user;
- document.getElementById("auth-overlay").classList.add("hidden");
- document.getElementById("app").classList.remove("hidden");
- loadStats();
-}
-async function logout(){
- await supabaseClient.auth.signOut();
- currentUser=null;
- document.getElementById("app").classList.add("hidden");
- document.getElementById("auth-overlay").classList.remove("hidden");
-}
-supabaseClient.auth.onAuthStateChange(async(event,session)=>{
- if(session?.user)await enterApp(session.user);
-});
-(async()=>{
- const {data}=await supabaseClient.auth.getSession();
- if(data.session?.user)await enterApp(data.session.user);
-})();
-
-/* LOCAL PLAYER PROFILE */
-function storageKey(){return currentUser?"mindgames_"+currentUser.id:"mindgames_guest"}
-function getStats(){
- let data;
- try{data=JSON.parse(localStorage.getItem(storageKey())||"null")}catch(e){}
- if(!data)data={balance:10000,games:0,points:0,minutes:0,activity:[]};
- if(typeof data.balance!=="number")data.balance=10000;
- return data;
-}
-function saveStats(data){localStorage.setItem(storageKey(),JSON.stringify(data));loadStats()}
-function loadStats(){
- const s=getStats();
- document.getElementById("balance").textContent="₦"+s.balance.toLocaleString();
- document.getElementById("games-count").textContent=s.games;
- document.getElementById("points-count").textContent=s.points;
- document.getElementById("minutes-count").textContent=s.minutes+" min";
-}
-function finishGame(points=10){
- if(!activeGame)return;
- const elapsed=Math.max(1,Math.round((Date.now()-gameStartedAt)/60000));
- const s=getStats();
- s.games++;s.points+=points;s.minutes+=elapsed;
- s.activity.unshift({game:activeGame,time:new Date().toLocaleString(),minutes:elapsed,points});
- s.activity=s.activity.slice(0,100);
- saveStats(s);
- activeGame=null;
-}
-
-/* SOUND */
-let audioContext;
-function beep(freq=440,duration=.12){
- if(!soundOn)return;
- try{
-  audioContext=audioContext||new(window.AudioContext||window.webkitAudioContext)();
-  const osc=audioContext.createOscillator(),gain=audioContext.createGain();
-  osc.frequency.value=freq;gain.gain.value=.045;
-  osc.connect(gain);gain.connect(audioContext.destination);
-  osc.start();osc.stop(audioContext.currentTime+duration);
- }catch(e){}
-}
-function toggleSound(){
- soundOn=!soundOn;
- document.getElementById("sound-btn").textContent=soundOn?"🔊 SOUND ON":"🔇 SOUND OFF";
- beep(550);
-}
-
-/* GAME NAVIGATION */
-function openGame(name){
- closeGame(false);
- activeGame=name;gameStartedAt=Date.now();
- document.getElementById("dashboard").classList.add("hidden");
- document.getElementById("game-area").classList.remove("hidden");
- document.getElementById("game-area").scrollIntoView({behavior:"smooth"});
- const titles={truth:"🔥 Truth or Dare",tic:"⭕ Tic-Tac-Toe",guess:"🔢 Guess the Number",memory:"🧠 Memory Match",monopoly:"🏦 Monopoly",whot:"🃏 WHOT!",spin:"🍾 Spin the Bottle",likely:"👀 Most Likely To",challenge:"⏱️ 60-Second Challenges"};
- document.getElementById("game-title").textContent=titles[name];
- const functions={truth:truthGame,tic:ticGame,guess:guessGame,memory:memoryGame,monopoly:monopolyGame,whot:whotGame,spin:spinGame,likely:likelyGame,challenge:challengeGame};
- functions[name]();
-}
-function closeGame(complete=true){
- if(complete&&activeGame)finishGame(10);
- document.getElementById("game-area").classList.add("hidden");
-}
-function showDashboard(){
- document.getElementById("game-area").classList.add("hidden");
- document.getElementById("dashboard").classList.remove("hidden");
- const s=getStats();
- let html="<p>Activity recorded on this device for this account.</p>";
- html+="<div class='player-row'><strong>Total games</strong><span>"+s.games+"</span></div>";
- html+="<div class='player-row'><strong>Total minutes</strong><span>"+s.minutes+"</span></div>";
- html+="<div class='player-row'><strong>Total points</strong><span>"+s.points+"</span></div>";
- html+="<h3 class='gold'>Recent activity</h3>";
- if(!s.activity.length)html+="<p class='muted'>No games recorded yet.</p>";
- s.activity.forEach(a=>{html+="<div class='player-row'><span>"+a.game+"<br><small class='muted'>"+a.time+"</small></span><span>"+a.minutes+" min<br>"+a.points+" pts</span></div>"});
- document.getElementById("activity-content").innerHTML=html;
-}
-function hideDashboard(){document.getElementById("dashboard").classList.add("hidden")}
-
-/* TRUTH OR DARE */
-const truths=[
-"What's the biggest secret you've kept from your friends?",
-"Who was your first crush?",
-"Have you ever pretended to like someone?",
-"What is the most embarrassing thing you've done?",
-"What's one thing you wish people knew about you?",
-"Have you ever stalked someone's social media?",
-"What's the biggest lie you've told?",
-"Who in this room knows you best?",
-"What's your biggest relationship red flag?",
-"Have you ever had a crush on a friend's friend?",
-"What is something you are afraid to admit?",
-"What's the most awkward date you've had?",
-"Have you ever sent a message to the wrong person?",
-"What is your most irrational fear?",
-"Who would you call at 3am?",
-"What is one thing you regret?",
-"Have you ever been caught lying?",
-"What's the most spontaneous thing you've done?",
-"What is your biggest guilty pleasure?",
-"Who was the last person you searched online?"
+const games = [
+ {id:"truth-or-dare",name:"Truth or Dare",icon:"🎭",desc:"A party game of questions and challenges.",category:"PARTY"},
+ {id:"tic-tac-toe",name:"Tic-Tac-Toe",icon:"⭕",desc:"Outsmart your opponent and claim three in a row.",category:"STRATEGY"},
+ {id:"guess-number",name:"Guess the Number",icon:"🔢",desc:"Find the secret number before Round 10.",category:"BRAIN"},
+ {id:"memory-match",name:"Memory Match",icon:"🧠",desc:"Test your memory and match every pair.",category:"BRAIN"},
+ {id:"monopoly",name:"Monopoly",icon:"🏦",desc:"Roll the dice, move around the board and buy properties.",category:"BOARD"},
+ {id:"whot",name:"WHOT!",icon:"🃏",desc:"Match shapes and numbers. Be the first to clear your hand.",category:"CARD"},
+ {id:"spin-the-bottle",name:"Spin the Bottle",icon:"🍾",desc:"A party spinner for friends.",category:"PARTY"},
+ {id:"most-likely-to",name:"Most Likely To",icon:"👀",desc:"Vote for the person who fits the question.",category:"PARTY"},
+ {id:"60-second-challenges",name:"60-Second Challenges",icon:"⏱️",desc:"Quick-fire challenges against the clock.",category:"CHALLENGE"}
 ];
-const dares=[
-"Do your funniest dance for 20 seconds.",
-"Speak in an accent for the next two rounds.",
-"Let the group choose a funny nickname for you.",
-"Sing the chorus of your favourite song.",
-"Do ten dramatic jumping jacks.",
-"Give everyone in the room a compliment.",
-"Act like a celebrity for 30 seconds.",
-"Tell a joke without laughing.",
-"Do your best runway walk.",
-"Talk like a news presenter for one minute.",
-"Make a funny face and hold it for 15 seconds.",
-"Imitate an animal chosen by the group.",
-"Do your best movie villain laugh.",
-"Try to rap for 20 seconds.",
-"Tell a story using only five words.",
-"Do a slow-motion action scene.",
-"Make up a short song about the person beside you.",
-"Balance an object on your head for 20 seconds.",
-"Let the group pick your next dance move.",
-"Give a dramatic acceptance speech."
-];
-function truthGame(){
- document.getElementById("game-content").innerHTML=`
- <p class="muted">Choose honestly. You can always pass a question or challenge. Respect everyone's boundaries.</p>
- <button class="action" onclick="truthPick('truth')">TRUTH</button>
- <button class="action" onclick="truthPick('dare')">DARE</button>
- <div id="truth-output" class="game-output">Ready? Pick your challenge.</div>
- <button class="secondary" onclick="truthPick('truth')">Next Truth</button>
- <button class="secondary" onclick="truthPick('dare')">Next Dare</button>`;
+
+let user=null,profile=null,signupMode=false,currentGame=null,mode="computer";
+let room=null,roomChannel=null,gameState=null,turn=0,round=0;
+let startedAt=0,activity=[];
+let memoryDeck=[],memoryOpen=[],memoryMatches=0;
+let whotHand=[],whotPile=[],whotTop=null,whotTurn=0;
+let monopolyPlayers=[],monopolyTurn=0,monopolyPosition=0;
+let timerHandle=null;
+
+const $=id=>document.getElementById(id);
+const fmt=n=>"₦"+Number(n||0).toLocaleString("en-NG");
+
+function say(id,msg){$(id).textContent=msg}
+function show(id){$(id).classList.remove("hidden")}
+function hide(id){$(id).classList.add("hidden")}
+
+function toggleAuth(){
+ signupMode=!signupMode;
+ $("signupFields").classList.toggle("hidden",!signupMode);
+ $("authSubmit").textContent=signupMode?"CREATE ACCOUNT":"SIGN IN";
+ $("authToggle").textContent=signupMode?"I already have an account":"Create an account";
+ say("authMessage","");
 }
-function truthPick(type){
- const arr=type==="truth"?truths:dares;
- document.getElementById("truth-output").innerHTML="<strong>"+type.toUpperCase()+"</strong><br>"+arr[Math.floor(Math.random()*arr.length)];
- beep(520);
+async function submitAuth(){
+ const email=$("email").value.trim(),password=$("password").value;
+ if(!email||!password){say("authMessage","Enter your email and password.");return}
+ say("authMessage","Please wait…");
+ let result;
+ if(signupMode){
+  result=await db.auth.signUp({
+   email,password,
+   options:{data:{username:$("username").value.trim()||email.split("@")[0]}}
+  });
+ }else result=await db.auth.signInWithPassword({email,password});
+ if(result.error){say("authMessage",result.error.message);return}
+ if(signupMode&&!result.data.session){
+  say("authMessage","Account created. Check your email to verify, then sign in.");
+  return;
+ }
+ if(result.data.user) await enterApp(result.data.user);
 }
+async function signOut(){
+ await db.auth.signOut();
+ user=null;profile=null;
+ if(room)await leaveOnlineRoom();
+ hide("app");show("authScreen");
+}
+async function enterApp(u){
+ user=u;hide("authScreen");show("app");
+ await loadProfile();
+ renderGames();
+ goHome();
+}
+async function loadProfile(){
+ const {data,error}=await db.from("player_profiles").select("*").eq("user_id",user.id).maybeSingle();
+ if(data)profile=data;
+ else{
+  const username=user.user_metadata?.username||user.email?.split("@")[0]||"Player";
+  const result=await db.from("player_profiles").upsert({
+   user_id:user.id,username,virtual_balance:10000
+  }).select().maybeSingle();
+  profile=result.data||{username,virtual_balance:10000};
+ }
+ updateBalance();
+}
+function updateBalance(){
+ $("balance").textContent=fmt(profile?.virtual_balance||10000);
+}
+function renderGames(){
+ $("gamesGrid").innerHTML=games.map(g=>`
+ <article class="game-card" onclick="openGame('${g.id}')">
+  <div class="game-icon">${g.icon}</div><h3>${g.name}</h3>
+  <p>${g.desc}</p>
+ </article>`).join("");
+}
+function openGame(id){
+ currentGame=games.find(g=>g.id===id);
+ if(!currentGame)return;
+ hide("homePage");hide("dashboardPage");show("gamePage");
+ $("gameTitle").textContent=currentGame.name;
+ $("gameCategory").textContent=currentGame.category;
+ $("gameDescription").textContent=currentGame.desc;
+ goModes();
+}
+function goHome(){
+ hide("gamePage");hide("dashboardPage");show("homePage");
+ if(room)leaveOnlineRoom();
+}
+function goModes(){
+ hide("onlinePanel");hide("roomPanel");hide("playPanel");show("modePicker");
+}
+function showOnline(){
+ hide("modePicker");hide("playPanel");show("onlinePanel");
+ $("onlineName").value=profile?.username||"Player";
+ say("onlineMessage","");
+}
+function startComputer(){
+ mode="computer";room=null;hide("modePicker");hide("onlinePanel");
+ hide("roomPanel");show("playPanel");$("modeLabel").textContent="Computer";
+ $("opponentLabel").textContent="Virtual opponent";
+ initGame();
+}
+function startFriends(){
+ mode="friends";room=null;hide("modePicker");hide("onlinePanel");
+ hide("roomPanel");show("playPanel");$("modeLabel").textContent="Friends — same device";
+ $("opponentLabel").textContent="Pass the device between players";
+ initGame();
+}
+function initGame(){
+ startedAt=Date.now();round=0;turn=0;gameState={};
+ say("gameStatus","Game started");
+ $("gameInfo").textContent=currentGame.desc;
+ if(currentGame.id==="tic-tac-toe")initTicTacToe();
+ else if(currentGame.id==="guess-number")initGuess();
+ else if(currentGame.id==="memory-match")initMemory();
+ else if(currentGame.id==="whot")initWhot();
+ else if(currentGame.id==="monopoly")initMonopoly();
+ else if(currentGame.id==="truth-or-dare")initTruthDare();
+ else if(currentGame.id==="spin-the-bottle")initSpin();
+ else if(currentGame.id==="most-likely-to")initMostLikely();
+ else if(currentGame.id==="60-second-challenges")initChallenge();
+}
+function resetGame(){initGame()}
 
 /* TIC TAC TOE */
-let ticBoard,ticTurn,ticOver;
-function ticGame(){
- document.getElementById("game-content").innerHTML=`
- <p class="muted">Two players • X goes first.</p>
- <div id="tic-status" class="game-output">Player X's turn</div>
- <div class="board" id="tic-board"></div>
- <button class="action" onclick="ticGame()">RESTART</button>`;
- ticBoard=Array(9).fill("");ticTurn="X";ticOver=false;drawTic();
+function initTicTacToe(){
+ gameState={cells:Array(9).fill(""),turn:"X",over:false};
+ drawTicTacToe();
 }
-function drawTic(){
- const board=document.getElementById("tic-board");
- board.innerHTML="";
- ticBoard.forEach((v,i)=>{
-  const b=document.createElement("button");b.className="cell";b.textContent=v;
-  b.onclick=()=>ticMove(i);board.appendChild(b);
- });
+function drawTicTacToe(){
+ $("board").innerHTML=`<div class="board-grid">${gameState.cells.map((v,i)=>
+ `<button class="cell" onclick="ticMove(${i})">${v}</button>`).join("")}</div>`;
+ say("gameStatus",gameState.over?"Game finished":gameState.turn+"'s turn");
+}
+function ticWinner(c){
+ const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+ for(const [a,b,d] of lines)if(c[a]&&c[a]===c[b]&&c[a]===c[d])return c[a];
+ return c.every(Boolean)?"draw":null;
 }
 function ticMove(i){
- if(ticBoard[i]||ticOver)return;
- ticBoard[i]=ticTurn;beep(400);drawTic();
- const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
- if(wins.some(w=>w.every(n=>ticBoard[n]===ticTurn))){
-  ticOver=true;document.getElementById("tic-status").textContent="🎉 Player "+ticTurn+" wins!";
-  finishGame(20);return;
+ if(gameState.over||gameState.cells[i])return;
+ gameState.cells[i]=gameState.turn;
+ let w=ticWinner(gameState.cells);
+ if(w){finishGame(w==="draw"?"It's a draw":w+" wins!");gameState.over=true;drawTicTacToe();return}
+ gameState.turn=gameState.turn==="X"?"O":"X";
+ drawTicTacToe();
+ if(mode==="computer"&&gameState.turn==="O")setTimeout(ticAI,350);
+}
+function ticAI(){
+ if(gameState.over)return;
+ let best=-Infinity,choice=-1;
+ for(let i=0;i<9;i++)if(!gameState.cells[i]){
+  gameState.cells[i]="O";
+  let score=minimax(gameState.cells,false);
+  gameState.cells[i]="";
+  if(score>best){best=score;choice=i}
  }
- if(ticBoard.every(Boolean)){
-  ticOver=true;document.getElementById("tic-status").textContent="It's a draw!";
-  finishGame(5);return;
+ if(choice>=0)ticMove(choice);
+}
+function minimax(c,isMax){
+ let w=ticWinner(c);
+ if(w==="O")return 10;
+ if(w==="X")return -10;
+ if(w==="draw")return 0;
+ let best=isMax?-Infinity:Infinity;
+ for(let i=0;i<9;i++)if(!c[i]){
+  c[i]=isMax?"O":"X";
+  let s=minimax(c,!isMax);
+  c[i]="";
+  best=isMax?Math.max(best,s):Math.min(best,s);
  }
- ticTurn=ticTurn==="X"?"O":"X";
- document.getElementById("tic-status").textContent="Player "+ticTurn+"'s turn";
+ return best;
 }
 
 /* GUESS THE NUMBER */
-let secretNumber,guessRound,guessRewarded,guessFinished;
-function guessGame(){
- secretNumber=Math.floor(Math.random()*100)+1;
- guessRound=1;guessRewarded=false;guessFinished=false;
- document.getElementById("game-content").innerHTML=`
- <div class="game-output">
- <strong class="gold">GUESS THE NUMBER</strong><br>
- I'm thinking of a number between 1 and 100.<br>
- Guess it before Round 10 and win ₦2,000 virtual game money!
- </div>
- <p>Round: <strong id="guess-round">1</strong> / 10</p>
- <input id="guess-input" class="game-input" type="number" min="1" max="100" placeholder="Enter your guess">
- <button class="action" onclick="makeGuess()">SUBMIT GUESS</button>
- <div id="guess-output" class="game-output">Your challenge starts now.</div>
- <button class="secondary" onclick="guessGame()">NEW GAME</button>`;
+function initGuess(){
+ gameState={secret:Math.floor(Math.random()*100)+1,tries:0,won:false,claimed:false};
+ $("board").innerHTML=`
+ <div class="big-number">?</div><p style="text-align:center">I'm thinking of a number from 1 to 100.</p>
+ <label>Your guess</label><input id="guessInput" type="number" min="1" max="100" placeholder="Enter a number">
+ <button class="primary" style="width:100%;margin-top:12px" onclick="makeGuess()">SUBMIT GUESS</button>
+ <p id="guessResult" class="gold" style="text-align:center"></p>`;
+ say("gameStatus","Round 1 of 10");
 }
 function makeGuess(){
- if(guessFinished)return;
- const input=document.getElementById("guess-input");
- const n=Number(input.value);
- if(!n||n<1||n>100){document.getElementById("guess-output").textContent="Enter a number between 1 and 100.";return}
- if(n===secretNumber){
-  guessFinished=true;
-  let message="🎉 CORRECT! You found the secret number!";
-  if(guessRound<10&&!guessRewarded){
-   const s=getStats();s.balance+=2000;saveStats(s);guessRewarded=true;
-   message+="<br><strong class='gold'>₦2,000 VIRTUAL GAME MONEY REWARDED!</strong>";
-  }else{message+="<br>You got it, but the Round 10 reward window has passed."}
-  document.getElementById("guess-output").innerHTML=message;
-  finishGame(25);beep(800,.25);return;
+ if(gameState.won||gameState.tries>=10)return;
+ const v=Number($("guessInput").value);
+ if(!Number.isInteger(v)||v<1||v>100){say("guessResult","Enter a whole number from 1 to 100.");return}
+ gameState.tries++;round=gameState.tries;
+ let result=v===gameState.secret?"Correct!":v<gameState.secret?"Too low!":"Too high!";
+ $("guessResult").textContent=result;
+ $("guessInput").value="";
+ say("gameStatus",`Round ${gameState.tries} of 10`);
+ if(v===gameState.secret){
+  gameState.won=true;
+  $("guessResult").textContent="🎉 You found it! You earned ₦2,000 virtual game money.";
+  awardGuessReward();
+  say("gameStatus","You won!");
+ }else if(gameState.tries>=10){
+  $("guessResult").textContent=`Game over. The number was ${gameState.secret}.`;
+  say("gameStatus","No more rounds");
  }
- guessRound++;
- document.getElementById("guess-round").textContent=guessRound;
- if(guessRound>10){
-  guessFinished=true;
-  document.getElementById("guess-output").textContent="Game over! The number was "+secretNumber+". Try again!";
-  finishGame(0);return;
- }
- document.getElementById("guess-output").textContent=n<secretNumber?"Too low! Try a higher number.":"Too high! Try a lower number.";
- input.value="";beep(300);
+}
+async function awardGuessReward(){
+ if(gameState.claimed)return;
+ gameState.claimed=true;
+ if(mode==="online"){say("gameStatus","Online reward settlement is not enabled in this build.");return}
+ // This is a virtual local reward; never represents cash.
+ profile.virtual_balance=Number(profile.virtual_balance||10000)+2000;
+ await db.from("player_profiles").update({virtual_balance:profile.virtual_balance}).eq("user_id",user.id);
+ updateBalance();
 }
 
 /* MEMORY MATCH */
-const memorySymbols=["🍒","🍋","🍇","🍉","⭐","💎","🎲","👑"];
-let memoryDeck=[],memoryFirst=null,memoryLock=false,memoryPairs=0;
-function memoryGame(){
- memoryDeck=[...memorySymbols,...memorySymbols].sort(()=>Math.random()-.5);
- memoryFirst=null;memoryLock=false;memoryPairs=0;
- document.getElementById("game-content").innerHTML=`
- <p class="muted">Find all eight matching pairs.</p>
- <div id="memory-status" class="game-output">Pairs found: 0 / 8</div>
- <div class="memory-grid" id="memory-grid"></div>
- <button class="action" onclick="memoryGame()">RESTART</button>`;
+function initMemory(){
+ const symbols=["🍒","🍋","🍇","🍉","⭐","🎲","💎","🔥"];
+ memoryDeck=[...symbols,...symbols].sort(()=>Math.random()-.5);
+ memoryOpen=[];memoryMatches=0;gameState={locked:false,moves:0};
  drawMemory();
 }
 function drawMemory(){
- const grid=document.getElementById("memory-grid");grid.innerHTML="";
- memoryDeck.forEach((item,i)=>{
-  const b=document.createElement("button");b.className="memory-card";
-  b.textContent=item.open||item.matched?item.symbol:"?";
-  b.onclick=()=>flipMemory(i);grid.appendChild(b);
- });
+ $("board").innerHTML=`<div class="memory-grid">${memoryDeck.map((s,i)=>{
+ const open=memoryOpen.includes(i),matched=memoryDeck[i+"_matched"];
+ return `<button class="memory-card ${open?"open":""} ${matched?"matched":""}" onclick="memoryFlip(${i})">${open||matched?s:"?"}</button>`;
+ }).join("")}</div><p style="text-align:center">Pairs found: ${memoryMatches}/8 • Moves: ${gameState.moves}</p>`;
 }
-function flipMemory(i){
- if(memoryLock||memoryDeck[i].matched||memoryDeck[i].open)return;
- memoryDeck[i]={symbol:memoryDeck[i].symbol||memoryDeck[i],open:true};
+function memoryFlip(i){
+ if(gameState.locked||memoryOpen.includes(i)||memoryDeck[i+"_matched"])return;
+ memoryOpen.push(i);
+ if(memoryOpen.length===2){
+  gameState.moves++;
+  const [a,b]=memoryOpen;
+  if(memoryDeck[a]===memoryDeck[b]){
+   memoryDeck[a+"_matched"]=true;memoryDeck[b+"_matched"]=true;
+   memoryMatches++;memoryOpen=[];
+   if(memoryMatches===8)finishGame("You matched every pair!");
+  }else{
+   gameState.locked=true;
+   setTimeout(()=>{memoryOpen=[];gameState.locked=false;drawMemory()},750);
+  }
+ }
  drawMemory();
- if(memoryFirst===null){memoryFirst=i;return}
- const first=memoryFirst;memoryFirst=null;
- if(memoryDeck[first].symbol===memoryDeck[i].symbol){
-  memoryDeck[first].matched=true;memoryDeck[i].matched=true;
-  memoryPairs++;document.getElementById("memory-status").textContent="Pairs found: "+memoryPairs+" / 8";
-  if(memoryPairs===8){document.getElementById("memory-status").textContent="🏆 You matched every pair!";finishGame(20)}
- }else{
-  memoryLock=true;setTimeout(()=>{
-   memoryDeck[first].open=false;memoryDeck[i].open=false;
-   memoryLock=false;drawMemory();
-  },750);
- }
 }
 
-/* MONOPOLY - LOCAL STARTER GAME */
-const monoNames=["START","Lagos Island","Community Chest","Abuja","TAX","Port Harcourt","Chance","Ibadan","JAIL","Kano","Enugu","Free Parking","Lekki","Kaduna","Luxury Tax","Magboro"];
-const monoPrices=[0,600,0,800,200,700,0,500,0,650,550,0,1000,450,100,400];
-let monoPlayers=[],monoTurn=0,monoOwner={},monoPosition=[];
-function monopolyGame(){
- monoPlayers=[{name:"Player 1",cash:1500,token:"🎩"},{name:"Player 2",cash:1500,token:"🚗"}];
- monoTurn=0;monoOwner={};monoPosition=[0,0];
- document.getElementById("game-content").innerHTML=`
- <p class="muted">Local two-player Monopoly starter. Pass the device between players.</p>
- <div class="game-output" id="mono-status">Player 1's turn. Roll the dice!</div>
- <div class="mono-board" id="mono-board"></div>
- <div id="mono-players"></div>
- <button class="action" onclick="monoRoll()">🎲 ROLL DICE</button>
- <button class="secondary" onclick="monopolyGame()">NEW GAME</button>
- <p class="muted">Buy properties when you land on them. Pay rent when another player owns the space.</p>`;
- drawMono();
-}
-function drawMono(){
- const board=document.getElementById("mono-board");board.innerHTML="";
- monoNames.forEach((name,i)=>{
-  const owner=monoOwner[i];
-  const occupants=monoPosition.map((p,n)=>p===i?monoPlayers[n].token:"").join("");
-  const div=document.createElement("div");div.className="mono-space";
-  div.innerHTML="<strong>"+name+"</strong>"+(monoPrices[i]?"₦"+monoPrices[i]:"")+
-  "<br>"+(owner!==undefined?"Owned":"")+
-  "<div class='mono-token'>"+occupants+"</div>";
-  board.appendChild(div);
- });
- document.getElementById("mono-players").innerHTML=monoPlayers.map((p,i)=>
- `<div class="player-row"><span>${p.token} ${p.name} ${i===monoTurn?"(TURN)":""}</span><strong>₦${p.cash}</strong></div>`
- ).join("");
-}
-function monoRoll(){
- const p=monoPlayers[monoTurn],dice=Math.floor(Math.random()*6)+1;
- let pos=(monoPosition[monoTurn]+dice)%monoNames.length;
- if(pos<monoPosition[monoTurn]){p.cash+=200;document.getElementById("mono-status").textContent="You passed START and collected ₦200!"}
- monoPosition[monoTurn]=pos;
- const owner=monoOwner[pos],price=monoPrices[pos];
- if(owner!==undefined&&owner!==monoTurn){
-  const rent=Math.max(50,Math.round(price*.2));
-  p.cash-=rent;monoPlayers[owner].cash+=rent;
-  document.getElementById("mono-status").textContent="🎲 "+dice+"! "+p.name+" landed on "+monoNames[pos]+". Paid ₦"+rent+" rent.";
- }else if(price>0&&owner===undefined){
-  document.getElementById("mono-status").innerHTML="🎲 "+dice+"! "+p.name+" landed on "+monoNames[pos]+". <button class='action' onclick='monoBuy("+pos+")'>BUY FOR ₦"+price+"</button>";
- }else{
-  document.getElementById("mono-status").textContent="🎲 "+dice+"! "+p.name+" landed on "+monoNames[pos]+".";
- }
- if(pos===4||pos===14){const tax=pos===4?200:100;p.cash-=tax;document.getElementById("mono-status").textContent+=" Tax paid: ₦"+tax}
- if(pos===2||pos===6){const bonus=100;p.cash+=bonus;document.getElementById("mono-status").textContent+=" Bonus: ₦100"}
- drawMono();beep(500);
-}
-function monoBuy(pos){
- const p=monoPlayers[monoTurn],price=monoPrices[pos];
- if(p.cash<price){document.getElementById("mono-status").textContent="Not enough money to buy this property.";return}
- p.cash-=price;monoOwner[pos]=monoTurn;
- document.getElementById("mono-status").textContent=p.name+" bought "+monoNames[pos]+"!";
- drawMono();
-}
-function monoNext(){monoTurn=(monoTurn+1)%monoPlayers.length;drawMono()}
-
-/* WHOT - SIMPLE LOCAL CARD MATCH */
-const whotShapes=["○","△","□","☆","✕"];
-let whotHands=[],whotDeck=[],whotTop=0,whotTurn=0;
-function whotGame(){
+/* WHOT — basic playable matching game */
+const whotShapes=["○","△","□","☆","✚"];
+function initWhot(){
  const deck=[];
- for(let i=1;i<=14;i++)for(let s=0;s<5;s++)deck.push({n:i,s});
+ whotShapes.forEach((s,i)=>{for(let n=1;n<=14;n++)deck.push({s,n})});
  deck.sort(()=>Math.random()-.5);
- whotHands=[deck.splice(0,5),deck.splice(0,5)];
- whotDeck=deck;whotTop=whotDeck.pop();whotTurn=0;
- renderWhot();
+ whotHand=deck.splice(0,5);whotPile=deck;whotTop=whotPile.pop();whotTurn=0;
+ drawWhot();
 }
-function renderWhot(){
- const p=whotHands[whotTurn];
- document.getElementById("game-content").innerHTML=`
- <div class="game-output">Top card: <span class="big-number">${whotTop.n===20?"WHOT":whotTop.n+" "+whotShapes[whotTop.s]}</span><br>Player ${whotTurn+1}'s turn. Match the number or shape.</div>
- <div>Your cards:</div>
- <div id="whot-hand"></div>
- <button class="action" onclick="whotDraw()">DRAW CARD</button>`;
- const hand=document.getElementById("whot-hand");
- p.forEach((c,i)=>{
-  const b=document.createElement("button");b.className="action";
-  b.textContent=c.n+" "+whotShapes[c.s];b.onclick=()=>whotPlay(i);hand.appendChild(b);
- });
+function drawWhot(){
+ $("board").innerHTML=`<h3 style="text-align:center">Top card</h3>
+ <div class="big-number">${whotTop.s} ${whotTop.n}</div>
+ <p style="text-align:center">Cards remaining in deck: ${whotPile.length}</p>
+ <p style="text-align:center">${whotTurn===0?"Your turn":"Computer's turn"}</p>
+ <div class="whot-hand">${whotHand.map((c,i)=>`<button class="whot-card" onclick="playWhot(${i})" ${whotTurn!==0?"disabled":""}>${c.s}<br>${c.n}</button>`).join("")}</div>
+ <button class="secondary" onclick="drawWhotCard()" ${whotTurn!==0?"disabled":""}>Pick a card</button>`;
 }
-function whotPlay(i){
- const card=whotHands[whotTurn][i];
- if(card.n!==whotTop.n&&card.s!==whotTop.s&&card.n!==20&&whotTop.n!==20){
-  alert("That card does not match the top card.");return;
- }
- whotTop=card;whotHands[whotTurn].splice(i,1);
- if(!whotHands[whotTurn].length){
-  document.getElementById("game-content").innerHTML="<h2 class='gold'>🏆 Player "+(whotTurn+1)+" wins WHOT!</h2><button class='action' onclick='whotGame()'>PLAY AGAIN</button>";
-  finishGame(20);return;
- }
- whotTurn=1-whotTurn;renderWhot();
+function validWhot(c){return c.s===whotTop.s||c.n===whotTop.n}
+function playWhot(i){
+ if(whotTurn!==0)return;
+ const c=whotHand[i];if(!validWhot(c)){say("gameStatus","Match the shape or number.");return}
+ whotTop=c;whotHand.splice(i,1);
+ if(!whotHand.length){finishGame("You won WHOT!");drawWhot();return}
+ whotTurn=1;drawWhot();
+ if(mode==="computer")setTimeout(whotAI,650);
 }
-function whotDraw(){
- if(!whotDeck.length){alert("No more cards in the deck.");return}
- whotHands[whotTurn].push(whotDeck.pop());whotTurn=1-whotTurn;renderWhot();
+function drawWhotCard(){
+ if(whotTurn!==0||!whotPile.length)return;
+ whotHand.push(whotPile.pop());whotTurn=1;drawWhot();
+ if(mode==="computer")setTimeout(whotAI,650);
+}
+function whotAI(){
+ const i=whotHand.findIndex(validWhot);
+ if(i>=0){whotTop=whotHand.splice(i,1)[0];}
+ else if(whotPile.length)whotHand.push(whotPile.pop());
+ if(!whotHand.length){finishGame("Computer won WHOT.");}
+ whotTurn=0;drawWhot();
 }
 
-/* SPIN THE BOTTLE */
-function spinGame(){
- document.getElementById("game-content").innerHTML=`
- <p class="muted">Add players' names, separated by commas.</p>
- <input class="game-input" id="spin-names" placeholder="Ayo, Tobi, Sarah, ...">
- <button class="action" onclick="spinBottle()">🍾 SPIN</button>
- <div id="spin-output" class="game-output">Who will the bottle choose?</div>`;
+/* MONOPOLY — starter property and dice game */
+const properties=[
+ ["START",0],["Old Kent Road",60],["Community Chest",0],["Whitechapel",60],
+ ["King's Cross",200],["The Angel Islington",100],["Chance",0],["Euston Road",100],
+ ["Pentonville Road",120],["JAIL",0],["Pall Mall",140],["Electric Company",150],
+ ["Bow Street",180],["Free Parking",0],["Strand",220],["Fleet Street",220]
+];
+function initMonopoly(){
+ monopolyPlayers=[{name:"You",pos:0,money:1500},{name:mode==="computer"?"Computer":"Friend",pos:0,money:1500}];
+ monopolyTurn=0;monopolyPosition=0;gameState={owned:{}};
+ drawMonopoly();
+}
+function drawMonopoly(){
+ $("board").innerHTML=`<div class="monopoly-track">${properties.map((p,i)=>
+ `<div class="property"><strong>${p[0]}</strong>${monopolyPlayers.some(x=>x.pos===i)?"👤":""}<br>${p[1]?"₦"+p[1]:""}</div>`).join("")}</div>
+ <p>You: ₦${monopolyPlayers[0].money} • Position ${monopolyPlayers[0].pos}</p>
+ <p>${monopolyPlayers[1].name}: ₦${monopolyPlayers[1].money} • Position ${monopolyPlayers[1].pos}</p>
+ <button class="primary" onclick="rollMonopoly()" ${monopolyTurn!==0?"disabled":""}>🎲 ROLL DICE</button>`;
+}
+function rollMonopoly(){
+ if(monopolyTurn!==0)return;
+ const dice=Math.floor(Math.random()*6)+1+Math.floor(Math.random()*6)+1;
+ const p=monopolyPlayers[0];p.pos=(p.pos+dice)%properties.length;
+ const prop=properties[p.pos];
+ let msg=`You rolled ${dice}. You landed on ${prop[0]}.`;
+ if(prop[1]){
+  const owner=gameState.owned[p.pos];
+  if(!owner&&p.money>=prop[1]){
+   if(confirm(`Buy ${prop[0]} for ₦${prop[1]}?`)){
+    p.money-=prop[1];gameState.owned[p.pos]=0;msg+=" Property purchased!";
+   }
+  }else if(owner===1){p.money-=Math.min(prop[1]/5,p.money);monopolyPlayers[1].money+=prop[1]/5;msg+=" Rent paid."}
+ }
+ say("gameStatus",msg);drawMonopoly();monopolyTurn=1;
+ if(mode==="computer")setTimeout(monopolyAI,700);
+ else{
+  $("board").innerHTML+=`<button class="secondary" onclick="nextMonopolyTurn()">Pass to next player</button>`;
+ }
+}
+function nextMonopolyTurn(){monopolyTurn=1;monopolyAI()}
+function monopolyAI(){
+ const p=monopolyPlayers[1],dice=Math.floor(Math.random()*6)+1+Math.floor(Math.random()*6)+1;
+ p.pos=(p.pos+dice)%properties.length;
+ const prop=properties[p.pos];
+ if(prop[1]&&!gameState.owned[p.pos]&&p.money>=prop[1]){
+  p.money-=prop[1];gameState.owned[p.pos]=1;
+ }
+ if(gameState.owned[p.pos]===0&&prop[1]){
+  p.money-=Math.min(prop[1]/5,p.money);monopolyPlayers[0].money+=prop[1]/5;
+ }
+ monopolyTurn=0;drawMonopoly();
+}
+
+/* PARTY MODES */
+const truths=["What is one thing you have never told this group?","What is your funniest embarrassing moment?","Who here makes you laugh the most?","What is a fear you want to overcome?"];
+const dares=["Do your best celebrity impression.","Sing a chorus without music.","Talk in an accent for one round.","Do a silly dance for 15 seconds."];
+function initTruthDare(){
+ $("board").innerHTML=`<div class="big-number">🎭</div><p style="text-align:center">Choose your challenge.</p>
+ <div class="action-row"><button class="primary" onclick="truthDare('truth')">TRUTH</button><button class="secondary" onclick="truthDare('dare')">DARE</button></div>
+ <h3 id="partyResult" style="text-align:center;margin-top:25px"></h3>
+ <p class="muted" style="text-align:center">Everyone can pass any prompt. Respect each other's boundaries.</p>`;
+}
+function truthDare(type){
+ const arr=type==="truth"?truths:dares;
+ $("partyResult").textContent=arr[Math.floor(Math.random()*arr.length)];
+}
+function initSpin(){
+ $("board").innerHTML=`<div class="big-number" id="bottle">🍾</div>
+ <p style="text-align:center">Tap to spin.</p>
+ <button class="primary" style="width:100%" onclick="spinBottle()">SPIN THE BOTTLE</button>
+ <h3 id="spinResult" style="text-align:center"></h3>`;
 }
 function spinBottle(){
- const names=document.getElementById("spin-names").value.split(",").map(x=>x.trim()).filter(Boolean);
- if(names.length<2){document.getElementById("spin-output").textContent="Enter at least two names.";return}
- const out=document.getElementById("spin-output");
- out.innerHTML="<div class='big-number'>🍾</div>Spinning...";
- setTimeout(()=>{
-  out.innerHTML="<div class='big-number'>👉 "+names[Math.floor(Math.random()*names.length)]+"</div> has been chosen!";
-  beep(700,.25);
- },1300);
+ const bottle=$("bottle");bottle.style.transition="transform 2s ease-out";
+ bottle.style.transform=`rotate(${1080+Math.floor(Math.random()*360)}deg)`;
+ const names=mode==="friends"?["Player 1","Player 2","Player 3","Player 4"]:["You","Computer"];
+ setTimeout(()=>{$("spinResult").textContent="The bottle points to "+names[Math.floor(Math.random()*names.length)]+"!";},2000);
 }
-
-/* MOST LIKELY TO */
-const likelyQuestions=[
-"Who is most likely to become famous?",
-"Who is most likely to forget someone's birthday?",
-"Who is most likely to get married first?",
-"Who is most likely to travel the world?",
-"Who is most likely to laugh at the wrong time?",
-"Who is most likely to become a millionaire?",
-"Who is most likely to fall asleep at a party?",
-"Who is most likely to keep a secret?",
-"Who is most likely to send a risky text?",
-"Who is most likely to survive on a deserted island?",
-"Who is most likely to become a celebrity?",
-"Who is most likely to arrive late?",
-"Who is most likely to start a business?",
-"Who is most likely to dance in public?",
-"Who is most likely to get lost even with directions?",
-"Who is most likely to become a movie star?",
-"Who is most likely to spend all their money shopping?",
-"Who is most likely to make everyone laugh?",
-"Who is most likely to fall in love quickly?",
-"Who is most likely to win an argument?"
-];
-function likelyGame(){
- document.getElementById("game-content").innerHTML=`
- <div class="game-output" id="likely-output">Who's most likely to...?</div>
- <button class="action" onclick="nextLikely()">NEXT QUESTION</button>`;
- nextLikely();
+const mostLikely=["Who is most likely to become famous?","Who is most likely to laugh at the wrong moment?","Who is most likely to travel the world?","Who is most likely to forget their phone?"];
+function initMostLikely(){
+ $("board").innerHTML=`<div class="big-number">👀</div><h3 id="likelyQuestion" style="text-align:center">${mostLikely[0]}</h3>
+ <div class="action-row"><button class="primary" onclick="nextLikely()">NEXT QUESTION</button></div>`;
+ gameState.index=0;
 }
 function nextLikely(){
- document.getElementById("likely-output").textContent=likelyQuestions[Math.floor(Math.random()*likelyQuestions.length)];
+ gameState.index=(gameState.index+1)%mostLikely.length;
+ $("likelyQuestion").textContent=mostLikely[gameState.index];
 }
-
-/* 60 SECOND CHALLENGES */
-const challenges=[
-"Name 10 countries in 60 seconds.",
-"Say five words that rhyme with light.",
-"Name 10 football clubs without repeating.",
-"List 10 fruits in 60 seconds.",
-"Name 10 movies as quickly as possible.",
-"Say the alphabet backwards as far as you can.",
-"Name 8 things you can find in a kitchen.",
-"List 10 animals in 60 seconds.",
-"Name 10 musicians without repeating.",
-"Say 10 words that begin with the letter B."
-];
-let challengeTimer=null,challengeLeft=60;
-function challengeGame(){
- clearInterval(challengeTimer);
- document.getElementById("game-content").innerHTML=`
- <div id="challenge-output" class="game-output">Press start to receive your challenge.</div>
- <div class="big-number" id="challenge-clock">60</div>
- <button class="action" onclick="startChallenge()">START CHALLENGE</button>
- <button class="secondary" onclick="clearInterval(challengeTimer)">STOP</button>`;
+const challenges=["Name five countries in 10 seconds.","Say the alphabet backwards as far as you can.","Name five animals in 10 seconds.","Do ten jumping jacks.","Name five foods beginning with B."];
+function initChallenge(){
+ $("board").innerHTML=`<div class="big-number">⏱️</div><h3 id="challengeText" style="text-align:center">${challenges[Math.floor(Math.random()*challenges.length)]}</h3>
+ <div class="big-number" id="clock">60</div>
+ <button class="primary" style="width:100%" onclick="startChallenge()">START 60 SECONDS</button>
+ <button class="secondary" style="width:100%;margin-top:10px" onclick="nextChallenge()">New challenge</button>`;
 }
 function startChallenge(){
- clearInterval(challengeTimer);challengeLeft=60;
- document.getElementById("challenge-output").textContent=challenges[Math.floor(Math.random()*challenges.length)];
- document.getElementById("challenge-clock").textContent=60;
- challengeTimer=setInterval(()=>{
-  challengeLeft--;document.getElementById("challenge-clock").textContent=challengeLeft;
-  if(challengeLeft<=0){
-   clearInterval(challengeTimer);
-   document.getElementById("challenge-output").textContent="⏰ TIME'S UP!";
-   beep(200,.5);finishGame(10);
-  }
- },1000);
+ clearInterval(timerHandle);let t=60;
+ $("clock").textContent=t;
+ timerHandle=setInterval(()=>{t--;$("clock").textContent=t;if(t<=0){clearInterval(timerHandle);say("gameStatus","Time is up!");}},1000);
 }
+function nextChallenge(){
+ $("challengeText").textContent=challenges[Math.floor(Math.random()*challenges.length)];
+}
+
+/* ONLINE MULTIPLAYER */
+async function createOnlineRoom(){
+ if(!user)return;
+ const name=$("onlineName").value.trim()||profile?.username||"Player";
+ say("onlineMessage","Creating room…");
+ const {data,error}=await db.rpc("create_game_room",{
+  p_game_key:currentGame.id,p_player_name:name,p_player_avatar:"🎮",
+  p_max_players:Number($("roomSize").value)
+ });
+ if(error){say("onlineMessage",error.message);return}
+ const result=Array.isArray(data)?data[0]:data;
+ if(!result){say("onlineMessage","Room creation failed.");return}
+ await enterRoom({id:result.room_id,code:result.room_code});
+}
+async function joinOnlineRoom(){
+ const code=$("joinCode").value.trim().toUpperCase();
+ if(code.length!==6){say("onlineMessage","Enter the 6-character room code.");return}
+ say("onlineMessage","Joining room…");
+ const {data,error}=await db.rpc("join_game_room",{
+  p_room_code:code,p_player_name:$("onlineName").value.trim()||profile?.username||"Player",
+  p_player_avatar:"🎮"
+ });
+ if(error){say("onlineMessage",error.message);return}
+ const r=Array.isArray(data)?data[0]:data;
+ if(!r){say("onlineMessage","Could not join this room.");return}
+ if(r.game_key!==currentGame.id){say("onlineMessage","That room is for a different game.");return}
+ await enterRoom({id:r.room_id,code:r.room_code});
+}
+async function enterRoom(r){
+ room=r;hide("onlinePanel");hide("modePicker");show("roomPanel");
+ $("roomCodeDisplay").textContent=r.code;
+ say("roomStatus","Connecting to room…");
+ roomChannel=db.channel("mindgames-room-"+r.id,{
+  config:{presence:{key:user.id},broadcast:{ack:true,self:false}}
+ });
+ roomChannel
+  .on("presence",{event:"sync"},()=>renderRoomPresence())
+  .on("broadcast",{event:"game-update"},({payload})=>{
+    if(payload?.state){gameState=payload.state;renderSyncedGame()}
+  })
+  .subscribe(async status=>{
+   if(status==="SUBSCRIBED"){
+    await roomChannel.track({user_id:user.id,name:profile?.username||"Player",avatar:"🎮",online_at:new Date().toISOString()});
+    await refreshRoomPlayers();
+    say("roomStatus","Connected. Waiting for players.");
+   }else if(status==="CHANNEL_ERROR")say("roomStatus","Realtime connection error. Check Supabase Realtime settings.");
+  });
+ await refreshRoomPlayers();
+}
+function renderRoomPresence(){
+ if(!roomChannel)return;
+ const state=roomChannel.presenceState();
+ const players=Object.values(state).flat();
+ $("roomPlayers").innerHTML=players.map(p=>`<div>🟢 ${escapeHTML(p.name||"Player")}</div>`).join("")||"Waiting for players…";
+}
+async function refreshRoomPlayers(){
+ if(!room)return;
+ const {data,error}=await db.from("room_players").select("player_name,player_avatar").eq("room_id",room.id);
+ if(!error&&data){
+  $("roomPlayers").innerHTML=data.map(p=>`<div>🎮 ${escapeHTML(p.player_name)}</div>`).join("");
+ }
+}
+function escapeHTML(s){
+ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function copyRoomCode(){
+ if(room)navigator.clipboard?.writeText(room.code);
+}
+async function beginOnlineGame(){
+ if(!room)return;
+ const {data,error}=await db.from("room_players").select("id").eq("room_id",room.id);
+ if(error){say("roomStatus",error.message);return}
+ if((data||[]).length<2){say("roomStatus","You need at least two players to start.");return}
+ mode="online";hide("roomPanel");show("playPanel");
+ $("modeLabel").textContent="Online multiplayer";
+ $("opponentLabel").textContent="Connected room: "+room.code;
+ initGame();
+ await broadcastGameState();
+}
+async function broadcastGameState(){
+ if(!room||!roomChannel||!gameState)return;
+ await roomChannel.send({type:"broadcast",event:"game-update",payload:{state:gameState}});
+ await db.rpc("update_game_room_state",{
+  p_room_id:room.id,p_game_state:gameState,p_status:"playing"
+ });
+}
+function renderSyncedGame(){
+ if(!currentGame)return;
+ if(currentGame.id==="tic-tac-toe")drawTicTacToe();
+ else if(currentGame.id==="guess-number")say("gameStatus","Game state updated by another player.");
+}
+async function leaveOnlineRoom(){
+ if(!room)return;
+ if(roomChannel){await roomChannel.untrack();await db.removeChannel(roomChannel)}
+ await db.rpc("leave_game_room",{p_room_id:room.id});
+ room=null;roomChannel=null;
+}
+async function finishGame(result){
+ say("gameStatus",result);
+ recordActivity(result);
+ if(mode==="online")await broadcastGameState();
+}
+function recordActivity(result){
+ const item={game:currentGame?.name||"Game",result,minutes:Math.max(1,Math.round((Date.now()-startedAt)/60000)),date:new Date().toLocaleString()};
+ activity.unshift(item);activity=activity.slice(0,30);
+ try{localStorage.setItem("mindgames_activity_"+user.id,JSON.stringify(activity))}catch(e){}
+}
+function showDashboard(){
+ hide("homePage");hide("gamePage");show("dashboardPage");
+ activity=[];
+ try{activity=JSON.parse(localStorage.getItem("mindgames_activity_"+user.id)||"[]")}catch(e){}
+ $("dashName").textContent=profile?.username||"Player";
+ $("dashBalance").textContent=fmt(profile?.virtual_balance||10000);
+ $("dashStats").textContent=`${activity.length} recorded game sessions on this device.`;
+ $("activityList").innerHTML=activity.length?activity.map(a=>`<p><strong>${escapeHTML(a.game)}</strong> — ${escapeHTML(a.result)}<br><span class="muted">${a.minutes} min • ${escapeHTML(a.date)}</span></p>`).join(""):"No games played yet.";
+}
+
+/* Keep game moves in sync for online Tic-Tac-Toe */
+const originalTicMove=ticMove;
+ticMove=async function(i){
+ originalTicMove(i);
+ if(mode==="online")await broadcastGameState();
+};
+const originalWhotMove=playWhot;
+playWhot=async function(i){
+ originalWhotMove(i);
+ if(mode==="online")await broadcastGameState();
+};
+
+/* Session restore */
+db.auth.getSession().then(async({data})=>{
+ if(data.session?.user)await enterApp(data.session.user);
+});
+db.auth.onAuthStateChange(async(event,session)=>{
+ if(event==="SIGNED_OUT"){
+  hide("app");show("authScreen");
+ }
+});
 </script>
 </body>
 </html>

@@ -34,6 +34,73 @@ h1,h2,h3{line-height:1.15}h1{font-size:clamp(30px,6vw,58px);margin:10px 0}h2{fon
 .stickman-wrap{background:#0b0b0b;border:1px solid var(--line);border-radius:15px;padding:12px;overflow:hidden}.stickman-hud{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;font-size:11px;color:var(--gold);text-align:center;padding:5px 2px 12px}.stickman-hud>div:first-child{text-align:left}.stickman-hud>div:last-child{text-align:right}.sm-health{height:11px;background:#342020;border:1px solid #6b4c28;border-radius:20px;overflow:hidden;margin-top:6px}.sm-health i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#35b878,#c4d86a);transition:width .12s}.stickman-wrap canvas{display:block;width:100%;height:auto;aspect-ratio:900/420;background:#111;border-radius:10px;border:1px solid #4d3b1e}.sm-round{font-size:12px;font-weight:900;letter-spacing:2px}.sm-status{text-align:center;color:var(--gold2);font-weight:800;padding:12px 4px}.sm-controls{display:flex;justify-content:space-between;gap:10px;align-items:center}.sm-pad,.sm-attacks{display:flex;gap:7px}.sm-controls button{min-width:53px;min-height:48px;border:1px solid #8c6c32;border-radius:10px;background:#211b10;color:#f5d98f;font-weight:900;touch-action:none}.sm-attacks button{padding:0 14px;background:#382016;border-color:#a65d32}.sm-help{font-size:11px;color:#888;text-align:center;margin-bottom:2px}@media(max-width:520px){.stickman-wrap{padding:8px}.sm-controls button{min-width:45px;min-height:46px}.sm-attacks button{padding:0 9px;font-size:11px}.sm-help{font-size:10px}}
 
 footer{text-align:center;color:#666;font-size:11px;padding:25px}@media(max-width:760px){.game-layout{grid-template-columns:1fr}header{align-items:flex-start}.logo{font-size:18px}.top-actions{justify-content:flex-end}}
+ /* FULL-SCREEN STICKMAN ARENA */
+.stickman-wrap{
+ position:fixed!important;
+ inset:0!important;
+ z-index:9999!important;
+ width:100vw!important;
+ height:100vh!important;
+ height:100dvh!important;
+ border:0!important;
+ border-radius:0!important;
+ padding:10px!important;
+ background:
+ radial-gradient(ellipse at 50% 40%,#26344b 0%,#10131d 48%,#030407 100%)!important;
+ display:flex!important;
+ flex-direction:column!important;
+ justify-content:space-between!important;
+ overflow:hidden!important;
+}
+.stickman-wrap .stickman-hud{
+ flex:0 0 auto;
+ width:min(100%,1100px);
+ margin:0 auto;
+ padding:8px 5px 12px;
+}
+.stickman-wrap canvas{
+ flex:1 1 auto;
+ width:min(100%,1400px)!important;
+ height:auto!important;
+ max-height:calc(100dvh - 190px)!important;
+ min-height:150px;
+ aspect-ratio:900/420;
+ margin:auto;
+ object-fit:contain;
+}
+.stickman-wrap .sm-status{
+ flex:0 0 auto;
+}
+.stickman-wrap .sm-controls{
+ flex:0 0 auto;
+ width:min(100%,1100px);
+ margin:8px auto 0;
+ padding-bottom:env(safe-area-inset-bottom);
+}
+.stickman-wrap .sm-help{
+ flex:0 0 auto;
+ margin:5px auto 0;
+}
+.stickman-wrap button{
+ user-select:none;
+ -webkit-user-select:none;
+ -webkit-touch-callout:none;
+ touch-action:none;
+}
+body:has(.stickman-wrap){
+ overflow:hidden!important;
+}
+@media(orientation:landscape){
+ .stickman-wrap canvas{
+  max-height:calc(100dvh - 145px)!important;
+ }
+ .stickman-wrap .sm-help{font-size:10px}
+}
+@media(max-width:520px){
+ .stickman-wrap{padding:7px!important}
+ .stickman-wrap .stickman-hud{font-size:10px}
+ .stickman-wrap .sm-controls button{min-width:48px;min-height:48px}
+}
 </style>
 </head>
 <body>

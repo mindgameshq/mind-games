@@ -256,7 +256,22 @@ function stickmanLoop(now){if(!stickman||!$("stickmanCanvas"))return;let dt=Math
  }
  drawStickman();stickmanFrame=requestAnimationFrame(stickmanLoop)
 }
-function stickmanAI(){let a=stickman.fighters[0],b=stickman.fighters[1],d=a.x-b.x,near=Math.abs(d)<105;return{left:d>78,right:d< -78,jump:near&&a.y<250&&Math.random()<.035,punch:near&&Math.random()<.16,kick:Math.abs(d)<125&&Math.random()<.075}}
+function stickmanAI(){
+ let player=stickman.fighters[0];
+ let cpu=stickman.fighters[1];
+
+ let distance=player.x-cpu.x;
+ let near=Math.abs(distance)<115;
+
+ return {
+  left:distance< -85,
+  right:distance>85,
+  jump:near && Math.random()<0.025,
+  punch:near && Math.random()<0.12,
+  kick:near && Math.random()<0.10
+ };
+}
+
 function stepStickman(dt,inputs){let f=stickman.fighters;for(let i=0;i<2;i++){let p=f[i],q=f[1-i],u=inputs[i]||{};p.cool=Math.max(0,p.cool-dt);p.attack=Math.max(0,p.attack-dt);p.flash=Math.max(0,p.flash-dt);p.vx=0;if(u.left)p.vx=-245;if(u.right)p.vx=245;if(u.jump&&p.ground){p.vy=-470;p.ground=false}if((u.punch||u.kick)&&p.cool<=0){p.attack=u.kick?.28:.2;p.attackType=u.kick?"kick":"punch";p.cool=u.kick?.62:.38;let reach=u.kick?104:82;if(Math.abs(q.x-p.x)<reach&&Math.abs(q.y-p.y)<85&&((q.x-p.x)*p.face)>-8){q.hp=Math.max(0,q.hp-(u.kick?13:8));q.flash=.13;q.vx=p.face*180;q.vy=-100}}
  p.x=Math.max(45,Math.min(855,p.x+p.vx*dt));p.vy+=1050*dt;p.y+=p.vy*dt;if(p.y>=326){p.y=326;p.vy=0;p.ground=true}p.face=q.x>=p.x?1:-1;
  }

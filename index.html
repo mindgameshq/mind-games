@@ -551,7 +551,22 @@ async function refreshRoomPlayers(){if(!room)return;let{data,error}=await db.fro
 function copyRoomCode(){if(room)navigator.clipboard?.writeText(room.code)}
 async function beginOnlineGame(){if(!room)return;let{data,error}=await db.from("room_players").select("id").eq("room_id",room.id);if(error){say("roomStatus",error.message);return}if((data||[]).length<2){say("roomStatus","You need at least two players to start.");return}mode="online";hide("roomPanel");show("playPanel");$("modeLabel").textContent="Online multiplayer";$("opponentLabel").textContent="Connected room: "+room.code;initGame();await broadcastGameState()}
 async function broadcastGameState(){if(!room||!roomChannel||!gameState)return;await roomChannel.send({type:"broadcast",event:"game-update",payload:{state:gameState}});await db.rpc("update_game_room_state",{p_room_id:room.id,p_game_state:gameState,p_status:"playing"})}
-function renderSyncedGame(){if(!currentGame)return;if(currentGame.id==="tic-tac-toe")drawTicTacToe();else say("gameStatus","Game state received. This game mode's online turn controls are not yet implemented.")}
+function renderSyncedGame(){
+  if(!currentGame||!gameState)return;
+
+  if(currentGame.id==="tic-tac-toe"){
+    drawTicTacToe();
+
+    if(gameState.over){
+      let winner=ticWinner(gameState.cells);
+      say("gameStatus",winner==="draw"?"It's a draw":winner+" wins!");
+    }else{
+      say("gameStatus",gameState.turn+"'s turn");
+    }
+  }else{
+    say("gameStatus","Game state received. This game mode's online turn controls are not yet implemented.");
+  }
+}
 async function leaveOnlineRoom(){if(!room)return;if(roomChannel){await roomChannel.untrack();await db.removeChannel(roomChannel)}await db.rpc("leave_game_room",{p_room_id:room.id});room=null;roomChannel=null}
 async function finishGame(result){say("gameStatus",result);if(mode==="online")await broadcastGameState();say("message","Game result recorded on this screen only. Verified rewards and wallet credits are not active yet.")}
 async function showDashboard(){hide("homePage");hide("gamePage");show("dashboardPage");$("dashName").textContent=profile?.username||"Player";$("dashBalance").textContent=profile?.virtual_balance==null?"Unavailable":fmt(profile.virtual_balance);$("activityList").textContent="Loading verified game history…";$("transactionList").textContent="Loading wallet transactions…";await Promise.all([loadRewardStats(),loadVerifiedGames(),loadTransactions()])}

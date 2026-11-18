@@ -259,7 +259,7 @@ const games=[
 {id:"60-second-challenges",name:"60-Second Challenges",icon:"⏱️",desc:"Quick-fire challenges against the clock.",category:"CHALLENGE"},
 {id:"stickman-fighting",name:"Stickman Fighting",icon:"🥊",desc:"Enter the arena, master your moves and defeat your rival.",category:"ACTION"}];
 let user=null,profile=null,signupMode=false,currentGame=null,mode="computer",room=null,roomChannel=null,gameState={},startedAt=0;
-let memoryDeck=[],memoryOpen=[],memoryMatches=0,whotHand=[],whotPile=[],whotTop=null,whotTurn=0,monopolyPlayers=[],monopolyTurn=0,timerHandle=null;
+let memoryDeck=[],memoryOpen=[],memoryMatches=0,whotHand=[],whotAIHand=[],whotPile=[],whotTop=null,whotTurn=0,monopolyPlayers=[],monopolyTurn=0,timerHandle=null;
 const $=id=>document.getElementById(id),fmt=n=>"₦"+Number(n||0).toLocaleString("en-NG");
 function say(id,msg){$(id).textContent=msg}function show(id){$(id).classList.remove("hidden")}function hide(id){$(id).classList.add("hidden")}
 function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}

@@ -1400,16 +1400,7 @@ function drawStickman(){if(!stickman)return;let c=stickman.ctx,cv=stickman.canva
 }
 function destroyStickman(){if(!stickman)return;cancelAnimationFrame(stickmanFrame);window.removeEventListener("keydown",stickman.onDown);window.removeEventListener("keyup",stickman.onUp);stickman=null;stickmanKeys={};stickmanTouch={}}
 db.auth.onAuthStateChange((event,session)=>{
-  if(session?.user){
-    user=session.user;
-    hide("authScreen");
-    show("app");
-    setTimeout(async()=>{
-      await loadProfile();
-      renderGames();
-      goHome();
-    },0);
-  }else{
+  if(event==="SIGNED_OUT"){
     user=null;
     profile=null;
     hide("app");

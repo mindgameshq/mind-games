@@ -962,8 +962,52 @@ const $=id=>document.getElementById(id),fmt=n=>"₦"+Number(n||0).toLocaleString
 function say(id,msg){$(id).textContent=msg}function show(id){$(id).classList.remove("hidden")}function hide(id){$(id).classList.add("hidden")}
 function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function toggleAuth(){signupMode=!signupMode;$("signupFields").classList.toggle("hidden",!signupMode);$("authSubmit").textContent=signupMode?"CREATE ACCOUNT":"SIGN IN";$("authToggle").textContent=signupMode?"I already have an account":"Create an account";say("authMessage","")}
-async function submitAuth(){const email=$("email").value.trim(),password=$("password").value;if(!email||!password){say("authMessage","Enter your email and password.");return}say("authMessage","Please wait…");let r;if(signupMode){r=await db.auth.signUp({email,password,options:{data:{username:$("username").value.trim()||email.split("@")[0]}}})}else r=await db.auth.signInWithPassword({email,password});if(r.error){say("authMessage",r.error.message);return}if(signupMode&&!r.data.session){say("authMessage","Account created. Check your email to verify, then sign in.");return}if(r.data.user)await enterApp(r.data.user)}
-async function signOut(){if(room)await leaveOnlineRoom();await db.auth.signOut();user=null;profile=null;hide("app");show("authScreen")}
+async function submitAuth(){
+  const email=$("email").value.trim();
+  const password=$("password").value;
+  const button=$("authSubmit");
+
+  if(!email||!password){
+    say("authMessage","Enter your email and password.");
+    return;
+  }
+
+  button.disabled=true;
+  say("authMessage","Connecting to Supabase…");
+
+  try{
+    const r=signupMode
+      ? await db.auth.signUp({
+          email,
+          password,
+          options:{
+            data:{
+              username:$("username").value.trim()||email.split("@")[0]
+            }
+          }
+        })
+      : await db.auth.signInWithPassword({email,password});
+
+    if(r.error){
+      say("authMessage",r.error.message);
+      return;
+    }
+
+    if(signupMode&&!r.data.session){
+      say("authMessage","Account created. Check your email to verify, then sign in.");
+      return;
+    }
+
+    if(r.data.user) await enterApp(r.data.user);
+
+  }catch(error){
+    say("authMessage","Authentication error: "+(error.message||String(error)));
+  }finally{
+    button.disabled=false;
+    button.textContent=signupMode?"CREATE ACCOUNT":"SIGN IN";
+  }
+}
+ async function signOut(){if(room)await leaveOnlineRoom();await db.auth.signOut();user=null;profile=null;hide("app");show("authScreen")}
 async function loadProfile(){
   const {data,error}=await db
     .from("player_profiles")

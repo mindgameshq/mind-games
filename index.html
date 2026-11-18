@@ -328,6 +328,232 @@ input:focus, select:focus {
     animation-duration: .01ms !important;
     transition-duration: .01ms !important;
   }
+}
+/* MINDWEAVER MONOPOLY — 3D ENVIRONMENT PHASE 1 */
+
+.mw-monopoly{
+  position:relative;
+  overflow:hidden;
+  padding:18px;
+  border:1px solid rgba(224,190,120,.35);
+  border-radius:25px;
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(65,105,85,.24),transparent 55%),
+    linear-gradient(145deg,#17251f,#080e0d 75%);
+  box-shadow:
+    0 25px 65px rgba(0,0,0,.65),
+    inset 0 1px rgba(255,255,255,.08);
+}
+
+.mw-monopoly-header{
+  position:relative;
+  z-index:2;
+  padding:5px 4px 16px;
+}
+
+.mw-monopoly-header h2{
+  color:#f4d69a;
+  text-shadow:0 3px 15px rgba(229,180,95,.3);
+}
+
+/* Deep green premium playing table */
+.mw-classic-board{
+  position:relative;
+  isolation:isolate;
+  perspective:1100px;
+  transform:perspective(1100px) rotateX(3deg);
+  transform-origin:center center;
+  padding:12px;
+  gap:5px;
+
+  background-color:#123e2d;
+  background-image:
+    radial-gradient(ellipse at 50% 45%,rgba(65,135,91,.35),transparent 70%),
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,.018) 0px,
+      rgba(255,255,255,.018) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    linear-gradient(145deg,#20563d,#0b281e 75%);
+
+  border:9px solid #76502b;
+  border-radius:13px;
+
+  box-shadow:
+    0 18px 0 #392516,
+    0 25px 35px rgba(0,0,0,.7),
+    inset 0 0 0 2px #c49a5d,
+    inset 0 0 35px rgba(0,0,0,.65);
+}
+
+/* Warm wooden frame */
+.mw-classic-board::before{
+  content:"";
+  position:absolute;
+  inset:-8px;
+  z-index:-1;
+  border:5px solid #a77b43;
+  border-radius:17px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,220,155,.09) 0 2px,
+      transparent 2px 12px
+    ),
+    linear-gradient(135deg,#8b6036,#432a18 50%,#a77b43);
+  box-shadow:0 12px 25px #0009;
+}
+
+/* Raised ceramic property tiles */
+.mw-board-space{
+  position:relative;
+  z-index:1;
+  min-width:0;
+  border:1px solid #bca477;
+  border-radius:5px;
+
+  background:
+    linear-gradient(145deg,#fff9e9 0%,#e9d9b5 48%,#c9b58c 100%);
+
+  box-shadow:
+    0 5px 0 #806744,
+    0 8px 12px rgba(0,0,0,.55),
+    inset 0 1px 2px rgba(255,255,255,.95),
+    inset 0 -3px 5px rgba(80,53,24,.15);
+
+  transform:translateZ(7px);
+  transition:transform .22s ease,box-shadow .22s ease;
+}
+
+.mw-board-space::after{
+  content:"";
+  position:absolute;
+  inset:1px;
+  pointer-events:none;
+  border:1px solid rgba(255,255,255,.32);
+  border-radius:4px;
+}
+
+.mw-board-space strong{
+  color:#302319;
+  text-shadow:0 1px rgba(255,255,255,.65);
+}
+
+.mw-space-band{
+  height:10px;
+  box-shadow:0 2px 4px rgba(0,0,0,.22);
+}
+
+.mw-space-price{
+  color:#594326;
+  font-weight:900;
+}
+
+.mw-special-space{
+  background:
+    radial-gradient(circle at 50% 20%,#fff2c5,#e5c77f 75%);
+}
+
+/* Highlight the occupied property */
+.mw-space-active{
+  z-index:3;
+  outline:2px solid #ffe5a0;
+  box-shadow:
+    0 0 18px rgba(255,218,119,.8),
+    0 6px 0 #806744,
+    0 12px 20px #0009;
+  transform:translateY(-4px) translateZ(14px);
+}
+
+/* Central felt emblem */
+.mw-board-centre{
+  position:relative;
+  isolation:isolate;
+  border:2px solid #c5a365;
+  border-radius:10px;
+
+  background:
+    radial-gradient(ellipse at 50% 35%,rgba(85,145,104,.6),transparent 70%),
+    linear-gradient(145deg,#174d37,#08291e);
+
+  box-shadow:
+    inset 0 0 30px rgba(0,0,0,.55),
+    0 5px 12px rgba(0,0,0,.45);
+}
+
+.mw-board-centre::before{
+  content:"";
+  position:absolute;
+  inset:9px;
+  z-index:-1;
+  border:1px solid rgba(229,194,126,.3);
+  border-radius:7px;
+}
+
+.mw-centre-crown{
+  color:#f5d58e;
+  text-shadow:0 4px 15px rgba(240,190,95,.5);
+  filter:drop-shadow(0 5px 5px #0008);
+}
+
+.mw-board-centre h2{
+  color:#f7d99b;
+  text-shadow:0 3px 12px #0008;
+}
+
+/* Premium player wallet panels */
+.mw-monopoly-player{
+  background:
+    linear-gradient(145deg,#263a32,#101b19);
+  border:1px solid rgba(214,183,119,.3);
+  box-shadow:
+    0 8px 18px #0005,
+    inset 0 1px rgba(255,255,255,.07);
+}
+
+.mw-player-active{
+  border-color:#e9c77e;
+  box-shadow:
+    0 0 20px rgba(226,187,109,.2),
+    inset 0 0 15px rgba(226,187,109,.08);
+}
+
+.mw-monopoly-player strong{
+  color:#f2d18c;
+  text-shadow:0 2px 10px rgba(220,175,91,.2);
+}
+
+.mw-roll-button{
+  box-shadow:
+    0 5px 0 #75501f,
+    0 10px 22px rgba(0,0,0,.5),
+    inset 0 1px rgba(255,255,255,.5);
+}
+
+@media(max-width:520px){
+  .mw-monopoly{
+    padding:10px;
+  }
+
+  .mw-classic-board{
+    transform:perspective(900px) rotateX(1deg);
+    padding:7px;
+    border-width:6px;
+  }
+
+  .mw-board-space{
+    box-shadow:
+      0 3px 0 #806744,
+      0 5px 7px #0006;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .mw-board-space{
+    transition:none;
+  }
 } 
 </style>
 </head>

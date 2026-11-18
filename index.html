@@ -1399,11 +1399,16 @@ function drawStickman(){if(!stickman)return;let c=stickman.ctx,cv=stickman.canva
  const f=stickman.fighters;[0,1].forEach(i=>{let el=$(i===0?"smHealth1":"smHealth2");if(el)el.style.width=f[i].hp+"%"});if($("smRound"))$("smRound").textContent="FIGHT • "+Math.ceil((f[0].hp+f[1].hp)/2)+"% POWER";
 }
 function destroyStickman(){if(!stickman)return;cancelAnimationFrame(stickmanFrame);window.removeEventListener("keydown",stickman.onDown);window.removeEventListener("keyup",stickman.onUp);stickman=null;stickmanKeys={};stickmanTouch={}}
-
-db.auth.getSession().then(async({data})=>{if(data.session?.user)await enterApp(data.session.user)});
 db.auth.onAuthStateChange((event,session)=>{
   if(session?.user){
-    enterApp(session.user);
+    user=session.user;
+    hide("authScreen");
+    show("app");
+    setTimeout(async()=>{
+      await loadProfile();
+      renderGames();
+      goHome();
+    },0);
   }else{
     user=null;
     profile=null;

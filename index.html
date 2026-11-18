@@ -1401,5 +1401,14 @@ function drawStickman(){if(!stickman)return;let c=stickman.ctx,cv=stickman.canva
 function destroyStickman(){if(!stickman)return;cancelAnimationFrame(stickmanFrame);window.removeEventListener("keydown",stickman.onDown);window.removeEventListener("keyup",stickman.onUp);stickman=null;stickmanKeys={};stickmanTouch={}}
 
 db.auth.getSession().then(async({data})=>{if(data.session?.user)await enterApp(data.session.user)});
-db.auth.onAuthStateChange(async(event,session)=>{if(event==="SIGNED_OUT"){user=null;profile=null;hide("app");show("authScreen")}});
+db.auth.onAuthStateChange((event,session)=>{
+  if(session?.user){
+    enterApp(session.user);
+  }else{
+    user=null;
+    profile=null;
+    hide("app");
+    show("authScreen");
+  }
+});
 </script></body></html>

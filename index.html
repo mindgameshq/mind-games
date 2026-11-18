@@ -218,18 +218,18 @@ body:has(.stickman-wrap){
   </div>
 </section> 
 <section id="authScreen"><div class="auth-card">
-<div class="logo">MIND GAMES<small>THINK • PLAY • CONQUER</small></div><h2>Enter the arena.</h2><p>Your next challenge is waiting. Sign in to unlock the games.</p>
+<div class="logo">MINDWEAVER<small>THINK • PLAY • CONQUER</small></div><h2>Enter the arena.</h2><p>Your next challenge is waiting. Sign in to unlock the games.</p>
 <div id="signupFields" class="hidden"><label>Choose a username</label><input id="username" maxlength="24" placeholder="Your player name"></div>
 <label>Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com">
 <label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Your password">
 <button class="primary" id="authSubmit" onclick="submitAuth()">SIGN IN</button><button class="secondary" id="authToggle" onclick="toggleAuth()">Create an account</button><div id="authMessage"></div>
 </div></section>
-<div id="app" class="hidden"><header><div class="logo">MIND GAMES<small>THINK • PLAY • CONQUER</small></div><div class="top-actions"><span class="balance" id="balance">Loading wallet…</span><button class="secondary" onclick="showDashboard()">My activity</button><button class="secondary" onclick="signOut()">Sign out</button></div></header>
+<div id="app" class="hidden"><header><div class="logo">MINDWEAVER<small>THINK • PLAY • CONQUER</small></div><div class="top-actions"><span class="balance" id="balance">Loading wallet…</span><button class="secondary" onclick="showDashboard()">My activity</button><button class="secondary" onclick="signOut()">Sign out</button></div></header>
 <main class="wrap">
 <section id="homePage"><div class="hero"><div class="eyebrow">WELCOME TO THE ARENA</div><h1>Think sharper.<br><span class="gold">Play smarter.</span></h1><p>Challenge yourself, take on the computer, play with friends or create an online room and compete with real players.</p></div>
 <div class="promo">📣 PLAY GUESS THE NUMBER TO EARN! Guess the secret number before Round 10 and collect ₦2,000 game money. <span style="display:block;font-size:11px;font-weight:400;margin-top:5px">Reward activation is temporarily paused while secure server verification is connected.</span></div>
 <div class="section-head"><h2>Choose your game</h2><span class="muted">9 games</span></div><div class="games-grid" id="gamesGrid"></div></section>
-<section id="gamePage" class="hidden"><button class="secondary back" onclick="goHome()">← All games</button><div class="eyebrow" id="gameCategory">MIND GAMES</div><h1 id="gameTitle">Game</h1><p class="muted" id="gameDescription"></p>
+<section id="gamePage" class="hidden"><button class="secondary back" onclick="goHome()">← All games</button><div class="eyebrow" id="gameCategory">MINDWEAVER</div><h1 id="gameTitle">Game</h1><p class="muted" id="gameDescription"></p>
 <div id="modePicker" class="panel"><h2>Choose how to play</h2><div class="modes">
 <button class="mode-card" onclick="startComputer()"><div class="game-icon">🤖</div><strong>Play Computer</strong><span>Challenge a virtual opponent where supported.</span></button>
 <button class="mode-card" onclick="showOnline()"><div class="game-icon">🌐</div><strong>Play Online</strong><span>Create a room or join a real player using an invite code.</span></button>
@@ -241,9 +241,9 @@ body:has(.stickman-wrap){
 <section id="dashboardPage" class="hidden"><button class="secondary back" onclick="goHome()">← Back</button><h1>Player activity</h1><div class="panel"><h3 id="dashName">Your account</h3><div class="big-number" id="dashBalance">₦10,000</div><p class="muted">Virtual game money • no cash value</p><div class="stat-grid"><div class="stat">Total points<strong id="dashPoints">0</strong></div><div class="stat">Win streak<strong id="dashStreak">0</strong></div><div class="stat">Total wins<strong id="dashWins">0</strong></div><div class="stat">Total losses<strong id="dashLosses">0</strong></div></div></div>
 <div class="panel"><h3>Reward progress</h3><p id="rewardProgress" class="muted">Loading reward progress…</p><p class="muted">Rewards are credited only after a trusted server verifies a completed game.</p></div>
 <div class="panel"><h3>Recent verified games</h3><div id="activityList" class="muted">Loading…</div></div><div class="panel"><h3>Wallet transactions</h3><div id="transactionList" class="muted">Loading…</div></div></section>
-<div id="message"></div></main><footer>MIND GAMES • THINK • PLAY • CONQUER<br>Virtual game currency has no cash value.</footer></div>
+<div id="message"></div></main><footer>MINDWEAVER • THINK • PLAY • CONQUER<br>Virtual game currency has no cash value.</footer></div>
 <script>
-/* MIND GAMES — Supabase account wallet edition */
+/* MINDWEAVER — Supabase account wallet edition */
 const SUPABASE_URL="https://pnatjqwplyxhpcfqhgcm.supabase.co";
 const SUPABASE_KEY="sb_publishable_lbUX7xkFk96kxH1ZP_Zk6A_zWvXT6AD";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);

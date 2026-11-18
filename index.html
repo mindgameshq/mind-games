@@ -289,7 +289,32 @@ function initMemory(){const s=["🍒","🍋","🍇","🍉","⭐","🎲","💎","
 function drawMemory(){$("board").innerHTML=`<div class="memory-grid">${memoryDeck.map((s,i)=>{let o=memoryOpen.includes(i),m=memoryDeck[i+"_matched"];return `<button class="memory-card ${o?"open":""} ${m?"matched":""}" onclick="memoryFlip(${i})">${o||m?s:"?"}</button>`}).join("")}</div><p style="text-align:center">Pairs found: ${memoryMatches}/8 • Moves: ${gameState.moves}</p>`}
 function memoryFlip(i){if(gameState.locked||memoryOpen.includes(i)||memoryDeck[i+"_matched"])return;memoryOpen.push(i);if(memoryOpen.length===2){gameState.moves++;let[a,b]=memoryOpen;if(memoryDeck[a]===memoryDeck[b]){memoryDeck[a+"_matched"]=true;memoryDeck[b+"_matched"]=true;memoryMatches++;memoryOpen=[];if(memoryMatches===8)finishGame("You matched every pair!")}else{gameState.locked=true;setTimeout(()=>{memoryOpen=[];gameState.locked=false;drawMemory()},750)}}drawMemory()}
 const whotShapes=["○","△","□","☆","✚"];
-function initWhot(){let deck=[];whotShapes.forEach(s=>{for(let n=1;n<=14;n++)deck.push({s,n})});deck.sort(()=>Math.random()-.5);whotHand=deck.splice(0,5);whotPile=deck;whotTop=whotPile.pop();whotTurn=0;drawWhot()}
+function initWhot(){
+  let deck=[];
+
+  whotShapes.forEach(s=>{
+    for(let n=1;n<=14;n++){
+      deck.push({s,n});
+    }
+  });
+
+  deck.sort(()=>Math.random()-.5);
+
+  // Deal separate hands
+  whotHand=deck.splice(0,5);
+  whotAIHand=deck.splice(0,5);
+
+  // Remaining draw pile
+  whotPile=deck;
+
+  // First card on the table
+  whotTop=whotPile.pop();
+
+  // Human plays first
+  whotTurn=0;
+
+  drawWhot();
+}
 function drawWhot(){$("board").innerHTML=`<h3 style="text-align:center">Top card</h3><div class="big-number">${whotTop.s} ${whotTop.n}</div><p style="text-align:center">Cards in deck: ${whotPile.length}</p><p style="text-align:center">${whotTurn===0?"Your turn":"Computer's turn"}</p><div class="whot-hand">${whotHand.map((c,i)=>`<button class="whot-card" onclick="playWhot(${i})" ${whotTurn!==0?"disabled":""}>${c.s}<br>${c.n}</button>`).join("")}</div><button class="secondary" onclick="drawWhotCard()" ${whotTurn!==0?"disabled":""}>Pick a card</button>`}
 function validWhot(c){return c.s===whotTop.s||c.n===whotTop.n}
 function playWhot(i){if(whotTurn!==0)return;let c=whotHand[i];if(!validWhot(c)){say("gameStatus","Match the shape or number.");return}whotTop=c;whotHand.splice(i,1);if(!whotHand.length){finishGame("You won WHOT!");drawWhot();return}whotTurn=1;drawWhot();if(mode==="computer")setTimeout(whotAI,650);else{whotTurn=0}}
@@ -316,7 +341,7 @@ function startChallenge(){clearInterval(timerHandle);let t=60;$("clock").textCon
 function nextChallenge(){$("challengeText").textContent=challenges[Math.floor(Math.random()*challenges.length)]}
 async function createOnlineRoom(){if(!user)return;let name=$("onlineName").value.trim()||profile?.username||"Player";say("onlineMessage","Creating room…");let{data,error}=await db.rpc("create_game_room",{p_game_key:currentGame.id,p_player_name:name,p_player_avatar:"🎮",p_max_players:Number($("roomSize").value)});if(error){say("onlineMessage",error.message);return}let r=Array.isArray(data)?data[0]:data;if(!r){say("onlineMessage","Room creation failed.");return}await enterRoom({id:r.room_id,code:r.room_code})}
 async function joinOnlineRoom(){let code=$("joinCode").value.trim().toUpperCase();if(code.length!==6){say("onlineMessage","Enter the 6-character room code.");return}say("onlineMessage","Joining room…");let{data,error}=await db.rpc("join_game_room",{p_room_code:code,p_player_name:$("onlineName").value.trim()||profile?.username||"Player",p_player_avatar:"🎮"});if(error){say("onlineMessage",error.message);return}let r=Array.isArray(data)?data[0]:data;if(!r){say("onlineMessage","Could not join this room.");return}if(r.game_key!==currentGame.id){say("onlineMessage","That room is for a different game.");return}await enterRoom({id:r.room_id,code:r.room_code})}
-async function enterRoom(r){room=r;hide("onlinePanel");hide("modePicker");show("roomPanel");$("roomCodeDisplay").textContent=r.code;say("roomStatus","Connecting to room…");roomChannel=db.channel("mindgames-room-"+r.id,{config:{presence:{key:user.id},broadcast:{ack:true,self:false}}});roomChannel.on("presence",{event:"sync"},renderRoomPresence).on("broadcast",{event:"game-update"},({payload})=>{if(payload?.state){gameState=payload.state;renderSyncedGame()}}).on("broadcast",{event:"stickman-input"},({payload})=>{if(payload?.user_id&&payload.user_id!==user.id&&stickman){stickman.remoteInput=payload.input||{}}}).on("broadcast",{event:"stickman-state"},({payload})=>{if(payload?.state&&mode==="online"&&stickman&&!stickman.isHost){stickman.fighters=payload.state.fighters;stickman.round=payload.state.round;stickman.over=payload.state.over;drawStickman()}}).subscribe(async status=>{if(status==="SUBSCRIBED"){await roomChannel.track({user_id:user.id,name:profile?.username||"Player",avatar:"🎮"});await refreshRoomPlayers();say("roomStatus","Connected. Waiting for players.")}else if(status==="CHANNEL_ERROR")say("roomStatus","Realtime connection error. Check Supabase Realtime settings.")});await refreshRoomPlayers()}
+async function enterRoom(r){room=r;hide("onlinePanel");hide("modePicker");show("roomPanel");$("roomCodeDisplay").textContent=r.code;say("roomStatus","Connecting to room…");roomChannel=db.channel("mindwaver-room-"+r.id,{config:{presence:{key:user.id},broadcast:{ack:true,self:false}}});roomChannel.on("presence",{event:"sync"},renderRoomPresence).on("broadcast",{event:"game-update"},({payload})=>{if(payload?.state){gameState=payload.state;renderSyncedGame()}}).on("broadcast",{event:"stickman-input"},({payload})=>{if(payload?.user_id&&payload.user_id!==user.id&&stickman){stickman.remoteInput=payload.input||{}}}).on("broadcast",{event:"stickman-state"},({payload})=>{if(payload?.state&&mode==="online"&&stickman&&!stickman.isHost){stickman.fighters=payload.state.fighters;stickman.round=payload.state.round;stickman.over=payload.state.over;drawStickman()}}).subscribe(async status=>{if(status==="SUBSCRIBED"){await roomChannel.track({user_id:user.id,name:profile?.username||"Player",avatar:"🎮"});await refreshRoomPlayers();say("roomStatus","Connected. Waiting for players.")}else if(status==="CHANNEL_ERROR")say("roomStatus","Realtime connection error. Check Supabase Realtime settings.")});await refreshRoomPlayers()}
 function renderRoomPresence(){if(!roomChannel)return;let players=Object.values(roomChannel.presenceState()).flat();$("roomPlayers").innerHTML=players.map(p=>`<div>🟢 ${escapeHTML(p.name||"Player")}</div>`).join("")||"Waiting for players…"}
 async function refreshRoomPlayers(){if(!room)return;let{data,error}=await db.from("room_players").select("player_name,player_avatar").eq("room_id",room.id);if(!error&&data)$("roomPlayers").innerHTML=data.map(p=>`<div>🎮 ${escapeHTML(p.player_name)}</div>`).join("")}
 function copyRoomCode(){if(room)navigator.clipboard?.writeText(room.code)}

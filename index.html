@@ -964,8 +964,61 @@ function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;",
 function toggleAuth(){signupMode=!signupMode;$("signupFields").classList.toggle("hidden",!signupMode);$("authSubmit").textContent=signupMode?"CREATE ACCOUNT":"SIGN IN";$("authToggle").textContent=signupMode?"I already have an account":"Create an account";say("authMessage","")}
 async function submitAuth(){const email=$("email").value.trim(),password=$("password").value;if(!email||!password){say("authMessage","Enter your email and password.");return}say("authMessage","Please wait…");let r;if(signupMode){r=await db.auth.signUp({email,password,options:{data:{username:$("username").value.trim()||email.split("@")[0]}}})}else r=await db.auth.signInWithPassword({email,password});if(r.error){say("authMessage",r.error.message);return}if(signupMode&&!r.data.session){say("authMessage","Account created. Check your email to verify, then sign in.");return}if(r.data.user)await enterApp(r.data.user)}
 async function signOut(){if(room)await leaveOnlineRoom();await db.auth.signOut();user=null;profile=null;hide("app");show("authScreen")}
-async function enterApp(u){user=u;hide("authScreen");show("app");await loadProfile();renderGames();goHome()}
-async function loadProfile(){const {data,error}=await db.from("player_profiles").select("user_id,username,avatar,virtual_balance").eq("user_id",user.id).maybeSingle();if(error){say("message","Wallet could not load: "+error.message);$("balance").textContent="Wallet unavailable";return}if(!data){say("message","Your player profile is not ready yet. Please refresh or contact support.");$("balance").textContent="Wallet unavailable";return}profile=data;updateBalance()}
+async function loadProfile(){
+  const {data,error}=await db
+    .from("player_profiles")
+    .select("user_id,username,avatar,virtual_balance")
+    .eq("user_id",user.id)
+    .maybeSingle();
+
+  if(error){
+    say("message","Profile error: "+error.message);
+    return false;
+  }
+
+  if(!data){
+    const username=user.user_metadata?.username||user.email?.split("@")[0]||"Player";
+
+    const {data:newProfile,error:createError}=await db
+      .from("player_profiles")
+      .insert({
+        user_id:user.id,
+        username,
+        avatar:"🎮",
+        virtual_balance:0
+      })
+      .select("user_id,username,avatar,virtual_balance")
+      .single();
+
+    if(createError){
+      say("message","Profile creation failed: "+createError.message);
+      return false;
+    }
+
+    profile=newProfile;
+  }else{
+    profile=data;
+  }
+
+  updateBalance();
+  return true;
+}
+async function enterApp(u){
+  user=u;
+  show("app");
+  hide("authScreen");
+
+  const ready=await loadProfile();
+
+  if(!ready){
+    show("authScreen");
+    hide("app");
+    return;
+  }
+
+  renderGames();
+  goHome();
+}
 function updateBalance(){const amount=profile?.virtual_balance;$("balance").textContent=amount===null||amount===undefined?"Wallet unavailable":fmt(amount)}
 function renderGames(){
   const themes=[

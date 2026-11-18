@@ -328,6 +328,370 @@ input:focus, select:focus {
     animation-duration: .01ms !important;
     transition-duration: .01ms !important;
   }
+}
+/* MINDWEAVER CINEMATIC GAME CARDS */
+.mw-card{
+  position:relative;
+  overflow:hidden;
+  padding:0!important;
+  text-align:left;
+  border:1px solid rgba(130,160,255,.2)!important;
+  border-radius:22px!important;
+  background:linear-gradient(155deg,#17213b,#090e1c)!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.35);
+  transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease;
+  isolation:isolate;
+}
+
+.mw-card:hover{
+  transform:translateY(-7px) scale(1.015);
+  border-color:var(--art-primary)!important;
+  box-shadow:0 18px 42px rgba(0,0,0,.5),0 0 25px color-mix(in srgb,var(--art-primary) 25%,transparent);
+}
+
+.mw-card-art{
+  position:relative;
+  height:155px;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  background:
+    radial-gradient(ellipse at 50% 45%,var(--art-primary),transparent 48%),
+    linear-gradient(135deg,var(--art-dark),#080d1b 85%);
+}
+
+.mw-art-glow{
+  position:absolute;
+  width:150px;
+  height:150px;
+  border-radius:50%;
+  background:var(--art-primary);
+  filter:blur(55px);
+  opacity:.35;
+  animation:mwGlow 4s ease-in-out infinite alternate;
+}
+
+.mw-art-orb{
+  position:absolute;
+  width:105px;
+  height:105px;
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:50%;
+  box-shadow:inset 0 0 25px rgba(255,255,255,.1),0 0 30px var(--art-primary);
+  transform:rotateX(60deg);
+}
+
+.mw-art-icon{
+  position:relative;
+  z-index:2;
+  font-size:66px;
+  filter:drop-shadow(0 10px 12px rgba(0,0,0,.55));
+  animation:mwFloat 3s ease-in-out infinite;
+}
+
+.mw-art-number{
+  position:absolute;
+  top:12px;
+  left:14px;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:2px;
+  color:rgba(255,255,255,.55);
+}
+
+.mw-play-icon{
+  position:absolute;
+  right:13px;
+  bottom:12px;
+  width:31px;
+  height:31px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(10px);
+  color:white;
+  font-size:12px;
+}
+
+.mw-card-info{
+  position:relative;
+  padding:17px;
+}
+
+.mw-card-info h3{
+  margin:8px 0;
+  font-size:19px;
+  font-weight:850;
+  color:#f5f7ff;
+}
+
+.mw-card-info p{
+  color:#a8b5d0;
+  font-size:12px;
+  line-height:1.6;
+  min-height:36px;
+}
+
+.mw-card-action{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:15px;
+  padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.1);
+  color:var(--art-primary);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:1.5px;
+}
+
+.mw-card-action span{
+  font-size:19px;
+}
+
+@keyframes mwFloat{
+  0%,100%{transform:translateY(0) rotate(-4deg)}
+  50%{transform:translateY(-9px) rotate(4deg)}
+}
+
+@keyframes mwGlow{
+  from{opacity:.2;transform:scale(.85)}
+  to{opacity:.5;transform:scale(1.15)}
+}
+
+@media(max-width:600px){
+  .mw-card-art{height:125px}
+  .mw-art-icon{font-size:55px}
+  .mw-card-info{padding:13px}
+  .mw-card-info h3{font-size:16px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .mw-art-icon,.mw-art-glow{animation:none}
+  .mw-card{transition:none}
+} 
+/* MINDWEAVER MONOPOLY PREMIUM BOARD */
+.mw-monopoly{
+  color:#f7f0df;
+  padding:14px;
+  border-radius:24px;
+  background:linear-gradient(145deg,#111b2a,#080d17);
+  border:1px solid rgba(231,190,102,.25);
+  box-shadow:0 20px 50px #0008;
+}
+
+.mw-monopoly-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.mw-monopoly-kicker{
+  color:#e7bd70;
+  font-size:9px;
+  letter-spacing:3px;
+  font-weight:900;
+}
+
+.mw-monopoly-header h2{
+  margin:5px 0;
+  font-size:27px;
+  letter-spacing:3px;
+}
+
+.mw-monopoly-header p{
+  color:#aebbd0;
+  font-size:11px;
+}
+
+.mw-monopoly-badge{
+  color:#f3ce85;
+  font-size:9px;
+  border:1px solid #a98549;
+  padding:8px;
+  border-radius:20px;
+}
+
+.mw-monopoly-table{
+  padding:10px;
+  border-radius:20px;
+  background:linear-gradient(135deg,#194d3b,#092b25);
+  border:5px solid #75512c;
+  box-shadow:inset 0 0 25px #0008,0 10px 25px #0008;
+}
+
+.mw-monopoly-center{
+  text-align:center;
+  padding:22px 8px;
+  margin-bottom:12px;
+  border:1px solid #d2ad65;
+  border-radius:13px;
+  background:radial-gradient(circle,#28644b,#123b30 70%);
+}
+
+.mw-monopoly-emblem{
+  color:#f2d28c;
+  font-size:36px;
+}
+
+.mw-monopoly-center h2{
+  color:#f6d68d;
+  font-size:25px;
+  letter-spacing:4px;
+  margin:5px 0;
+}
+
+.mw-monopoly-center p,
+.mw-monopoly-center span{
+  color:#d5c49d;
+  font-size:9px;
+  letter-spacing:2px;
+}
+
+.mw-monopoly-center-line{
+  width:65px;
+  height:2px;
+  background:#e5c47d;
+  margin:12px auto;
+}
+
+.mw-monopoly-track{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+
+.mw-property{
+  position:relative;
+  min-height:105px;
+  padding:12px 5px 7px;
+  overflow:hidden;
+  text-align:center;
+  background:linear-gradient(145deg,#fff5d9,#d9c59c);
+  color:#302416;
+  border-radius:7px;
+  border:2px solid #a78a59;
+  box-shadow:0 4px 8px #0005;
+}
+
+.mw-property-color{
+  position:absolute;
+  height:8px;
+  top:0;
+  left:0;
+  right:0;
+  background:linear-gradient(90deg,#b68b42,#f0d28c);
+}
+
+.mw-property strong{
+  display:block;
+  margin-top:4px;
+  font-size:10px;
+}
+
+.mw-property-price{
+  font-size:9px;
+  margin-top:7px;
+  font-weight:800;
+}
+
+.mw-property-players{
+  margin-top:5px;
+  font-size:17px;
+}
+
+.mw-property-active{
+  border-color:#ffe19b;
+  box-shadow:0 0 15px #ffda77,0 4px 8px #0005;
+  transform:translateY(-2px);
+}
+
+.mw-owned{
+  display:block;
+  color:#26764d;
+  font-size:8px;
+  font-weight:900;
+}
+
+.mw-monopoly-wallets{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:16px;
+}
+
+.mw-monopoly-player{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  border-radius:13px;
+  background:#172338;
+  border:1px solid #35435a;
+}
+
+.mw-player-active{
+  border-color:#e4bd70;
+  box-shadow:0 0 15px #e4bd7033;
+}
+
+.mw-player-avatar{
+  font-size:25px;
+}
+
+.mw-monopoly-player span,
+.mw-monopoly-player strong,
+.mw-monopoly-player small{
+  display:block;
+}
+
+.mw-monopoly-player span{
+  font-size:10px;
+  color:#bac7dc;
+}
+
+.mw-monopoly-player strong{
+  color:#f2cf83;
+  font-size:15px;
+  margin:4px 0;
+}
+
+.mw-monopoly-player small{
+  color:#91a1b9;
+  font-size:8px;
+}
+
+.mw-monopoly-controls{
+  margin-top:15px;
+  text-align:center;
+}
+
+.mw-turn-label{
+  color:#e6c17b;
+  font-weight:800;
+  font-size:12px;
+  margin-bottom:10px;
+}
+
+.mw-roll-button{
+  width:100%;
+  min-height:53px;
+  border-radius:14px!important;
+  background:linear-gradient(110deg,#a77932,#f3d28b,#a77932)!important;
+  color:#201609!important;
+  font-weight:950!important;
+  letter-spacing:1px;
+  box-shadow:0 6px 20px #d8a94d44;
+}
+
+@media(max-width:420px){
+  .mw-monopoly{padding:9px}
+  .mw-property{min-height:90px}
+  .mw-property strong{font-size:9px}
+  .mw-monopoly-header h2{font-size:22px}
 } 
 </style>
 </head>
@@ -398,7 +762,48 @@ async function signOut(){if(room)await leaveOnlineRoom();await db.auth.signOut()
 async function enterApp(u){user=u;hide("authScreen");show("app");await loadProfile();renderGames();goHome()}
 async function loadProfile(){const {data,error}=await db.from("player_profiles").select("user_id,username,avatar,virtual_balance").eq("user_id",user.id).maybeSingle();if(error){say("message","Wallet could not load: "+error.message);$("balance").textContent="Wallet unavailable";return}if(!data){say("message","Your player profile is not ready yet. Please refresh or contact support.");$("balance").textContent="Wallet unavailable";return}profile=data;updateBalance()}
 function updateBalance(){const amount=profile?.virtual_balance;$("balance").textContent=amount===null||amount===undefined?"Wallet unavailable":fmt(amount)}
-function renderGames(){const looks=["linear-gradient(135deg,#8b4a16,#ef9a24 48%,#32120b)","linear-gradient(135deg,#087b56,#27d98a 48%,#092d39)","linear-gradient(135deg,#123e7a,#348bdb 48%,#19113c)","linear-gradient(135deg,#642025,#e64c37 48%,#1c0b20)","linear-gradient(135deg,#72502a,#e4b75d 48%,#302016)","linear-gradient(135deg,#46165d,#c34de4 48%,#160d38)","linear-gradient(135deg,#8a3158,#ed76aa 48%,#25102d)","linear-gradient(135deg,#1b6471,#4bd2c4 48%,#102337)","linear-gradient(135deg,#704a13,#e4b64d 48%,#25170c)","linear-gradient(135deg,#142b54,#3977c7 48%,#080d1b)"];$("gamesGrid").innerHTML=games.map((g,i)=>`<button type="button" class="game-card" style="--tile-bg:${looks[i%looks.length]}" onclick="openGame('${g.id}')" aria-label="Open ${g.name}"><span class="game-category">${g.category}</span><span class="game-art" aria-hidden="true">${g.icon}</span><h3>${g.name}</h3><p>${g.desc}</p></button>`).join("")}
+function renderGames(){
+  const themes=[
+    ["#ff9d35","#702b18","🎭"],
+    ["#38e8a0","#07533f","⭕"],
+    ["#55a5ff","#102d70","🔢"],
+    ["#ff647e","#641d39","🧠"],
+    ["#f5c66b","#68431b","🏦"],
+    ["#c77aff","#45146d","🃏"],
+    ["#ff83bb","#76234e","🍾"],
+    ["#54e0dc","#14545d","🎯"],
+    ["#ffcf62","#704514","⚡"],
+    ["#69a7ff","#152b61","🥊"]
+  ];
+
+  $("gamesGrid").innerHTML=games.map((g,i)=>{
+    const t=themes[i%themes.length];
+
+    return `
+      <button type="button"
+        class="game-card mw-card"
+        style="--art-primary:${t[0]};--art-dark:${t[1]}"
+        onclick="openGame('${g.id}')"
+        aria-label="Play ${g.name}">
+
+        <div class="mw-card-art">
+          <div class="mw-art-glow"></div>
+          <div class="mw-art-orb"></div>
+          <span class="mw-art-icon">${t[2]}</span>
+          <span class="mw-art-number">0${i+1}</span>
+          <span class="mw-play-icon">▶</span>
+        </div>
+
+        <div class="mw-card-info">
+          <span class="game-category">${g.category}</span>
+          <h3>${g.name}</h3>
+          <p>${g.desc}</p>
+          <span class="mw-card-action">PLAY NOW <span>→</span></span>
+        </div>
+      </button>
+    `;
+  }).join("");
+}
 function openGame(id){currentGame=games.find(g=>g.id===id);if(!currentGame)return;hide("homePage");hide("dashboardPage");show("gamePage");$("gameTitle").textContent=currentGame.name;$("gameCategory").textContent=currentGame.category;$("gameDescription").textContent=currentGame.desc;goModes()}
 function goHome(){destroyStickman();hide("gamePage");hide("dashboardPage");show("homePage");if(room)leaveOnlineRoom()}
 function goModes(){destroyStickman();hide("onlinePanel");hide("roomPanel");hide("playPanel");show("modePicker")}

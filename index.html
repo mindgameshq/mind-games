@@ -1406,5 +1406,20 @@ db.auth.onAuthStateChange((event,session)=>{
     hide("app");
     show("authScreen");
   }
-});
+});(async()=>{
+  const {data,error}=await db.auth.getSession();
+
+  if(error){
+    say("authMessage",error.message);
+    return;
+  }
+
+  if(data.session?.user){
+    await enterApp(data.session.user);
+  }else{
+    hide("app");
+    show("authScreen");
+  }
+})();
+ 
 </script></body></html>

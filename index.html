@@ -200,6 +200,135 @@ body:has(.stickman-wrap){
   0%,82%{opacity:1;visibility:visible}
   100%{opacity:0;visibility:hidden;pointer-events:none}
 }
+/* MINDWEAVER PREMIUM VISUAL UPGRADE */
+:root {
+  --bg: #060914;
+  --panel: #10172b;
+  --gold: #78b7ff;
+  --gold2: #bd8cff;
+  --line: rgba(120,183,255,.24);
+  --muted: #a7b5d1;
+  --white: #f4f7ff;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 15% 5%, rgba(48,91,180,.20), transparent 38%),
+    radial-gradient(ellipse at 90% 45%, rgba(125,65,190,.13), transparent 40%),
+    #060914;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6,9,20,.88);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(120,183,255,.2);
+}
+
+.logo {
+  background: linear-gradient(90deg,#70baff,#c5a0ff,#70baff);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: mwLogoGlow 5s linear infinite;
+}
+
+@keyframes mwLogoGlow {
+  to { background-position: 200% center; }
+}
+
+.hero {
+  position: relative;
+  padding: 55px 0 42px;
+}
+
+.hero h1 {
+  letter-spacing: -2px;
+  text-shadow: 0 8px 35px rgba(82,137,255,.22);
+}
+
+.hero p {
+  font-size: 15px;
+  color: #b4c1dc;
+}
+
+.panel, .auth-card, .game-board, .side-panel {
+  background: linear-gradient(145deg,
+    rgba(24,36,65,.96),
+    rgba(10,15,30,.98));
+  border: 1px solid rgba(120,183,255,.2);
+  box-shadow: 0 18px 50px rgba(0,0,0,.25);
+}
+
+.game-card {
+  min-height: 210px;
+  border: 1px solid rgba(255,255,255,.15);
+  box-shadow: 0 15px 35px rgba(0,0,0,.4);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-7px) scale(1.025);
+  box-shadow: 0 20px 45px rgba(60,130,255,.2);
+}
+
+.game-card .game-art {
+  filter: drop-shadow(0 0 22px rgba(115,165,255,.4));
+}
+
+button.primary {
+  background: linear-gradient(115deg,#55aaff,#bd8cff);
+  color: #080c18;
+  box-shadow: 0 5px 22px rgba(100,150,255,.2);
+}
+
+button.primary:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+}
+
+button.secondary, .mode-card {
+  background: linear-gradient(145deg,#1a2440,#10172a);
+  border-color: rgba(120,183,255,.23);
+}
+
+input, select {
+  background: #080e1c;
+  border-color: rgba(120,183,255,.25);
+}
+
+input:focus, select:focus {
+  box-shadow: 0 0 0 3px rgba(100,160,255,.12);
+}
+
+.promo {
+  background: linear-gradient(110deg,#14294a,#24183d);
+  border-color: rgba(120,183,255,.35);
+  color: #d7e7ff;
+}
+
+.stat, .property {
+  background: linear-gradient(145deg,#17233d,#0c1324);
+  border-color: rgba(120,183,255,.22);
+}
+
+.room-code {
+  text-shadow: 0 0 24px rgba(120,183,255,.55);
+}
+
+.game-card, .panel, .auth-card, .game-board {
+  backdrop-filter: blur(12px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+} 
 </style>
 </head>
 <body>

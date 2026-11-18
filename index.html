@@ -315,7 +315,43 @@ function initWhot(){
 
   drawWhot();
 }
-function drawWhot(){$("board").innerHTML=`<h3 style="text-align:center">Top card</h3><div class="big-number">${whotTop.s} ${whotTop.n}</div><p style="text-align:center">Cards in deck: ${whotPile.length}</p><p style="text-align:center">${whotTurn===0?"Your turn":"Computer's turn"}</p><div class="whot-hand">${whotHand.map((c,i)=>`<button class="whot-card" onclick="playWhot(${i})" ${whotTurn!==0?"disabled":""}>${c.s}<br>${c.n}</button>`).join("")}</div><button class="secondary" onclick="drawWhotCard()" ${whotTurn!==0?"disabled":""}>Pick a card</button>`}
+function drawWhot(){
+  $("board").innerHTML=`
+    <h3 style="text-align:center">Top card</h3>
+
+    <div class="big-number">
+      ${whotTop.s} ${whotTop.n}
+    </div>
+
+    <p style="text-align:center">
+      Cards in deck: ${whotPile.length}
+    </p>
+
+    <p style="text-align:center">
+      Computer cards: ${whotAIHand.length}
+    </p>
+
+    <p style="text-align:center">
+      ${whotTurn===0?"Your turn":"Computer's turn"}
+    </p>
+
+    <div class="whot-hand">
+      ${whotHand.map((c,i)=>`
+        <button class="whot-card"
+          onclick="playWhot(${i})"
+          ${whotTurn!==0?"disabled":""}>
+          ${c.s}<br>${c.n}
+        </button>
+      `).join("")}
+    </div>
+
+    <button class="secondary"
+      onclick="drawWhotCard()"
+      ${whotTurn!==0?"disabled":""}>
+      Pick a card
+    </button>
+  `;
+}
 function validWhot(c){return c.s===whotTop.s||c.n===whotTop.n}
 function playWhot(i){if(whotTurn!==0)return;let c=whotHand[i];if(!validWhot(c)){say("gameStatus","Match the shape or number.");return}whotTop=c;whotHand.splice(i,1);if(!whotHand.length){finishGame("You won WHOT!");drawWhot();return}whotTurn=1;drawWhot();if(mode==="computer")setTimeout(whotAI,650);else{whotTurn=0}}
 function drawWhotCard(){if(whotTurn!==0||!whotPile.length)return;whotHand.push(whotPile.pop());if(mode==="computer"){whotTurn=1;drawWhot();setTimeout(whotAI,650)}else drawWhot()}

@@ -693,6 +693,211 @@ input:focus, select:focus {
   .mw-property strong{font-size:9px}
   .mw-monopoly-header h2{font-size:22px}
 } 
+ /* MINDWEAVER ANIMATED MONOPOLY DICE */
+.mw-dice-result{
+  padding:18px 10px;
+  margin-bottom:14px;
+  text-align:center;
+  border:1px solid rgba(243,210,139,.3);
+  border-radius:16px;
+  background:radial-gradient(circle at top,#34435b,#111a2b 75%);
+  animation:mwDiceAppear .45s ease-out;
+}
+
+.mw-dice-pair{
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  margin-bottom:12px;
+}
+
+.mw-dice{
+  display:grid;
+  place-items:center;
+  width:65px;
+  height:65px;
+  border-radius:13px;
+  color:#272018;
+  font-size:48px;
+  background:linear-gradient(145deg,#fff,#d9cba9);
+  box-shadow:0 7px 0 #92794d,0 12px 20px #0007;
+  animation:mwDiceRoll .65s cubic-bezier(.2,.8,.3,1);
+}
+
+.mw-dice-result strong,
+.mw-dice-result small{
+  display:block;
+}
+
+.mw-dice-result strong{
+  color:#f3d28b;
+  font-size:13px;
+  letter-spacing:2px;
+}
+
+.mw-dice-result small{
+  margin-top:6px;
+  color:#d1d9e8;
+  font-size:10px;
+  letter-spacing:1px;
+}
+
+@keyframes mwDiceRoll{
+  0%{transform:rotate(0) scale(.4);opacity:0}
+  55%{transform:rotate(180deg) scale(1.15);opacity:1}
+  100%{transform:rotate(360deg) scale(1)}
+}
+
+@keyframes mwDiceAppear{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+/* MINDWEAVER CLASSIC MONOPOLY BOARD */
+.mw-classic-board{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-rows:repeat(4,minmax(105px,auto));
+  gap:5px;
+  padding:9px;
+  border:5px solid #987044;
+  border-radius:15px;
+  background:linear-gradient(145deg,#174b38,#09251e);
+  box-shadow:inset 0 0 30px #0008,0 12px 25px #0008;
+}
+
+.mw-board-space{
+  position:relative;
+  min-width:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding:13px 3px 5px;
+  text-align:center;
+  color:#302416;
+  border:1px solid #b99d6d;
+  border-radius:5px;
+  background:linear-gradient(145deg,#fff4d8,#d8c39a);
+  box-shadow:0 3px 7px #0005;
+}
+
+.mw-space-band{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:9px;
+}
+
+.mw-board-space strong{
+  font-size:clamp(8px,2.2vw,11px);
+  line-height:1.25;
+  overflow-wrap:anywhere;
+  margin-top:3px;
+}
+
+.mw-space-price{
+  font-size:9px;
+  font-weight:800;
+  margin-top:6px;
+}
+
+.mw-space-tokens{
+  display:flex;
+  justify-content:center;
+  gap:2px;
+  margin-top:5px;
+  font-size:17px;
+}
+
+.mw-space-owned{
+  color:#18794b;
+  font-size:7px;
+  font-weight:950;
+  margin-top:3px;
+}
+
+.mw-special-space{
+  background:linear-gradient(145deg,#f5d998,#c99b4c);
+}
+
+.mw-space-active{
+  outline:2px solid #ffe39a;
+  box-shadow:0 0 13px #ffda77;
+  z-index:1;
+}
+
+.mw-board-centre{
+  grid-column:2/4;
+  grid-row:2/4;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px;
+  border:1px solid #c8a35f;
+  border-radius:9px;
+  background:radial-gradient(circle,#28664b,#103a2c 75%);
+  color:#f4d18a;
+  overflow:hidden;
+}
+
+.mw-centre-crown{
+  font-size:35px;
+}
+
+.mw-board-centre h2{
+  font-size:clamp(12px,3vw,20px);
+  letter-spacing:2px;
+  margin:5px 0;
+}
+
+.mw-board-centre p,
+.mw-board-centre>span{
+  font-size:8px;
+  letter-spacing:1px;
+  color:#d9c79f;
+}
+
+.mw-centre-divider{
+  width:55px;
+  height:2px;
+  margin:10px;
+  background:#e6c37e;
+}
+
+.mw-centre-players{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin-top:10px;
+  font-size:9px;
+  font-weight:800;
+  color:#fff0c9;
+}
+
+@media(max-width:420px){
+  .mw-classic-board{
+    gap:3px;
+    padding:5px;
+    grid-template-rows:repeat(4,minmax(85px,auto));
+  }
+
+  .mw-board-space{
+    padding-left:2px;
+    padding-right:2px;
+  }
+
+  .mw-space-price{
+    font-size:8px;
+  }
+
+  .mw-space-tokens{
+    font-size:14px;
+  }
+} 
 </style>
 </head>
 <body>
@@ -931,8 +1136,157 @@ function drawWhotCard(){if(whotTurn!==0||!whotPile.length)return;whotHand.push(w
 function whotAI(){if(whotTurn!==1)return;let i=whotHand.findIndex(validWhot);if(i>=0)whotTop=whotHand.splice(i,1)[0];else if(whotPile.length)whotHand.push(whotPile.pop());if(!whotHand.length){finishGame("Computer won WHOT.");whotTurn=0;drawWhot();return}whotTurn=0;drawWhot()}
 const properties=[["START",0],["Old Kent Road",60],["Community Chest",0],["Whitechapel",60],["King's Cross",200],["Angel Islington",100],["Chance",0],["Euston Road",100],["Pentonville Road",120],["JAIL",0],["Pall Mall",140],["Electric Company",150],["Bow Street",180],["Free Parking",0],["Strand",220],["Fleet Street",220]];
 function initMonopoly(){monopolyPlayers=[{name:"You",pos:0,money:1500},{name:mode==="computer"?"Computer":"Friend",pos:0,money:1500}];monopolyTurn=0;gameState={owned:{}};drawMonopoly()}
-function drawMonopoly(){$("board").innerHTML=`<div class="monopoly-track">${properties.map((p,i)=>`<div class="property"><strong>${p[0]}</strong>${monopolyPlayers.some(x=>x.pos===i)?"👤":""}<br>${p[1]?"₦"+p[1]:""}${gameState.owned[i]!==undefined?"<br>Owned":""}</div>`).join("")}</div><p>You: ₦${monopolyPlayers[0].money} • Space ${monopolyPlayers[0].pos}</p><p>${monopolyPlayers[1].name}: ₦${monopolyPlayers[1].money} • Space ${monopolyPlayers[1].pos}</p><button class="primary" onclick="rollMonopoly()" ${monopolyTurn!==0?"disabled":""}>🎲 ROLL DICE</button>`}
-function rollMonopoly(){if(monopolyTurn!==0)return;const dice=1+Math.floor(Math.random()*6)+Math.floor(Math.random()*6),p=monopolyPlayers[0];p.pos=(p.pos+dice)%properties.length;const prop=properties[p.pos];let msg=`You rolled ${dice}. You landed on ${prop[0]}.`;if(prop[1]){let owner=gameState.owned[p.pos];if(owner===undefined&&p.money>=prop[1]&&confirm(`Buy ${prop[0]} for ₦${prop[1]}?`)){p.money-=prop[1];gameState.owned[p.pos]=0;msg+=" Property purchased!"}else if(owner===1){p.money-=Math.min(prop[1]/5,p.money);monopolyPlayers[1].money+=prop[1]/5;msg+=" Rent paid."}}say("gameStatus",msg);monopolyTurn=1;drawMonopoly();if(mode==="computer")setTimeout(monopolyAI,700);else $("board").innerHTML+=`<button class="secondary" onclick="nextMonopolyTurn()">Pass to next player</button>`}
+function drawMonopoly(){
+  const board=$("board");
+
+  board.innerHTML=`
+    <div class="mw-monopoly">
+
+      <div class="mw-monopoly-header">
+        <div>
+          <span class="mw-monopoly-kicker">MINDWEAVER ORIGINAL</span>
+          <h2>MONOPOLY</h2>
+          <p>Build your empire. Own the board.</p>
+        </div>
+        <div class="mw-monopoly-badge">👑 PREMIUM EDITION</div>
+      </div>
+
+      <div class="mw-classic-board">
+        ${properties.map((p,i)=>{
+          const positions=[
+            0,1,2,3,
+            15,4,
+            14,5,
+            13,6,
+            12,7,
+            11,10,9,8
+          ];
+
+          const cell=positions.indexOf(i);
+          const row=Math.floor(cell/4);
+          const col=cell%4;
+          const owner=gameState.owned[i];
+          const special=!p[1];
+          const playersHere=monopolyPlayers
+            .map((player,n)=>player.pos===i
+              ? `<span class="mw-token">${n===0?"🔵":"🔴"}</span>`
+              : "")
+            .join("");
+
+          return `
+            <div class="mw-board-space ${special?"mw-special-space":""} ${playersHere?"mw-space-active":""}"
+              style="grid-row:${row+1};grid-column:${col+1}">
+              <div class="mw-space-band" style="background:${[
+                "#c75b45","#d5a33e","#4799d2","#8a60c0"
+              ][Math.floor(i/4)%4]}"></div>
+              <strong>${p[0]}</strong>
+              <span class="mw-space-price">${p[1]?"₦"+p[1]:"SPECIAL"}</span>
+              <div class="mw-space-tokens">${playersHere}</div>
+              ${owner!==undefined?'<small class="mw-space-owned">OWNED</small>':""}
+            </div>
+          `;
+        }).join("")}
+
+        <div class="mw-board-centre">
+          <div class="mw-centre-crown">♛</div>
+          <h2>MINDWEAVER</h2>
+          <p>PROPERTY EMPIRE</p>
+          <div class="mw-centre-divider"></div>
+          <span>ROLL • BUY • BUILD • WIN</span>
+          <div class="mw-centre-players">
+            <span>🔵 YOU: ₦${monopolyPlayers[0].money.toLocaleString()}</span>
+            <span>🔴 ${monopolyPlayers[1].name}: ₦${monopolyPlayers[1].money.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mw-monopoly-wallets">
+        ${monopolyPlayers.map((p,i)=>`
+          <div class="mw-monopoly-player ${monopolyTurn===i?"mw-player-active":""}">
+            <div class="mw-player-avatar">${i===0?"🔵":"🔴"}</div>
+            <div>
+              <span>${p.name}</span>
+              <strong>₦${p.money.toLocaleString()}</strong>
+              <small>POSITION ${p.pos+1}</small>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="mw-monopoly-controls">
+        <div class="mw-turn-label">
+          ${monopolyPlayers[monopolyTurn]?.name||"Player"}'s turn
+        </div>
+        <button class="primary mw-roll-button"
+          onclick="rollMonopoly()"
+          ${monopolyTurn!==0?"disabled":""}>
+          🎲 ROLL THE DICE
+        </button>
+      </div>
+
+    </div>
+  `;
+}
+ }
+function rollMonopoly(){
+  if(monopolyTurn!==0)return;
+
+  const faces=["⚀","⚁","⚂","⚃","⚄","⚅"];
+  const die1=Math.floor(Math.random()*6)+1;
+  const die2=Math.floor(Math.random()*6)+1;
+  const dice=die1+die2;
+  const p=monopolyPlayers[0];
+
+  p.pos=(p.pos+dice)%properties.length;
+
+  const prop=properties[p.pos];
+  let msg=`You rolled ${dice}. You landed on ${prop[0]}.`;
+
+  if(prop[1]){
+    let owner=gameState.owned[p.pos];
+
+    if(owner===undefined&&p.money>=prop[1]&&confirm(`Buy ${prop[0]} for ₦${prop[1]}?`)){
+      p.money-=prop[1];
+      gameState.owned[p.pos]=0;
+      msg+=" Property purchased!";
+    }else if(owner===1){
+      const rent=Math.min(prop[1]/5,p.money);
+      p.money-=rent;
+      monopolyPlayers[1].money+=rent;
+      msg+=" Rent paid.";
+    }
+  }
+
+  say("gameStatus",msg);
+
+  monopolyTurn=1;
+  drawMonopoly();
+
+  const controls=document.querySelector(".mw-monopoly-controls");
+
+  if(controls){
+    controls.insertAdjacentHTML("afterbegin",`
+      <div class="mw-dice-result">
+        <div class="mw-dice-pair">
+          <span class="mw-dice">${faces[die1-1]}</span>
+          <span class="mw-dice">${faces[die2-1]}</span>
+        </div>
+        <strong>YOU ROLLED ${dice}</strong>
+        <small>${prop[0].toUpperCase()}</small>
+      </div>
+    `);
+  }
+
+  if(mode==="computer"){
+    setTimeout(monopolyAI,700);
+  }else{
+    $("board").innerHTML+=`
+      <button class="secondary" onclick="nextMonopolyTurn()">
+        Pass to next player
+      </button>
+    `;
+  }
+} 
 function nextMonopolyTurn(){monopolyAI()}
 function monopolyAI(){let p=monopolyPlayers[1],dice=1+Math.floor(Math.random()*6)+Math.floor(Math.random()*6);p.pos=(p.pos+dice)%properties.length;let prop=properties[p.pos];if(prop[1]&&gameState.owned[p.pos]===undefined&&p.money>=prop[1]){p.money-=prop[1];gameState.owned[p.pos]=1}if(gameState.owned[p.pos]===0&&prop[1]){p.money-=Math.min(prop[1]/5,p.money);monopolyPlayers[0].money+=prop[1]/5}monopolyTurn=0;drawMonopoly()}
 const truths=["What is one thing you have never told this group?","What is your funniest embarrassing moment?","Who here makes you laugh the most?","What is a fear you want to overcome?","What is your most memorable day?"];

@@ -4,10 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080808">
-<title>MIND GAMES | Think • Play • Conquer</title>
+<title>MINDWEAVER | Think • Play • Conquer</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--gold:#d7ad52;--gold2:#f3d88b;--bg:#080808;--panel:#141414;--muted:#999;--white:#f7f4ed;--line:rgba(215,173,82,.25);--green:#39c98a}
+:root{
+--gold:#65a8ff;
+--gold2:#b18cff;
+--bg:#070b16;
+--panel:#10182a;
+--muted:#9ba9c4;
+--white:#f4f6ff;
+--line:rgba(105,140,255,.25);
+--green:#39c98a;
+}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--white);font-family:Arial,Helvetica,sans-serif;min-height:100vh}
 button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.hidden{display:none!important}.gold{color:var(--gold)}.muted{color:var(--muted)}.wrap{width:min(1120px,94%);margin:auto}
 header{display:flex;align-items:center;justify-content:space-between;padding:18px 3%;border-bottom:1px solid var(--line);gap:12px}.logo{font-size:23px;font-weight:900;letter-spacing:3px;color:var(--gold)}.logo small{display:block;font-size:9px;letter-spacing:4px;color:#aaa;margin-top:4px}
@@ -101,9 +110,113 @@ body:has(.stickman-wrap){
  .stickman-wrap .stickman-hud{font-size:10px}
  .stickman-wrap .sm-controls button{min-width:48px;min-height:48px}
 }
+ #splashScreen{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:radial-gradient(circle at 50% 45%,#182b55 0%,#0b1022 42%,#050711 100%);
+  animation:splashFade 3.5s ease forwards;
+}
+
+.splash-content{
+  position:relative;
+  z-index:2;
+  width:90%;
+  text-align:center;
+}
+
+.splash-title{
+  font-size:clamp(35px,9vw,76px);
+  font-weight:900;
+  letter-spacing:5px;
+  background:linear-gradient(90deg,#65a8ff,#c09aff,#65a8ff);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  animation:titleGlow 2.5s linear infinite;
+}
+
+.splash-tagline{
+  margin-top:13px;
+  color:#c5d5ff;
+  font-size:12px;
+  letter-spacing:5px;
+}
+
+.splash-orb{
+  position:absolute;
+  width:230px;
+  height:230px;
+  border-radius:50%;
+  background:radial-gradient(circle,#8b75ff 0%,#386dff 25%,transparent 70%);
+  filter:blur(22px);
+  opacity:.55;
+  animation:orbFloat 3s ease-in-out infinite alternate;
+}
+
+.loading-track{
+  width:min(280px,75%);
+  height:4px;
+  margin:35px auto 15px;
+  overflow:hidden;
+  border-radius:20px;
+  background:rgba(255,255,255,.13);
+}
+
+.loading-progress{
+  width:0;
+  height:100%;
+  border-radius:20px;
+  background:linear-gradient(90deg,#65a8ff,#bd8cff);
+  box-shadow:0 0 15px #65a8ff;
+  animation:loadingRun 2.8s ease forwards;
+}
+
+.splash-content p{
+  color:#9ba9c4;
+  font-size:12px;
+  letter-spacing:1px;
+}
+
+@keyframes loadingRun{
+  to{width:100%}
+}
+
+@keyframes titleGlow{
+  to{background-position:200% center}
+}
+
+@keyframes orbFloat{
+  from{transform:translateY(-18px) scale(.9)}
+  to{transform:translateY(18px) scale(1.15)}
+}
+
+@keyframes splashFade{
+  0%,82%{opacity:1;visibility:visible}
+  100%{opacity:0;visibility:hidden;pointer-events:none}
+}
 </style>
 </head>
 <body>
+<section id="splashScreen">
+  <div class="splash-orb"></div>
+
+  <div class="splash-content">
+    <div class="splash-title">MINDWEAVER</div>
+    <div class="splash-tagline">THINK • PLAY • CONQUER</div>
+
+    <div class="loading-track">
+      <div class="loading-progress"></div>
+    </div>
+
+    <p>Weaving your next challenge...</p>
+  </div>
+</section> 
 <section id="authScreen"><div class="auth-card">
 <div class="logo">MIND GAMES<small>THINK • PLAY • CONQUER</small></div><h2>Enter the arena.</h2><p>Your next challenge is waiting. Sign in to unlock the games.</p>
 <div id="signupFields" class="hidden"><label>Choose a username</label><input id="username" maxlength="24" placeholder="Your player name"></div>

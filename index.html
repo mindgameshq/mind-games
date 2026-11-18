@@ -410,7 +410,46 @@ function resetGame(){initGame()}
 function initTicTacToe(){gameState={cells:Array(9).fill(""),turn:"X",over:false};drawTicTacToe()}
 function drawTicTacToe(){$("board").innerHTML=`<div class="board-grid">${gameState.cells.map((v,i)=>`<button class="cell" onclick="ticMove(${i})" ${gameState.over||v?"disabled":""}>${v}</button>`).join("")}</div>`;say("gameStatus",gameState.over?"Game finished":gameState.turn+"'s turn")}
 function ticWinner(c){const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(const[a,b,d]of lines)if(c[a]&&c[a]===c[b]&&c[a]===c[d])return c[a];return c.every(Boolean)?"draw":null}
-function ticMove(i){if(gameState.over||gameState.cells[i]||(mode==="computer"&&gameState.turn==="O"))return;gameState.cells[i]=gameState.turn;let w=ticWinner(gameState.cells);if(w){gameState.over=true;drawTicTacToe();finishGame(w==="draw"?"It's a draw":w+" wins!");return}gameState.turn=gameState.turn==="X"?"O":"X";drawTicTacToe();if(mode==="computer"&&gameState.turn==="O")setTimeout(ticAI,350)}
+function ticMove(i){
+  if(gameState.over||gameState.cells[i]||(mode==="computer"&&gameState.turn==="O"))return;
+
+  gameState.cells[i]=gameState.turn;
+
+  let w=ticWinner(gameState.cells);
+
+  if(!w){
+    gameState.turn=gameState.turn==="X"?"O":"X";
+  }
+
+  drawTicTacToe();
+
+  if(mode==="online"&&roomChannel&&room){
+    roomChannel.send({
+      type:"broadcast",
+      event:"game-update",
+      payload:{state:gameState}
+    });
+
+    db.rpc("update_game_room_state",{
+      p_room_id:room.id,
+      p_game_state:gameState,
+      p_status:"playing"
+    }).then(({error})=>{
+      if(error)console.error("Room sync error:",error);
+    });
+  }
+
+  if(w){
+    gameState.over=true;
+    drawTicTacToe();
+    finishGame(w==="draw"?"It's a draw":w+" wins!");
+    return;
+  }
+
+  if(mode==="computer"&&gameState.turn==="O"){
+    setTimeout(ticAI,350);
+  }
+}
 function ticAI(){if(gameState.over||mode!=="computer"||gameState.turn!=="O")return;const cells=gameState.cells;const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];let choice=-1;for(const mark of ["O","X"]){for(const line of wins){const vals=line.map(i=>cells[i]);if(vals.filter(v=>v===mark).length===2&&vals.includes("")){choice=line[vals.indexOf("")];break}}if(choice!==-1)break}if(choice===-1&&cells[4]==="")choice=4;if(choice===-1){const corners=[0,2,6,8].filter(i=>cells[i]==="");if(corners.length)choice=corners[Math.floor(Math.random()*corners.length)]}if(choice===-1){const options=cells.map((v,i)=>v===""?i:-1).filter(i=>i>=0);if(options.length)choice=options[Math.floor(Math.random()*options.length)]}if(choice<0)return;cells[choice]="O";const winner=ticWinner(cells);if(winner){gameState.over=true;drawTicTacToe();finishGame(winner==="draw"?"It's a draw":"Computer wins!");return}gameState.turn="X";drawTicTacToe()}
 function initGuess(){gameState={secret:Math.floor(Math.random()*100)+1,tries:0,won:false};$("board").innerHTML=`<div class="big-number">?</div><p style="text-align:center">I'm thinking of a number from 1 to 100.</p><label>Your guess</label><input id="guessInput" type="number" min="1" max="100" placeholder="Enter a number"><button class="primary" style="width:100%;margin-top:12px" onclick="makeGuess()">SUBMIT GUESS</button><p id="guessResult" class="gold" style="text-align:center"></p>`;say("gameStatus","Round 1 of 10")}
 function makeGuess(){if(gameState.won||gameState.tries>=10)return;const v=Number($("guessInput").value);if(!Number.isInteger(v)||v<1||v>100){say("guessResult","Enter a whole number from 1 to 100.");return}gameState.tries++;$("guessResult").textContent=v===gameState.secret?"Correct!":v<gameState.secret?"Too low!":"Too high!";$("guessInput").value="";say("gameStatus",`Round ${gameState.tries} of 10`);if(v===gameState.secret){gameState.won=true;$("guessResult").textContent="🎉 You found it! Reward crediting is temporarily paused until secure verification is enabled.";say("gameStatus","You won!")}else if(gameState.tries>=10){$("guessResult").textContent=`Game over. The number was ${gameState.secret}.`;say("gameStatus","No more rounds")}}

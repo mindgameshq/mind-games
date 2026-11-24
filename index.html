@@ -237,7 +237,7 @@ function updateTurnStatus(message){
  status.innerHTML=`${playerNames[activePlayer]} TURN<strong>${message}</strong>`;
 }
 
-function movePlayer(activePlayer, total){
+function movePlayer(playerIndex,steps){
  return new Promise(resolve=>{
   const token=playerTokens[playerIndex];
   let moved=0;
@@ -356,14 +356,7 @@ document.querySelector('#roll').addEventListener('click',()=>{
   if(t<1)requestAnimationFrame(animateRoll);
   else{
    dice.forEach((d,i)=>{d.quaternion.copy(targets[i]);d.position.y=.65;});
-   rolling = false;
-characterMoving = true;
-
-updateTurnStatus(`MOVING ${playerNames[activePlayer]} · ${total} SPACES`);
-
-movePlayer(activePlayer, total).then(() => {
-    button.disabled = false;
-});
+   rolling=false; button.disabled=false;
   }
  }
  requestAnimationFrame(animateRoll);

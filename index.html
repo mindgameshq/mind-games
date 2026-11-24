@@ -35,10 +35,10 @@
 <div id="hud">
   <div class="top">
     <div class="brand"><b>MINDWEAVER</b><span>MONOPOLY · REBUILT</span></div>
-    <div class="status">PROTOTYPE PHASE<strong>3D BOARD FOUNDATION</strong></div>
+    <div class="status" id="turnStatus">PLAYER 1 TURN<strong>ROLL TO MOVE</strong></div>
   </div>
   <div class="bottom">
-    <div class="hint">Drag to orbit · Scroll or pinch to zoom. This is the first visual foundation; gameplay, rules, multiplayer and Supabase integration come next.</div>
+    <div class="hint">Drag to orbit · Scroll or pinch to zoom. Four player characters are active: roll the dice to move the current player around the board.</div>
     <div class="controls">
       <button class="secondary" id="reset">RESET VIEW</button>
       <button id="roll">ROLL DICE</button>
@@ -169,13 +169,116 @@ for(let i=0;i<4;i++){
   ring.rotation.x=Math.PI/2; ring.position.set(x,.35,z); scene.add(ring);
 }
 
-// Player token placeholder
-const tokenGroup=new THREE.Group(); scene.add(tokenGroup);
-const tokenBase=new THREE.Mesh(new THREE.CylinderGeometry(.38,.42,.14,32),gold);
-tokenBase.position.y=.52; tokenBase.castShadow=true; tokenGroup.add(tokenBase);
-const tokenBody=new THREE.Mesh(new THREE.SphereGeometry(.28,24,18),mat(0xd9e4ef,.24,.6));
-tokenBody.position.y=.83; tokenBody.scale.y=1.3; tokenBody.castShadow=true; tokenGroup.add(tokenBody);
-tokenGroup.position.set(9,.05,9);
+// Four active player characters
+const playerColors=[0x55c8ff,0xff647c,0x8ce36b,0xc69aff];
+const playerNames=['PLAYER 1','PLAYER 2','PLAYER 3','PLAYER 4'];
+const playerOffsets=[
+ {x:-.48,z:-.48},{x:.48,z:-.48},{x:-.48,z:.48},{x:.48,z:.48}
+];
+const playerTokens=[];
+const playerPositions=[0,0,0,0];
+let activePlayer=0;
+let characterMoving=false;
+
+function makeCharacter(color,index){
+ const group=new THREE.Group();
+ const mainMat=mat(color,.3,.25);
+ const trimMat=mat(0xf4e4bd,.28,.55);
+ const darkMat=mat(0x17202a,.38,.15);
+
+ const base=new THREE.Mesh(new THREE.CylinderGeometry(.34,.39,.13,32),trimMat);
+ base.position.y=.49; base.castShadow=true; group.add(base);
+
+ const footRing=new THREE.Mesh(new THREE.TorusGeometry(.25,.035,8,32),mainMat);
+ footRing.rotation.x=Math.PI/2; footRing.position.y=.57; group.add(footRing);
+
+ // Stylized avatar body and head
+ const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.17,.34,6,12),mainMat);
+ torso.position.y=.91; torso.castShadow=true; group.add(torso);
+
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.17,20,16),mat(0xf0c7a0,.52));
+ head.position.y=1.25; head.castShadow=true; group.add(head);
+
+ const hair=new THREE.Mesh(new THREE.SphereGeometry(.174,18,12,0,Math.PI*2,0,Math.PI*.55),darkMat);
+ hair.position.y=1.29; hair.castShadow=true; group.add(hair);
+
+ const armGeo=new THREE.CapsuleGeometry(.055,.22,4,8);
+ [-1,1].forEach(side=>{
+  const arm=new THREE.Mesh(armGeo,mainMat);
+  arm.position.set(side*.22,.94,0);
+  arm.rotation.z=side*-.22;
+  arm.castShadow=true; group.add(arm);
+ });
+
+ const badge=new THREE.Mesh(new THREE.SphereGeometry(.065,12,10),trimMat);
+ badge.position.set(0,.93,.16); group.add(badge);
+
+ group.userData.playerIndex=index;
+ return group;
+}
+
+function positionCharacter(token,spaceIndex,playerIndex){
+ const point=positions[spaceIndex];
+ const offset=playerOffsets[playerIndex];
+ token.position.set(point.x+offset.x,.05,point.z+offset.z);
+ // Face toward the centre of the board.
+ token.rotation.y=Math.atan2(-point.x,-point.z);
+}
+
+for(let i=0;i<4;i++){
+ const character=makeCharacter(playerColors[i],i);
+ scene.add(character);
+ positionCharacter(character,0,i);
+ playerTokens.push(character);
+}
+
+function updateTurnStatus(message){
+ const status=document.querySelector('#turnStatus');
+ status.innerHTML=`${playerNames[activePlayer]} TURN<strong>${message}</strong>`;
+}
+
+function movePlayer(playerIndex,steps){
+ return new Promise(resolve=>{
+  const token=playerTokens[playerIndex];
+  let moved=0;
+  const startPosition=playerPositions[playerIndex];
+  const totalSteps=steps;
+  const stepDuration=260;
+  let stepStart=performance.now();
+  let from=token.position.clone();
+  const moveOneStep=(now)=>{
+   const elapsed=now-stepStart;
+   const t=Math.min(1,elapsed/stepDuration);
+   const eased=t*t*(3-2*t);
+   const nextIndex=(startPosition+moved+1)%40;
+   const point=positions[nextIndex];
+   const offset=playerOffsets[playerIndex];
+   const target=new THREE.Vector3(point.x+offset.x,.05,point.z+offset.z);
+   token.position.lerpVectors(from,target,eased);
+   token.position.y=.05+Math.sin(t*Math.PI)*.22;
+   token.rotation.y+=.025;
+   if(t<1){
+    requestAnimationFrame(moveOneStep);
+    return;
+   }
+   token.position.copy(target);
+   token.position.y=.05;
+   moved++;
+   playerPositions[playerIndex]=nextIndex;
+   if(moved<totalSteps){
+    from=token.position.clone();
+    stepStart=performance.now();
+    requestAnimationFrame(moveOneStep);
+   }else{
+    characterMoving=false;
+    activePlayer=(activePlayer+1)%4;
+    updateTurnStatus('ROLL TO MOVE');
+    resolve();
+   }
+  };
+  requestAnimationFrame(moveOneStep);
+ });
+}
 
 // Dice — complete six-sided dice with correctly oriented pips
 function makeDie(x,z){
@@ -232,7 +335,7 @@ function orientationForTop(value){
 
 let rolling=false;
 document.querySelector('#roll').addEventListener('click',()=>{
- if(rolling)return;
+ if(rolling||characterMoving)return;
  rolling=true;
  const button=document.querySelector('#roll'); button.disabled=true;
  const values=dice.map(()=>1+Math.floor(Math.random()*6));

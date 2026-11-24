@@ -237,7 +237,7 @@ function updateTurnStatus(message){
  status.innerHTML=`${playerNames[activePlayer]} TURN<strong>${message}</strong>`;
 }
 
-function movePlayer(playerIndex,steps){
+function movePlayer(activePlayer, total){
  return new Promise(resolve=>{
   const token=playerTokens[playerIndex];
   let moved=0;

@@ -179,44 +179,85 @@ const playerTokens=[];
 const playerPositions=[0,0,0,0];
 let activePlayer=0;
 let characterMoving=false;
-
 function makeCharacter(color,index){
  const group=new THREE.Group();
  const mainMat=mat(color,.3,.25);
  const trimMat=mat(0xf4e4bd,.28,.55);
  const darkMat=mat(0x17202a,.38,.15);
 
- const base=new THREE.Mesh(new THREE.CylinderGeometry(.34,.39,.13,32),trimMat);
- base.position.y=.49; base.castShadow=true; group.add(base);
+ const base=new THREE.Mesh(
+  new THREE.CylinderGeometry(.34,.39,.13,32),trimMat
+ );
+ base.position.y=.49;
+ group.add(base);
 
- const footRing=new THREE.Mesh(new THREE.TorusGeometry(.25,.035,8,32),mainMat);
- footRing.rotation.x=Math.PI/2; footRing.position.y=.57; group.add(footRing);
+ const footRing=new THREE.Mesh(
+  new THREE.TorusGeometry(.25,.035,8,32),mainMat
+ );
+ footRing.rotation.x=Math.PI/2;
+ footRing.position.y=.57;
+ group.add(footRing);
 
- // Stylized avatar body and head
- const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.17,.34,6,12),mainMat);
- torso.position.y=.91; torso.castShadow=true; group.add(torso);
+ const torso=new THREE.Mesh(
+  new THREE.CapsuleGeometry(.17,.34,6,12),mainMat
+ );
+ torso.position.y=.91;
+ group.add(torso);
 
- const head=new THREE.Mesh(new THREE.SphereGeometry(.17,20,16),mat(0xf0c7a0,.52));
- head.position.y=1.25; head.castShadow=true; group.add(head);
+ const head=new THREE.Mesh(
+  new THREE.SphereGeometry(.17,20,16),
+  mat(0xf0c7a0,.52)
+ );
+ head.position.y=1.25;
+ group.add(head);
 
- const hair=new THREE.Mesh(new THREE.SphereGeometry(.174,18,12,0,Math.PI*2,0,Math.PI*.55),darkMat);
- hair.position.y=1.29; hair.castShadow=true; group.add(hair);
+ const hair=new THREE.Mesh(
+  new THREE.SphereGeometry(.174,18,12,0,Math.PI*2,0,Math.PI*.55),
+  darkMat
+ );
+ hair.position.y=1.29;
+ group.add(hair);
 
- const armGeo=new THREE.CapsuleGeometry(.055,.22,4,8);
+ const arms=[];
  [-1,1].forEach(side=>{
-  const arm=new THREE.Mesh(armGeo,mainMat);
-  arm.position.set(side*.22,.94,0);
-  arm.rotation.z=side*-.22;
-  arm.castShadow=true; group.add(arm);
+  const pivot=new THREE.Group();
+  pivot.position.set(side*.22,1.04,0);
+
+  const arm=new THREE.Mesh(
+   new THREE.CapsuleGeometry(.055,.22,4,8),mainMat
+  );
+  arm.position.y=-.13;
+  pivot.add(arm);
+  group.add(pivot);
+  arms.push(pivot);
  });
 
- const badge=new THREE.Mesh(new THREE.SphereGeometry(.065,12,10),trimMat);
- badge.position.set(0,.93,.16); group.add(badge);
+ const legs=[];
+ [-1,1].forEach(side=>{
+  const pivot=new THREE.Group();
+  pivot.position.set(side*.105,.59,0);
+
+  const leg=new THREE.Mesh(
+   new THREE.CapsuleGeometry(.065,.20,4,8),darkMat
+  );
+  leg.position.y=-.12;
+  pivot.add(leg);
+  group.add(pivot);
+  legs.push(pivot);
+ });
+
+ const badge=new THREE.Mesh(
+  new THREE.SphereGeometry(.065,12,10),trimMat
+ );
+ badge.position.set(0,.93,.16);
+ group.add(badge);
 
  group.userData.playerIndex=index;
+ group.userData.arms=arms;
+ group.userData.legs=legs;
+
  return group;
 }
-
 function positionCharacter(token,spaceIndex,playerIndex){
  const point=positions[spaceIndex];
  const offset=playerOffsets[playerIndex];
@@ -236,47 +277,93 @@ function updateTurnStatus(message){
  const status=document.querySelector('#turnStatus');
  status.innerHTML=`${playerNames[activePlayer]} TURN<strong>${message}</strong>`;
 }
-
 function movePlayer(playerIndex,steps){
  return new Promise(resolve=>{
   const token=playerTokens[playerIndex];
+
+  characterMoving=true;
+  updateTurnStatus(`MOVING ${steps} SPACES`);
+
   let moved=0;
-  const startPosition=playerPositions[playerIndex];
-  const totalSteps=steps;
-  const stepDuration=260;
   let stepStart=performance.now();
+
+  const stepDuration=420;
+
   let from=token.position.clone();
-  const moveOneStep=(now)=>{
+
+  function animateStep(now){
    const elapsed=now-stepStart;
    const t=Math.min(1,elapsed/stepDuration);
    const eased=t*t*(3-2*t);
-   const nextIndex=(startPosition+moved+1)%40;
+
+   const nextIndex=(playerPositions[playerIndex]+1)%40;
    const point=positions[nextIndex];
    const offset=playerOffsets[playerIndex];
-   const target=new THREE.Vector3(point.x+offset.x,.05,point.z+offset.z);
+
+   const target=new THREE.Vector3(
+    point.x+offset.x,
+    .05,
+    point.z+offset.z
+   );
+
+   // Face the direction of travel.
+   const dx=target.x-from.x;
+   const dz=target.z-from.z;
+   const targetAngle=Math.atan2(dx,dz);
+
+   let angleDiff=targetAngle-token.rotation.y;
+   angleDiff=Math.atan2(Math.sin(angleDiff),Math.cos(angleDiff));
+
+   token.rotation.y+=angleDiff*Math.min(1,elapsed/100);
+
+   // Move the character smoothly.
    token.position.lerpVectors(from,target,eased);
-   token.position.y=.05+Math.sin(t*Math.PI)*.22;
-   token.rotation.y+=.025;
+
+   // Walking bounce.
+   token.position.y=.05+Math.abs(Math.sin(t*Math.PI*2))*.10;
+
+   // Animate arms and legs.
+   const swing=Math.sin(t*Math.PI*2)*.65;
+
+   const arms=token.userData.arms;
+   const legs=token.userData.legs;
+
+   arms[0].rotation.x=swing;
+   arms[1].rotation.x=-swing;
+
+   legs[0].rotation.x=-swing;
+   legs[1].rotation.x=swing;
+
    if(t<1){
-    requestAnimationFrame(moveOneStep);
+    requestAnimationFrame(animateStep);
     return;
    }
+
    token.position.copy(target);
    token.position.y=.05;
-   moved++;
+
    playerPositions[playerIndex]=nextIndex;
-   if(moved<totalSteps){
+   moved++;
+
+   // Reset limbs between steps.
+   arms.forEach(a=>a.rotation.x=0);
+   legs.forEach(l=>l.rotation.x=0);
+
+   if(moved<steps){
     from=token.position.clone();
     stepStart=performance.now();
-    requestAnimationFrame(moveOneStep);
+    requestAnimationFrame(animateStep);
    }else{
     characterMoving=false;
+
     activePlayer=(activePlayer+1)%4;
     updateTurnStatus('ROLL TO MOVE');
+
     resolve();
    }
-  };
-  requestAnimationFrame(moveOneStep);
+  }
+
+  requestAnimationFrame(animateStep);
  });
 }
 
@@ -354,10 +441,19 @@ document.querySelector('#roll').addEventListener('click',()=>{
    d.position.y=.65+Math.sin(t*Math.PI*9)*(1-t)*.48;
   });
   if(t<1)requestAnimationFrame(animateRoll);
-  else{
-   dice.forEach((d,i)=>{d.quaternion.copy(targets[i]);d.position.y=.65;});
-   rolling=false; button.disabled=false;
-  }
+ else{
+  dice.forEach((d,i)=>{
+    d.quaternion.copy(targets[i]);
+    d.position.y=.65;
+  });
+
+  rolling=false;
+
+  // Automatically move the active player.
+  movePlayer(activePlayer,total).then(()=>{
+    button.disabled=false;
+  });
+}
  }
  requestAnimationFrame(animateRoll);
 });

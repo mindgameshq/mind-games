@@ -26,6 +26,70 @@
   button:active { transform:translateY(1px) }
   #loading { position:fixed; inset:0; display:grid; place-items:center; background:#080d12; color:#d7ad58; letter-spacing:.2em; font-size:12px; z-index:5; transition:opacity .5s }
   #loading.hidden { opacity:0; pointer-events:none }
+  #cardOverlay {
+ position:fixed;
+ inset:0;
+ z-index:10;
+ display:none;
+ place-items:center;
+ padding:20px;
+ background:rgba(0,0,0,.82);
+ backdrop-filter:blur(10px);
+ pointer-events:auto;
+}
+
+#cardOverlay.show {
+ display:grid;
+}
+
+.chestCard {
+ width:min(380px,100%);
+ padding:30px 22px;
+ text-align:center;
+ border:2px solid #d7ad58;
+ border-radius:22px;
+ background:linear-gradient(145deg,#173c32,#101a20);
+ box-shadow:0 20px 80px #000;
+ animation:cardReveal .45s ease-out;
+}
+
+.chestIcon { font-size:55px }
+.chestLabel {
+ color:#d7ad58;
+ letter-spacing:.22em;
+ font-size:10px;
+ margin:12px 0;
+}
+
+.chestCard h2 {
+ color:#e9c77d;
+ font-size:23px;
+ letter-spacing:.08em;
+}
+
+#cardMessage {
+ margin:22px 0;
+ font-size:17px;
+ line-height:1.6;
+}
+
+#cardAmount {
+ font-size:27px;
+ font-weight:900;
+ color:#8ce36b;
+ margin:15px 0;
+}
+
+#cardBalance {
+ color:#c4ced5;
+ font-size:13px;
+ margin-bottom:20px;
+}
+
+@keyframes cardReveal {
+ from {transform:scale(.75) translateY(30px);opacity:0}
+ to {transform:scale(1) translateY(0);opacity:1}
+}
   @media(max-width:600px) { .status {font-size:10px;padding:10px}.status strong{font-size:13px}.hint{font-size:10px;max-width:190px}.controls{gap:5px;padding:6px}button{min-width:66px;padding:10px 9px;font-size:11px}.brand{padding:10px 12px} }
 </style>
 </head>
@@ -45,6 +109,17 @@
     </div>
   </div>
 </div>
+ <div id="cardOverlay">
+  <div class="chestCard">
+    <div class="chestIcon">🎁</div>
+    <div class="chestLabel">MINDWEAVER BANK</div>
+    <h2>COMMUNITY CHEST</h2>
+    <div id="cardMessage">Your community has a surprise!</div>
+    <div id="cardAmount"></div>
+    <div id="cardBalance"></div>
+    <button id="collectCard">CONTINUE</button>
+  </div>
+</div> 
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
@@ -277,6 +352,58 @@ function updateTurnStatus(message){
  const status=document.querySelector('#turnStatus');
  status.innerHTML=`${playerNames[activePlayer]} TURN<strong>${message}</strong>`;
 }
+const playerCash = [2000000,2000000,2000000,2000000];
+
+const communityCards = [
+ {message:"The bank rewards your excellent service!",amount:100000},
+ {message:"You received an unexpected family gift!",amount:50000},
+ {message:"Your investment has paid off!",amount:250000},
+ {message:"You won a community lottery!",amount:150000},
+ {message:"Your insurance refund has arrived!",amount:75000},
+ {message:"Hospital expenses. Pay your medical bill!",amount:-40000},
+ {message:"You have unpaid school fees!",amount:-30000},
+ {message:"Your property needs urgent repairs!",amount:-60000},
+ {message:"You received a traffic violation fine!",amount:-25000},
+ {message:"Unexpected expenses! Pay the bank!",amount:-100000}
+];
+
+function resolveLanding(playerIndex){
+ const space=playerPositions[playerIndex];
+
+ if(![2,17,33].includes(space)){
+  return Promise.resolve();
+ }
+
+ return new Promise(resolve=>{
+  const card=communityCards[
+   Math.floor(Math.random()*communityCards.length)
+  ];
+
+  playerCash[playerIndex]+=card.amount;
+
+  const amountText=
+   (card.amount>=0?"+":"−")+
+   "₦"+Math.abs(card.amount).toLocaleString("en-NG");
+
+  document.querySelector('#cardMessage').textContent=card.message;
+
+  const amountElement=document.querySelector('#cardAmount');
+  amountElement.textContent=amountText;
+  amountElement.style.color=card.amount>=0?"#8ce36b":"#ff647c";
+
+  document.querySelector('#cardBalance').textContent=
+   "PLAYER "+(playerIndex+1)+
+   " BALANCE: ₦"+playerCash[playerIndex].toLocaleString("en-NG");
+
+  const overlay=document.querySelector('#cardOverlay');
+  overlay.classList.add('show');
+
+  document.querySelector('#collectCard').onclick=()=>{
+   overlay.classList.remove('show');
+   resolve();
+  };
+ });
+}  
 function movePlayer(playerIndex,steps){
  return new Promise(resolve=>{
   const token=playerTokens[playerIndex];
@@ -353,14 +480,15 @@ function movePlayer(playerIndex,steps){
     from=token.position.clone();
     stepStart=performance.now();
     requestAnimationFrame(animateStep);
-   }else{
+ }else{
     characterMoving=false;
 
-    activePlayer=(activePlayer+1)%4;
-    updateTurnStatus('ROLL TO MOVE');
-
-    resolve();
-   }
+    resolveLanding(playerIndex).then(()=>{
+      activePlayer=(activePlayer+1)%4;
+      updateTurnStatus('ROLL TO MOVE');
+      resolve();
+    });
+} 
   }
 
   requestAnimationFrame(animateStep);

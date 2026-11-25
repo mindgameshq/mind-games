@@ -113,7 +113,7 @@
   <div class="chestCard">
     <div class="chestIcon">🎁</div>
     <div class="chestLabel">MINDWEAVER BANK</div>
-    <h2>COMMUNITY CHEST</h2>
+    <h2 id="cardTitle">COMMUNITY CHEST</h2>
     <div id="cardMessage">Your community has a surprise!</div>
     <div id="cardAmount"></div>
     <div id="cardBalance"></div>
@@ -366,13 +366,78 @@ const communityCards = [
  {message:"You received a traffic violation fine!",amount:-25000},
  {message:"Unexpected expenses! Pay the bank!",amount:-100000}
 ];
+const chanceCards = [
+ {message:"The bank pays you a generous dividend!",amount:200000},
+ {message:"You won a business investment prize!",amount:150000},
+ {message:"Your shares have increased in value!",amount:300000},
+ {message:"You received a surprise bonus!",amount:100000},
+ {message:"Pay a luxury tax to the bank!",amount:-100000},
+ {message:"Your vehicle needs expensive repairs!",amount:-75000},
+ {message:"Pay your outstanding loan!",amount:-200000},
+ {message:"You received a Get Out of Jail Free card!",type:"jailfree"}
+];
+
+const getOutOfJailFree = [false,false,false,false];  
 
 function resolveLanding(playerIndex){
  const space=playerPositions[playerIndex];
 
- if(![2,17,33].includes(space)){
+ const isCommunity=[2,17,33].includes(space);
+ const isChance=[7,22,36].includes(space);
+
+ if(!isCommunity && !isChance){
   return Promise.resolve();
  }
+
+ return new Promise(resolve=>{
+  const deck=isCommunity?communityCards:chanceCards;
+
+  const card=deck[Math.floor(Math.random()*deck.length)];
+
+  if(card.type==="jailfree"){
+   getOutOfJailFree[playerIndex]=true;
+  }else{
+   playerCash[playerIndex]+=card.amount;
+  }
+
+  const title=document.querySelector('#cardTitle');
+  title.textContent=isCommunity?"COMMUNITY CHEST":"CHANCE";
+
+  document.querySelector('.chestIcon').textContent=
+   isCommunity?"🎁":"🎲";
+
+  document.querySelector('.chestLabel').textContent=
+   isCommunity?"MINDWEAVER BANK":"MINDWEAVER CHANCE";
+
+  document.querySelector('#cardMessage').textContent=card.message;
+
+  const amountElement=document.querySelector('#cardAmount');
+
+  if(card.type==="jailfree"){
+   amountElement.textContent="CARD KEPT";
+   amountElement.style.color="#e9c77d";
+  }else{
+   amountElement.textContent=
+    (card.amount>=0?"+":"−")+
+    "₦"+Math.abs(card.amount).toLocaleString("en-NG");
+
+   amountElement.style.color=
+    card.amount>=0?"#8ce36b":"#ff647c";
+  }
+
+  document.querySelector('#cardBalance').textContent=
+   "PLAYER "+(playerIndex+1)+
+   " BALANCE: ₦"+playerCash[playerIndex].toLocaleString("en-NG");
+
+  const overlay=document.querySelector('#cardOverlay');
+  overlay.classList.add('show');
+
+  document.querySelector('#collectCard').onclick=()=>{
+   overlay.classList.remove('show');
+   resolve();
+  };
+ });
+}
 
  return new Promise(resolve=>{
   const card=communityCards[

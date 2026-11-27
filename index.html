@@ -88,6 +88,17 @@ button{min-width:66px;padding:10px 9px;font-size:11px}
 
 <script type="module">
 import * as THREE from 'three';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const supabase = createClient(
+  'https://pnatjqwplyxhpcfqhgcm.supabase.co',
+  'sb_publishable_lbUX7xkFk96kxH1ZP_Zk6A_zWvXT6AD'
+);
+
+const { data: authData, error: authError } = await supabase.auth.getSession();
+
+console.log('MINDWEAVER SUPABASE:', authError || 'CONNECTED');
+console.log('PLAYER SESSION:', authData.session ? 'SIGNED IN' : 'NO ACTIVE SESSION'); 
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 
 const host=document.querySelector('#scene');

@@ -3,836 +3,253 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>MINDWEAVER — Monopoly Rebuild</title>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+<title>MINDWEAVER — Monopoly</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","@supabase/supabase-js":"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"}}</script>
 <style>
-:root{color-scheme:dark;--gold:#d7ad58;--ink:#080d12}
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--ink);color:#f4f0e7;font-family:Inter,system-ui,Arial,sans-serif}
-#scene{position:fixed;inset:0}
-#hud{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(12px,2vw,26px)}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.brand,.status,.controls{background:linear-gradient(145deg,rgba(19,29,38,.94),rgba(8,13,18,.88));border:1px solid rgba(215,173,88,.35);box-shadow:0 12px 40px #0008;backdrop-filter:blur(14px);border-radius:16px}
-.brand{padding:13px 17px}
-.brand b{display:block;letter-spacing:.19em;color:var(--gold);font-size:12px}
-.brand span{display:block;margin-top:4px;font-size:11px;color:#aeb9c2;letter-spacing:.12em}
-.status{padding:12px 16px;text-align:right;font-size:12px;color:#b9c4cc}
-.status strong{display:block;color:#f4f0e7;font-size:16px;margin-top:3px}
-.bottom{display:flex;justify-content:space-between;align-items:end;gap:12px}
-.hint{max-width:360px;padding:12px 15px;border-radius:13px;background:#0b1219d9;border:1px solid #ffffff18;color:#b8c2ca;font-size:12px;line-height:1.5}
-.controls{pointer-events:auto;display:flex;gap:8px;padding:9px}
-button{appearance:none;border:1px solid #d7ad5866;border-radius:10px;background:linear-gradient(180deg,#d9b76f,#a77b32);color:#17120a;padding:11px 15px;font-weight:800;cursor:pointer;min-width:82px}
-button.secondary{background:#18232d;color:#e8e1d2;border-color:#ffffff26}
-button:disabled{opacity:.5;cursor:not-allowed}
-button:active{transform:translateY(1px)}
-#loading{position:fixed;inset:0;display:grid;place-items:center;background:#080d12;color:#d7ad58;letter-spacing:.2em;font-size:12px;z-index:5;transition:opacity .5s}
-#loading.hidden{opacity:0;pointer-events:none}
-#cardOverlay{position:fixed;inset:0;z-index:10;display:none;place-items:center;padding:20px;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);pointer-events:auto}
-#cardOverlay.show{display:grid}
-.chestCard{width:min(380px,100%);padding:30px 22px;text-align:center;border:2px solid #d7ad58;border-radius:22px;background:linear-gradient(145deg,#173c32,#101a20);box-shadow:0 20px 80px #000;animation:cardReveal .45s ease-out}
-.chestIcon{font-size:55px}
-.chestLabel{color:#d7ad58;letter-spacing:.22em;font-size:10px;margin:12px 0}
-.chestCard h2{color:#e9c77d;font-size:23px;letter-spacing:.08em}
-#cardMessage{margin:22px 0;font-size:17px;line-height:1.6}
-#cardAmount{font-size:27px;font-weight:900;color:#8ce36b;margin:15px 0}
-#cardBalance{color:#c4ced5;font-size:13px;margin-bottom:20px}
-#jailActions{display:none;gap:12px;flex-direction:column;margin:20px 0}
-@keyframes cardReveal{from{transform:scale(.75) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
-@media(max-width:600px){
-.status{font-size:10px;padding:10px}
-.status strong{font-size:13px}
-.hint{font-size:10px;max-width:190px}
-.controls{gap:5px;padding:6px}
-button{min-width:66px;padding:10px 9px;font-size:11px}
-.brand{padding:10px 12px}
-}
+:root{color-scheme:dark;--gold:#d7ad58;--ink:#080d12;--panel:#111c25;--muted:#aeb9c2}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--ink);color:#f4f0e7;font-family:Inter,system-ui,Arial,sans-serif}
+#scene{position:fixed;inset:0}#hud{position:fixed;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(10px,2vw,24px)}
+.top,.bottom{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.bottom{align-items:end}
+.brand,.status,.controls,.playerPanel{background:linear-gradient(145deg,rgba(19,29,38,.95),rgba(8,13,18,.9));border:1px solid rgba(215,173,88,.35);box-shadow:0 12px 40px #0008;backdrop-filter:blur(14px);border-radius:15px}
+.brand{padding:12px 16px}.brand b{display:block;letter-spacing:.19em;color:var(--gold);font-size:12px}.brand span{display:block;margin-top:4px;font-size:10px;color:#aeb9c2;letter-spacing:.12em}
+.status{padding:11px 14px;text-align:right;font-size:11px;color:#b9c4cc}.status strong{display:block;color:#f4f0e7;font-size:15px;margin-top:3px}
+.playerPanel{pointer-events:auto;padding:10px 12px;display:grid;grid-template-columns:repeat(2,minmax(110px,1fr));gap:7px;max-width:360px}
+.playerChip{border:1px solid #ffffff20;border-radius:9px;padding:7px 9px;font-size:10px;color:#b9c4cc}.playerChip b{display:block;color:#fff;font-size:12px;margin-bottom:3px}.playerChip.active{border-color:var(--gold);background:#d7ad581c}
+.hint{max-width:310px;padding:10px 13px;border-radius:12px;background:#0b1219e8;border:1px solid #ffffff18;color:#b8c2ca;font-size:11px;line-height:1.45}
+.controls{pointer-events:auto;display:flex;gap:7px;padding:8px;flex-wrap:wrap;justify-content:flex-end}
+button{appearance:none;border:1px solid #d7ad5866;border-radius:9px;background:linear-gradient(180deg,#d9b76f,#a77b32);color:#17120a;padding:10px 13px;font-weight:800;cursor:pointer;min-width:78px;font-size:11px}
+button.secondary{background:#18232d;color:#e8e1d2;border-color:#ffffff26}button.danger{background:#55242b;color:#ffe4e4;border-color:#a44b55}button:disabled{opacity:.45;cursor:not-allowed}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:#080d12;color:#d7ad58;letter-spacing:.2em;font-size:12px;z-index:50;transition:opacity .5s}#loading.hidden{opacity:0;pointer-events:none}
+.overlay{position:fixed;inset:0;z-index:30;display:none;place-items:center;padding:16px;background:#000c;backdrop-filter:blur(9px);overflow:auto}.overlay.show{display:grid}
+.modal{width:min(480px,100%);max-height:min(90vh,850px);overflow:auto;padding:22px;border:1px solid #d7ad58a8;border-radius:19px;background:linear-gradient(145deg,#172832,#0c141b);box-shadow:0 25px 90px #000;text-align:center}
+.modal h2{color:#e9c77d;letter-spacing:.08em;margin:5px 0 12px}.modal p{color:#c3ccd2;font-size:13px;line-height:1.55}
+.modal input,.modal select{width:100%;padding:12px;margin:6px 0;background:#080d12;color:#fff;border:1px solid #ffffff35;border-radius:8px;font-size:14px}
+.modal button{margin:5px}.rowButtons{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.rowButtons button{flex:1}
+.small{font-size:11px;color:#9eabb4}.gold{color:var(--gold)}.bigCode{font-size:30px;letter-spacing:.22em;color:#e9c77d;font-weight:900;margin:12px}
+#propertyDetails{text-align:left;background:#080e14;border:1px solid #ffffff20;border-radius:12px;padding:13px;margin:12px 0;font-size:13px;line-height:1.7}
+#cardOverlay{z-index:35}.cardIcon{font-size:45px}.cardAmount{font-size:24px;font-weight:900;color:#8ce36b;margin:12px}
+#jailActions{display:none;gap:8px;flex-direction:column;margin:14px 0}
+#toast{position:fixed;left:50%;bottom:95px;transform:translateX(-50%);z-index:45;background:#101c25;border:1px solid #d7ad58;border-radius:12px;padding:10px 15px;color:#f4e5c2;font-size:12px;display:none;max-width:min(90vw,500px);text-align:center}
+#turnLog{position:fixed;right:16px;top:100px;z-index:4;pointer-events:none;color:#d2d9de;font-size:10px;text-align:right;text-shadow:0 2px 6px #000}
+@media(max-width:650px){.top{align-items:flex-start}.playerPanel{max-width:220px;grid-template-columns:1fr 1fr;padding:7px}.playerChip{font-size:9px;padding:6px}.playerChip b{font-size:10px}.hint{display:none}.controls{gap:4px;padding:6px}button{min-width:64px;padding:9px 8px;font-size:10px}.brand{padding:9px 11px}.status{padding:9px;font-size:9px}.status strong{font-size:12px}#turnLog{display:none}}
 </style>
 </head>
 <body>
-
-<div id="scene"></div>
-<div id="loading">BUILDING THE BOARD…</div>
-
+<div id="scene"></div><div id="loading">BUILDING THE BOARD…</div>
 <div id="hud">
-  <div class="top">
-    <div class="brand"><b>MINDWEAVER</b><span>MONOPOLY · REBUILT</span></div>
-    <div class="status" id="turnStatus">PLAYER 1 TURN<strong>ROLL TO MOVE</strong></div>
+ <div class="top">
+  <div class="brand"><b>MINDWEAVER</b><span>MONOPOLY · PROPERTY EMPIRE</span></div>
+  <div class="status" id="turnStatus">READY<strong>CHOOSE A GAME</strong></div>
+ </div>
+ <div class="bottom">
+  <div class="playerPanel" id="playerPanel"></div>
+  <div class="controls">
+   <button class="secondary" id="reset">RESET VIEW</button>
+   <button class="secondary" id="propertiesBtn">PROPERTIES</button>
+   <button class="secondary" id="endTurn" disabled>END TURN</button>
+   <button id="roll" disabled>ROLL DICE</button>
   </div>
-  <div class="bottom">
-    <div class="hint">Drag to orbit · Scroll or pinch to zoom. Four player characters are active: roll the dice to move the current player around the board.</div>
-    <div class="controls">
-      <button class="secondary" id="reset">RESET VIEW</button>
-      <button id="roll">ROLL DICE</button>
-    </div>
+ </div>
+</div>
+<div id="turnLog"></div><div id="toast"></div>
+
+<div class="overlay show" id="startOverlay">
+ <div class="modal">
+  <div class="gold" style="letter-spacing:.25em;font-size:10px">THE PROPERTY TRADING GAME</div>
+  <h2>MINDWEAVER</h2>
+  <p>Build your property empire. Play against intelligent computer opponents or invite friends into a private online room.</p>
+  <input id="displayName" maxlength="22" placeholder="Your player name" value="Player 1">
+  <select id="gameMode"><option value="ai">Play against computer</option><option value="local">Local pass-and-play</option><option value="online">Private online multiplayer</option></select>
+  <div id="aiOptions"><select id="aiCount"><option value="1">1 computer opponent</option><option value="2" selected>2 computer opponents</option><option value="3">3 computer opponents</option></select></div>
+  <div id="localOptions" style="display:none"><select id="localCount"><option value="2">2 local players</option><option value="3">3 local players</option><option value="4">4 local players</option></select></div>
+  <div id="onlineOptions" style="display:none">
+   <p class="small">Online play uses your existing signed-in Supabase account and private room system.</p>
+   <div class="rowButtons"><button id="createRoom">CREATE ROOM</button><button class="secondary" id="joinRoom">JOIN ROOM</button></div>
+   <input id="roomCodeInput" maxlength="6" placeholder="Friend's 6-character room code" style="text-transform:uppercase">
+   <div id="roomInfo" class="small">Create a room or enter a friend's code.</div>
+   <div id="roomPlayers" class="small"></div>
+   <button id="startOnline" disabled>START ONLINE GAME</button>
   </div>
+  <button id="startGame" style="width:100%">START GAME</button>
+  <p class="small">Each player starts with ₦2,000,000 in game money. This is virtual game currency.</p>
+ </div>
 </div>
 
-<div id="cardOverlay">
-  <div class="chestCard">
-    <div class="chestIcon">🎁</div>
-    <div class="chestLabel">MINDWEAVER BANK</div>
-    <h2 id="cardTitle">COMMUNITY CHEST</h2>
-    <div id="cardMessage">Your community has a surprise!</div>
-    <div id="cardAmount"></div>
-    <div id="cardBalance"></div>
+<div class="overlay" id="propertyOverlay">
+ <div class="modal">
+  <div class="gold" style="letter-spacing:.2em;font-size:10px">PROPERTY MARKET</div><h2 id="propertyTitle">PROPERTY</h2>
+  <div id="propertyDetails"></div>
+  <div class="rowButtons" id="propertyActions"></div>
+  <button class="secondary" id="closeProperty">CLOSE</button>
+ </div>
+</div>
 
-    <div id="jailActions">
-      <button id="payBail">PAY ₦100,000 BAIL</button>
-      <button id="useJailCard" class="secondary">USE GET OUT OF JAIL FREE</button>
-      <button id="serveJail" class="secondary">SERVE JAIL TURN</button>
-    </div>
-
-    <button id="collectCard">CONTINUE</button>
+<div class="overlay" id="cardOverlay">
+ <div class="modal">
+  <div class="cardIcon" id="cardIcon">🎁</div><div class="gold" style="letter-spacing:.2em;font-size:10px" id="cardLabel">MINDWEAVER BANK</div>
+  <h2 id="cardTitle">COMMUNITY CHEST</h2><p id="cardMessage">A surprise awaits.</p><div class="cardAmount" id="cardAmount"></div><p id="cardBalance"></p>
+  <div id="jailActions">
+   <button id="payBail">PAY ₦100,000 BAIL</button>
+   <button class="secondary" id="useJailCard">USE GET OUT OF JAIL FREE</button>
+   <button class="secondary" id="serveJail">SERVE JAIL TURN</button>
   </div>
+  <button id="collectCard">CONTINUE</button>
+ </div>
+</div>
+
+<div class="overlay" id="portfolioOverlay">
+ <div class="modal"><h2>PROPERTY PORTFOLIO</h2><div id="portfolioList" style="text-align:left;font-size:12px;line-height:1.7"></div><button class="secondary" id="closePortfolio">CLOSE</button></div>
 </div>
 
 <script type="module">
 import * as THREE from 'three';
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-const supabase = createClient(
-  'https://pnatjqwplyxhpcfqhgcm.supabase.co',
-  'sb_publishable_lbUX7xkFk96kxH1ZP_Zk6A_zWvXT6AD'
-);
-
-const { data: authData, error: authError } = await supabase.auth.getSession();
-
-console.log('MINDWEAVER SUPABASE:', authError || 'CONNECTED');
-console.log('PLAYER SESSION:', authData.session ? 'SIGNED IN' : 'NO ACTIVE SESSION'); 
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-const host=document.querySelector('#scene');
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x080d12);
-scene.fog=new THREE.Fog(0x080d12,24,48);
+const SUPABASE_URL='https://pnatjqwplyxhpcfqhgcm.supabase.co';
+const SUPABASE_KEY='sb_publishable_lbUX7xkFk96kxH1ZP_Zk6A_zWvXT6AD';
+const supabase=createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=s=>document.querySelector(s);
+const fmt=n=>'₦'+Math.round(n).toLocaleString('en-NG');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let toastTimer;
+function toast(msg){const el=$('#toast');el.textContent=msg;el.style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display='none',3000)}
+function showOverlay(id){$('#'+id).classList.add('show')}
+function hideOverlay(id){$('#'+id).classList.remove('show')}
 
-const camera=new THREE.PerspectiveCamera(36,innerWidth/innerHeight,.1,100);
-camera.position.set(0,21,25);
-
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-renderer.setSize(innerWidth,innerHeight);
-renderer.shadowMap.enabled=true;
-renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.15;
-host.appendChild(renderer.domElement);
-
-const controls=new OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true;
-controls.dampingFactor=.06;
-controls.minDistance=13;
-controls.maxDistance=38;
-controls.maxPolarAngle=Math.PI*.47;
-controls.target.set(0,0,0);
-
-scene.add(new THREE.HemisphereLight(0xc8d9ec,0x382719,2));
-
-const key=new THREE.DirectionalLight(0xffe1a5,3.2);
-key.position.set(-8,16,10);
-key.castShadow=true;
-key.shadow.mapSize.set(2048,2048);
-key.shadow.camera.left=-18;
-key.shadow.camera.right=18;
-key.shadow.camera.top=18;
-key.shadow.camera.bottom=-18;
-scene.add(key);
-
-const rim=new THREE.PointLight(0x4d8fbd,45,35);
-rim.position.set(10,8,-10);
-scene.add(rim);
-
-const mat=(color,roughness=.65,metalness=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness});
-const wood=mat(0x49301f,.38);
-const felt=mat(0x174d43,.82);
-const tileMat=mat(0xf0e7d4,.72);
-const gold=mat(0xc69a4b,.3,.72);
-const dark=mat(0x111820,.5,.2);
-
-function box(w,h,d,material,x,y,z,parent=scene){
- const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);
- m.position.set(x,y,z);
- m.castShadow=true;
- m.receiveShadow=true;
- parent.add(m);
- return m;
-}
-
-function textSprite(text,color='#20252a',bg='rgba(255,255,255,0)',size=64){
- const c=document.createElement('canvas');
- const ctx=c.getContext('2d');
- c.width=512;
- c.height=128;
- ctx.clearRect(0,0,c.width,c.height);
- if(bg!=='rgba(255,255,255,0)'){
-  ctx.fillStyle=bg;
-  ctx.fillRect(0,0,c.width,c.height);
- }
- ctx.fillStyle=color;
- ctx.font=`bold ${size}px Arial`;
- ctx.textAlign='center';
- ctx.textBaseline='middle';
- ctx.fillText(text,256,64,480);
- const tex=new THREE.CanvasTexture(c);
- tex.colorSpace=THREE.SRGBColorSpace;
- const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));
- s.scale.set(2,.5,1);
- return s;
-}
-
-// Board base
-box(22,.7,22,wood,0,-.5,0);
-box(21.4,.12,21.4,gold,0,-.08,0);
-box(21,.16,21,felt,0,.04,0);
-box(15,.025,15,mat(0x1c5a4b,.9),0,.14,0);
-
-for(const [w,d,x,z] of [
- [15.4,.035,0,-7.7],
- [15.4,.035,0,7.7],
- [.035,15.4,-7.7,0],
- [.035,15.4,7.7,0]
-])box(w,.025,d,gold,x,.17,z);
-
-// Board spaces
-const spaces=[
-'GO','OLD KENT ROAD','COMMUNITY CHEST','WHITECHAPEL ROAD','INCOME TAX','KINGS CROSS','THE ANGEL ISLINGTON','CHANCE','EUSTON ROAD','PENTONVILLE ROAD','JAIL / VISITING',
-'PALL MALL','ELECTRIC COMPANY','WHITEHALL','NORTHUMBERLAND AVENUE','MARYLEBONE STATION','BOW STREET','COMMUNITY CHEST','MARLBOROUGH STREET','VINE STREET','FREE PARKING',
-'STRAND','CHANCE','FLEET STREET','TRAFALGAR SQUARE','FENCHURCH STATION','LEICESTER SQUARE','COVENTRY STREET','WATER WORKS','PICCADILLY','GO TO JAIL',
-'REGENT STREET','OXFORD STREET','COMMUNITY CHEST','BOND STREET','LIVERPOOL STREET STATION','CHANCE','PARK LANE','SUPER TAX','MAYFAIR'
-];
-
-const groups={
- 1:0x8b5a9e,3:0x8b5a9e,6:0x9bcbd7,8:0x9bcbd7,9:0x9bcbd7,
- 11:0xd95783,13:0xd95783,14:0xd95783,16:0xf28d42,18:0xf28d42,19:0xf28d42,
- 21:0xe64d45,23:0xe64d45,24:0xe64d45,26:0xf0d34d,27:0xf0d34d,29:0xf0d34d,
- 31:0x3f9b68,32:0x3f9b68,34:0x3f9b68,37:0x2874bb,39:0x2874bb
+// Individual property economics. Prices and improvement costs intentionally vary by property.
+// Rent on improved property follows the agreed investment percentages. Unimproved land rent
+// remains zero until a base-rent rule is confirmed.
+const propertySpecs={
+ 1:[300000,50000,250000],3:[340000,60000,280000],
+ 6:[420000,70000,320000],8:[460000,75000,350000],9:[500000,80000,380000],
+ 11:[620000,95000,450000],13:[650000,100000,480000],14:[690000,105000,500000],
+ 16:[780000,115000,550000],18:[820000,120000,580000],19:[860000,125000,600000],
+ 21:[1050000,145000,680000],23:[1100000,150000,720000],24:[1150000,155000,750000],
+ 26:[1320000,170000,820000],27:[1380000,180000,850000],29:[1450000,190000,900000],
+ 31:[1680000,210000,980000],32:[1750000,220000,1020000],34:[1820000,230000,1080000],
+ 37:[2300000,270000,1250000],39:[2800000,320000,1500000]
 };
+const spaces=['GO','OLD KENT ROAD','COMMUNITY CHEST','WHITECHAPEL ROAD','INCOME TAX','KINGS CROSS','THE ANGEL ISLINGTON','CHANCE','EUSTON ROAD','PENTONVILLE ROAD','JAIL / VISITING','PALL MALL','ELECTRIC COMPANY','WHITEHALL','NORTHUMBERLAND AVENUE','MARYLEBONE STATION','BOW STREET','COMMUNITY CHEST','MARLBOROUGH STREET','VINE STREET','FREE PARKING','STRAND','CHANCE','FLEET STREET','TRAFALGAR SQUARE','FENCHURCH STATION','LEICESTER SQUARE','COVENTRY STREET','WATER WORKS','PICCADILLY','GO TO JAIL','REGENT STREET','OXFORD STREET','COMMUNITY CHEST','BOND STREET','LIVERPOOL STREET STATION','CHANCE','PARK LANE','SUPER TAX','MAYFAIR'];
+const groups={1:0x8b5a9e,3:0x8b5a9e,6:0x9bcbd7,8:0x9bcbd7,9:0x9bcbd7,11:0xd95783,13:0xd95783,14:0xd95783,16:0xf28d42,18:0xf28d42,19:0xf28d42,21:0xe64d45,23:0xe64d45,24:0xe64d45,26:0xf0d34d,27:0xf0d34d,29:0xf0d34d,31:0x3f9b68,32:0x3f9b68,34:0x3f9b68,37:0x2874bb,39:0x2874bb};
+const propertyData={};
+for(const [k,v] of Object.entries(propertySpecs)){const i=+k;propertyData[i]={index:i,name:spaces[i],price:v[0],houseCost:v[1],hotelCost:v[2],owner:null,houses:0,hotel:false,investment:v[0]};}
 
-const positions=[];
-const edge=10,step=2;
+const host=$('#scene'),scene=new THREE.Scene();scene.background=new THREE.Color(0x080d12);scene.fog=new THREE.Fog(0x080d12,24,48);
+const camera=new THREE.PerspectiveCamera(36,innerWidth/innerHeight,.1,100);camera.position.set(0,21,25);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;host.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.06;controls.minDistance=13;controls.maxDistance=38;controls.maxPolarAngle=Math.PI*.47;
+scene.add(new THREE.HemisphereLight(0xc8d9ec,0x382719,2));
+const key=new THREE.DirectionalLight(0xffe1a5,3.2);key.position.set(-8,16,10);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-18;key.shadow.camera.right=18;key.shadow.camera.top=18;key.shadow.camera.bottom=-18;scene.add(key);
+const rim=new THREE.PointLight(0x4d8fbd,45,35);rim.position.set(10,8,-10);scene.add(rim);
+const mat=(color,roughness=.65,metalness=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness});
+const wood=mat(0x49301f,.38),felt=mat(0x174d43,.82),tileMat=mat(0xf0e7d4,.72),gold=mat(0xc69a4b,.3,.72),dark=mat(0x111820,.5,.2);
+function box(w,h,d,material,x,y,z,parent=scene){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
+function textSprite(text,color='#20252a',size=48){const c=document.createElement('canvas');c.width=512;c.height=128;const ctx=c.getContext('2d');ctx.clearRect(0,0,512,128);ctx.fillStyle=color;ctx.font=`bold ${size}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,256,64,490);const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));s.scale.set(2,.5,1);return s;}
+box(22,.7,22,wood,0,-.5,0);box(21.4,.12,21.4,gold,0,-.08,0);box(21,.16,21,felt,0,.04,0);box(15,.025,15,mat(0x1c5a4b,.9),0,.14,0);
+for(const [w,d,x,z] of [[15.4,.035,0,-7.7],[15.4,.035,0,7.7],[.035,15.4,-7.7,0],[.035,15.4,7.7,0]])box(w,.025,d,gold,x,.17,z);
+const positions=[],edge=10,step=2;for(let i=0;i<11;i++)positions.push({x:edge-i*step,z:edge,rot:0});for(let i=1;i<11;i++)positions.push({x:-edge,z:edge-i*step,rot:Math.PI/2});for(let i=1;i<11;i++)positions.push({x:-edge+i*step,z:-edge,rot:Math.PI});for(let i=1;i<10;i++)positions.push({x:edge,z:-edge+i*step,rot:-Math.PI/2});
+spaces.forEach((name,i)=>{const p=positions[i];if(!p)return;const corner=[0,10,20,30].includes(i),w=corner?2.45:1.72,d=corner?2.45:1.72;box(w,.18,d,tileMat,p.x,.28,p.z);if(groups[i]){const strip=box(corner?2.1:1.48,.08,.32,mat(groups[i],.55),p.x,.41,p.z);strip.rotation.y=p.rot;strip.position.x+=Math.sin(p.rot)*.57;strip.position.z+=Math.cos(p.rot)*.57;}const label=textSprite(name,'#20252a',corner?40:27);label.position.set(p.x,.43,p.z);label.scale.set(corner?1.7:1.55,.39,1);label.material.rotation=p.rot;scene.add(label);});
+box(8,.12,2.5,dark,0,.28,0);const title=textSprite('MINDWEAVER','#e2bd72',70);title.position.set(0,.42,-.35);title.scale.set(5.8,1,1);scene.add(title);const sub=textSprite('THE CLASSIC PROPERTY TRADING GAME','#b7c8c0',34);sub.position.set(0,.4,.65);sub.scale.set(4.8,.42,1);scene.add(sub);
+for(let i=0;i<4;i++){const a=i*Math.PI/2,ring=new THREE.Mesh(new THREE.TorusGeometry(.55,.045,8,48),gold);ring.rotation.x=Math.PI/2;ring.position.set(Math.cos(a)*4.4,.35,Math.sin(a)*4.4);scene.add(ring);}
+const playerColors=[0x55c8ff,0xff647c,0x8ce36b,0xc69aff],playerOffsets=[{x:-.48,z:-.48},{x:.48,z:-.48},{x:-.48,z:.48},{x:.48,z:.48}],playerTokens=[];
+function makeCharacter(color,index){const g=new THREE.Group(),main=mat(color,.3,.25),trim=mat(0xf4e4bd,.28,.55),clothes=mat(0x17202a,.38,.15);const base=new THREE.Mesh(new THREE.CylinderGeometry(.34,.39,.13,32),trim);base.position.y=.49;g.add(base);const ring=new THREE.Mesh(new THREE.TorusGeometry(.25,.035,8,32),main);ring.rotation.x=Math.PI/2;ring.position.y=.57;g.add(ring);const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.17,.34,6,12),main);torso.position.y=.91;g.add(torso);const head=new THREE.Mesh(new THREE.SphereGeometry(.17,20,16),mat(0xf0c7a0,.52));head.position.y=1.25;g.add(head);const hair=new THREE.Mesh(new THREE.SphereGeometry(.174,18,12,0,Math.PI*2,0,Math.PI*.55),clothes);hair.position.y=1.29;g.add(hair);const arms=[],legs=[];[-1,1].forEach(side=>{const a=new THREE.Group();a.position.set(side*.22,1.04,0);const m=new THREE.Mesh(new THREE.CapsuleGeometry(.055,.22,4,8),main);m.position.y=-.13;a.add(m);g.add(a);arms.push(a);const l=new THREE.Group();l.position.set(side*.105,.59,0);const lm=new THREE.Mesh(new THREE.CapsuleGeometry(.065,.20,4,8),clothes);lm.position.y=-.12;l.add(lm);g.add(l);legs.push(l);});g.userData={playerIndex:index,arms,legs};scene.add(g);return g;}
+for(let i=0;i<4;i++)playerTokens.push(makeCharacter(playerColors[i],i));
+function placeToken(i){const p=positions[game.players[i]?.position||0],o=playerOffsets[i];playerTokens[i].position.set(p.x+o.x,.05,p.z+o.z);playerTokens[i].rotation.y=Math.atan2(-p.x,-p.z);}
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),mat(0x080d12,.95));floor.rotation.x=-Math.PI/2;floor.position.y=-.92;floor.receiveShadow=true;scene.add(floor);
 
-for(let i=0;i<11;i++)positions.push({x:edge-i*step,z:edge,rot:0});
-for(let i=1;i<11;i++)positions.push({x:-edge,z:edge-i*step,rot:Math.PI/2});
-for(let i=1;i<11;i++)positions.push({x:-edge+i*step,z:-edge,rot:Math.PI});
-for(let i=1;i<10;i++)positions.push({x:edge,z:-edge+i*step,rot:-Math.PI/2});
-
-spaces.forEach((name,i)=>{
- const p=positions[i];
- if(!p)return;
- const corner=[0,10,20,30].includes(i);
- const w=corner?2.45:1.72;
- const d=corner?2.45:1.72;
- const groupColor=groups[i];
-
- const tile=box(w,.18,d,tileMat,p.x,.28,p.z);
- tile.rotation.y=p.rot;
-
- if(groupColor){
-  const strip=box(corner?2.1:1.48,.08,.32,mat(groupColor,.55),p.x,.41,p.z);
-  strip.rotation.y=p.rot;
-  strip.position.x+=Math.sin(p.rot)*.57;
-  strip.position.z+=Math.cos(p.rot)*.57;
- }
-
- const label=textSprite(name,'#20252a','rgba(255,255,255,0)',corner?43:29);
- label.position.set(p.x,.43,p.z);
- label.scale.set(corner?1.7:1.55,.39,1);
- label.material.rotation=p.rot;
- scene.add(label);
-});
-
-// Central plaque
-box(8,.12,2.5,dark,0,.28,0);
-
-const title=textSprite('MINDWEAVER','#e2bd72');
-title.position.set(0,.42,-.35);
-title.scale.set(5.8,1,1);
-scene.add(title);
-
-const sub=textSprite('THE CLASSIC PROPERTY TRADING GAME','#b7c8c0');
-sub.position.set(0,.4,.65);
-sub.scale.set(4.8,.42,1);
-scene.add(sub);
-
-for(let i=0;i<4;i++){
- const a=i*Math.PI/2;
- const x=Math.cos(a)*4.4;
- const z=Math.sin(a)*4.4;
- const ring=new THREE.Mesh(new THREE.TorusGeometry(.55,.045,8,48),gold);
- ring.rotation.x=Math.PI/2;
- ring.position.set(x,.35,z);
- scene.add(ring);
-}
-
-// Players
-const playerColors=[0x55c8ff,0xff647c,0x8ce36b,0xc69aff];
-const playerNames=['PLAYER 1','PLAYER 2','PLAYER 3','PLAYER 4'];
-
-const playerOffsets=[
- {x:-.48,z:-.48},
- {x:.48,z:-.48},
- {x:-.48,z:.48},
- {x:.48,z:.48}
-];
-
-const playerTokens=[];
-const playerPositions=[0,0,0,0];
-const playerCash=[2000000,2000000,2000000,2000000];
-
+let game={players:[],active:0,started:false,turnRolled:false,mode:'ai',round:1,log:[],chanceFree:[]};
+let currentRoomId=null,currentRoomCode=null,roomPoll=null,roomHost=false,roomMembers=[],userId=null,session=null,onlineBusy=false,aiBusy=false,gameOver=false;
 const JAIL_BAIL=100000;
-const playerInJail=[false,false,false,false];
-const jailTurns=[0,0,0,0];
-const getOutOfJailFree=[false,false,false,false];
-
-let activePlayer=0;
-let characterMoving=false;
-let rolling=false;
-
-function makeCharacter(color,index){
- const group=new THREE.Group();
- const mainMat=mat(color,.3,.25);
- const trimMat=mat(0xf4e4bd,.28,.55);
- const darkMat=mat(0x17202a,.38,.15);
-
- const base=new THREE.Mesh(new THREE.CylinderGeometry(.34,.39,.13,32),trimMat);
- base.position.y=.49;
- group.add(base);
-
- const footRing=new THREE.Mesh(new THREE.TorusGeometry(.25,.035,8,32),mainMat);
- footRing.rotation.x=Math.PI/2;
- footRing.position.y=.57;
- group.add(footRing);
-
- const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.17,.34,6,12),mainMat);
- torso.position.y=.91;
- group.add(torso);
-
- const head=new THREE.Mesh(new THREE.SphereGeometry(.17,20,16),mat(0xf0c7a0,.52));
- head.position.y=1.25;
- group.add(head);
-
- const hair=new THREE.Mesh(new THREE.SphereGeometry(.174,18,12,0,Math.PI*2,0,Math.PI*.55),darkMat);
- hair.position.y=1.29;
- group.add(hair);
-
- const arms=[];
- [-1,1].forEach(side=>{
-  const pivot=new THREE.Group();
-  pivot.position.set(side*.22,1.04,0);
-  const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.055,.22,4,8),mainMat);
-  arm.position.y=-.13;
-  pivot.add(arm);
-  group.add(pivot);
-  arms.push(pivot);
- });
-
- const legs=[];
- [-1,1].forEach(side=>{
-  const pivot=new THREE.Group();
-  pivot.position.set(side*.105,.59,0);
-  const leg=new THREE.Mesh(new THREE.CapsuleGeometry(.065,.20,4,8),darkMat);
-  leg.position.y=-.12;
-  pivot.add(leg);
-  group.add(pivot);
-  legs.push(pivot);
- });
-
- const badge=new THREE.Mesh(new THREE.SphereGeometry(.065,12,10),trimMat);
- badge.position.set(0,.93,.16);
- group.add(badge);
-
- group.userData.playerIndex=index;
- group.userData.arms=arms;
- group.userData.legs=legs;
- return group;
-}
-
-function positionCharacter(token,spaceIndex,playerIndex){
- const point=positions[spaceIndex];
- const offset=playerOffsets[playerIndex];
- token.position.set(point.x+offset.x,.05,point.z+offset.z);
- token.rotation.y=Math.atan2(-point.x,-point.z);
-}
-
-for(let i=0;i<4;i++){
- const character=makeCharacter(playerColors[i],i);
- scene.add(character);
- positionCharacter(character,0,i);
- playerTokens.push(character);
-}
-
-function updateTurnStatus(message){
- document.querySelector('#turnStatus').innerHTML=
-  `${playerNames[activePlayer]} TURN<strong>${message}</strong>`;
-}
-
-// Card decks
-const communityCards=[
- {message:"The bank rewards your excellent service!",amount:100000},
- {message:"You received an unexpected family gift!",amount:50000},
- {message:"Your investment has paid off!",amount:250000},
- {message:"You won a community lottery!",amount:150000},
- {message:"Your insurance refund has arrived!",amount:75000},
- {message:"Hospital expenses. Pay your medical bill!",amount:-40000},
- {message:"You have unpaid school fees!",amount:-30000},
- {message:"Your property needs urgent repairs!",amount:-60000},
- {message:"You received a traffic violation fine!",amount:-25000},
- {message:"Unexpected expenses! Pay the bank!",amount:-100000}
-];
-
-const chanceCards=[
- {message:"The bank pays you a generous dividend!",amount:200000},
- {message:"You won a business investment prize!",amount:150000},
- {message:"Your shares have increased in value!",amount:300000},
- {message:"You received a surprise bonus!",amount:100000},
- {message:"Pay a luxury tax to the bank!",amount:-100000},
- {message:"Your vehicle needs expensive repairs!",amount:-75000},
- {message:"Pay your outstanding loan!",amount:-200000},
-
- {message:"You were caught committing a financial offence. Go directly to Jail!",type:"jail"},
- {message:"You violated the city regulations. Go directly to Jail!",type:"jail"},
- {message:"You were arrested for trespassing. Go directly to Jail!",type:"jail"},
- {message:"You ignored a court summons. Go directly to Jail!",type:"jail"},
-
- {message:"You received a Get Out of Jail Free card!",type:"jailfree"}
-];
-
-// Shuffle the Chance deck and draw without replacement.
-let shuffledChanceCards=[];
-
-function drawChanceCard(){
- if(shuffledChanceCards.length===0){
-  shuffledChanceCards=[...chanceCards];
-
-  for(let i=shuffledChanceCards.length-1;i>0;i--){
-   const j=Math.floor(Math.random()*(i+1));
-   [shuffledChanceCards[i],shuffledChanceCards[j]]=
-   [shuffledChanceCards[j],shuffledChanceCards[i]];
-  }
- }
-
- return shuffledChanceCards.pop();
-}
-
-function updateCardBalance(playerIndex){
- document.querySelector('#cardBalance').textContent=
-  `PLAYER ${playerIndex+1} BALANCE: ₦${playerCash[playerIndex].toLocaleString('en-NG')}`;
-}
-
-function openJailOptions(playerIndex,onFinish){
- const overlay=document.querySelector('#cardOverlay');
- const actions=document.querySelector('#jailActions');
- const collect=document.querySelector('#collectCard');
- const bail=document.querySelector('#payBail');
- const jailCard=document.querySelector('#useJailCard');
- const serve=document.querySelector('#serveJail');
-
- document.querySelector('#cardTitle').textContent='GO TO JAIL';
- document.querySelector('.chestIcon').textContent='🚔';
- document.querySelector('.chestLabel').textContent='MINDWEAVER POLICE DEPARTMENT';
-
- document.querySelector('#cardMessage').textContent=
-  `PLAYER ${playerIndex+1} IS IN JAIL. Choose how to proceed.`;
-
- document.querySelector('#cardAmount').textContent='IN JAIL 👮‍♂️';
- document.querySelector('#cardAmount').style.color='#ff647c';
-
- updateCardBalance(playerIndex);
-
- actions.style.display='flex';
- collect.style.display='none';
-
- bail.style.display='block';
- jailCard.style.display=getOutOfJailFree[playerIndex]?'block':'none';
- serve.style.display='block';
-
- function finish(){
-  overlay.classList.remove('show');
-  actions.style.display='none';
-  onFinish();
- }
-
- bail.onclick=()=>{
-  if(playerCash[playerIndex]<JAIL_BAIL){
-   document.querySelector('#cardMessage').textContent=
-    'INSUFFICIENT FUNDS! You need ₦100,000 to pay bail.';
-   return;
-  }
-
-  playerCash[playerIndex]-=JAIL_BAIL;
-  playerInJail[playerIndex]=false;
-  jailTurns[playerIndex]=0;
-
-  document.querySelector('#cardAmount').textContent='−₦100,000 BAIL PAID';
-  updateCardBalance(playerIndex);
-  finish();
- };
-
- jailCard.onclick=()=>{
-  if(!getOutOfJailFree[playerIndex])return;
-
-  getOutOfJailFree[playerIndex]=false;
-  playerInJail[playerIndex]=false;
-  jailTurns[playerIndex]=0;
-
-  document.querySelector('#cardAmount').textContent='JAIL FREE CARD USED';
-  finish();
- };
-
- serve.onclick=()=>{
-  jailTurns[playerIndex]++;
-  document.querySelector('#cardMessage').textContent=
-   'You remain in Jail. Your turn has been served.';
-  finish();
- };
-
- overlay.classList.add('show');
-}
-
-function showNormalCard(playerIndex,card,isCommunity){
- const overlay=document.querySelector('#cardOverlay');
- const actions=document.querySelector('#jailActions');
- const collect=document.querySelector('#collectCard');
-
- actions.style.display='none';
- collect.style.display='block';
-
- document.querySelector('#cardTitle').textContent=
-  isCommunity?'COMMUNITY CHEST':'CHANCE';
-
- document.querySelector('.chestIcon').textContent=
-  isCommunity?'🎁':'🎲';
-
- document.querySelector('.chestLabel').textContent=
-  isCommunity?'MINDWEAVER BANK':'MINDWEAVER CHANCE';
-
- document.querySelector('#cardMessage').textContent=card.message;
-
- const amountElement=document.querySelector('#cardAmount');
-
- if(card.type==='jailfree'){
-  amountElement.textContent='CARD KEPT';
-  amountElement.style.color='#e9c77d';
- }else{
-  amountElement.textContent=
-   (card.amount>=0?'+':'−')+
-   '₦'+Math.abs(card.amount).toLocaleString('en-NG');
-
-  amountElement.style.color=card.amount>=0?'#8ce36b':'#ff647c';
- }
-
- updateCardBalance(playerIndex);
-
- return new Promise(resolve=>{
-  collect.onclick=()=>{
-   overlay.classList.remove('show');
-   resolve();
-  };
-  overlay.classList.add('show');
- });
-}
-
-function resolveLanding(playerIndex){
- const space=playerPositions[playerIndex];
-
- const isCommunity=[2,17,33].includes(space);
- const isChance=[7,22,36].includes(space);
- const isGoToJail=space===30;
-
- if(isGoToJail){
-  playerInJail[playerIndex]=true;
-  jailTurns[playerIndex]=0;
-  playerPositions[playerIndex]=10;
-
-  positionCharacter(playerTokens[playerIndex],10,playerIndex);
-
-  return new Promise(resolve=>{
-   openJailOptions(playerIndex,resolve);
-  });
- }
-
- if(!isCommunity&&!isChance)return Promise.resolve();
-
- const card=isChance
-  ?drawChanceCard()
-  :communityCards[Math.floor(Math.random()*communityCards.length)];
-
- if(card.type==='jail'){
-  playerInJail[playerIndex]=true;
-  jailTurns[playerIndex]=0;
-  playerPositions[playerIndex]=10;
-
-  positionCharacter(playerTokens[playerIndex],10,playerIndex);
-
-  return new Promise(resolve=>{
-   openJailOptions(playerIndex,resolve);
-  });
- }
-
- if(card.type==='jailfree'){
-  getOutOfJailFree[playerIndex]=true;
- }else if(typeof card.amount==='number'){
-  playerCash[playerIndex]+=card.amount;
- }
-
- return showNormalCard(playerIndex,card,isCommunity);
-}
-
-// Handle the jailed player's turn.
-// They cannot roll or move while still in Jail.
-function handleJailedTurn(playerIndex){
- openJailOptions(playerIndex,()=>{
-  activePlayer=(activePlayer+1)%4;
-  updateTurnStatus('ROLL TO MOVE');
- });
-}
-
-function movePlayer(playerIndex,steps){
- return new Promise(resolve=>{
-  const token=playerTokens[playerIndex];
-
-  characterMoving=true;
-  updateTurnStatus(`MOVING ${steps} SPACES`);
-
-  let moved=0;
-  let stepStart=performance.now();
-  const stepDuration=420;
-  let from=token.position.clone();
-
-  function animateStep(now){
-   const elapsed=now-stepStart;
-   const t=Math.min(1,elapsed/stepDuration);
-   const eased=t*t*(3-2*t);
-
-   const previousIndex=playerPositions[playerIndex];
-   const nextIndex=(previousIndex+1)%40;
-   const point=positions[nextIndex];
-   const offset=playerOffsets[playerIndex];
-
-   const target=new THREE.Vector3(
-    point.x+offset.x,.05,point.z+offset.z
-   );
-
-   const dx=target.x-from.x;
-   const dz=target.z-from.z;
-   const targetAngle=Math.atan2(dx,dz);
-
-   let angleDiff=targetAngle-token.rotation.y;
-   angleDiff=Math.atan2(Math.sin(angleDiff),Math.cos(angleDiff));
-   token.rotation.y+=angleDiff*Math.min(1,elapsed/100);
-
-   token.position.lerpVectors(from,target,eased);
-   token.position.y=.05+Math.abs(Math.sin(t*Math.PI*2))*.10;
-
-   const swing=Math.sin(t*Math.PI*2)*.65;
-   const arms=token.userData.arms;
-   const legs=token.userData.legs;
-
-   arms[0].rotation.x=swing;
-   arms[1].rotation.x=-swing;
-   legs[0].rotation.x=-swing;
-   legs[1].rotation.x=swing;
-
-   if(t<1){
-    requestAnimationFrame(animateStep);
-    return;
-   }
-
-   token.position.copy(target);
-   token.position.y=.05;
-
-   // Award ₦200,000 only when a player passes GO.
-   // A jailed player cannot move or collect GO salary.
-   if(nextIndex<previousIndex){
-    playerCash[playerIndex]+=200000;
-   }
-
-   playerPositions[playerIndex]=nextIndex;
-   moved++;
-
-   arms.forEach(a=>a.rotation.x=0);
-   legs.forEach(l=>l.rotation.x=0);
-
-   if(moved<steps){
-    from=token.position.clone();
-    stepStart=performance.now();
-    requestAnimationFrame(animateStep);
-   }else{
-    characterMoving=false;
-
-    resolveLanding(playerIndex).then(()=>{
-     activePlayer=(activePlayer+1)%4;
-     updateTurnStatus('ROLL TO MOVE');
-     resolve();
-    });
-   }
-  }
-
-  requestAnimationFrame(animateStep);
- });
-}
-
-// Dice
-function makeDie(x,z){
- const g=new THREE.Group();
- g.position.set(x,.65,z);
- scene.add(g);
-
- const cube=new THREE.Mesh(
-  new THREE.BoxGeometry(.72,.72,.72),
-  mat(0xf5f1e8,.28)
- );
- cube.castShadow=true;
- cube.receiveShadow=true;
- g.add(cube);
-
- const pipMat=mat(0x17202a,.35);
-
- const layouts={
-  1:[[0,0]],
-  2:[[-.17,-.17],[.17,.17]],
-  3:[[-.17,-.17],[0,0],[.17,.17]],
-  4:[[-.17,-.17],[-.17,.17],[.17,-.17],[.17,.17]],
-  5:[[-.17,-.17],[-.17,.17],[0,0],[.17,-.17],[.17,.17]],
-  6:[[-.17,-.19],[-.17,0],[-.17,.19],[.17,-.19],[.17,0],[.17,.19]]
- };
-
- const faceDefs=[
-  {normal:new THREE.Vector3(0,0,1),u:new THREE.Vector3(1,0,0),v:new THREE.Vector3(0,1,0),value:1},
-  {normal:new THREE.Vector3(0,0,-1),u:new THREE.Vector3(-1,0,0),v:new THREE.Vector3(0,1,0),value:6},
-  {normal:new THREE.Vector3(1,0,0),u:new THREE.Vector3(0,0,-1),v:new THREE.Vector3(0,1,0),value:2},
-  {normal:new THREE.Vector3(-1,0,0),u:new THREE.Vector3(0,0,1),v:new THREE.Vector3(0,1,0),value:5},
-  {normal:new THREE.Vector3(0,1,0),u:new THREE.Vector3(1,0,0),v:new THREE.Vector3(0,0,-1),value:3},
-  {normal:new THREE.Vector3(0,-1,0),u:new THREE.Vector3(1,0,0),v:new THREE.Vector3(0,0,1),value:4}
- ];
-
- faceDefs.forEach(face=>{
-  layouts[face.value].forEach(([a,b])=>{
-   const pip=new THREE.Mesh(new THREE.SphereGeometry(.052,14,10),pipMat);
-   pip.position.copy(face.normal.clone().multiplyScalar(.366))
-    .add(face.u.clone().multiplyScalar(a))
-    .add(face.v.clone().multiplyScalar(b));
-   g.add(pip);
-  });
- });
-
- return g;
-}
-
+const communityCards=[{message:'The bank rewards your excellent service!',amount:100000},{message:'You received an unexpected family gift!',amount:50000},{message:'Your investment has paid off!',amount:250000},{message:'You won a community lottery!',amount:150000},{message:'Your insurance refund has arrived!',amount:75000},{message:'Hospital expenses. Pay your medical bill!',amount:-40000},{message:'You have unpaid school fees!',amount:-30000},{message:'Your property needs urgent repairs!',amount:-60000},{message:'You received a traffic violation fine!',amount:-25000},{message:'Unexpected expenses! Pay the bank!',amount:-100000}];
+const chanceCards=[{message:'The bank pays you a generous dividend!',amount:200000},{message:'You won a business investment prize!',amount:150000},{message:'Your shares have increased in value!',amount:300000},{message:'You received a surprise bonus!',amount:100000},{message:'Pay a luxury tax to the bank!',amount:-100000},{message:'Your vehicle needs expensive repairs!',amount:-75000},{message:'Pay your outstanding loan!',amount:-200000},{message:'You were caught committing a financial offence. Go directly to Jail!',type:'jail'},{message:'You violated the city regulations. Go directly to Jail!',type:'jail'},{message:'You were arrested for trespassing. Go directly to Jail!',type:'jail'},{message:'You ignored a court summons. Go directly to Jail!',type:'jail'},{message:'You received a Get Out of Jail Free card!',type:'jailfree'}];
+let chanceDeck=[];
+function shuffleChance(){chanceDeck=[...chanceCards];for(let i=chanceDeck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[chanceDeck[i],chanceDeck[j]]=[chanceDeck[j],chanceDeck[i]];}}
+function nextChance(){if(!chanceDeck.length)shuffleChance();return chanceDeck.pop();}
+function addLog(t){game.log.unshift(t);game.log=game.log.slice(0,4);$('#turnLog').innerHTML=game.log.map(x=>`<div>${escapeHtml(x)}</div>`).join('');}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function current(){return game.players[game.active];}
+function isHumanTurn(){if(game.mode!=='online')return !current()?.ai;return !!session&&current()?.userId===userId;}
+function updateStatus(msg){const p=current();$('#turnStatus').innerHTML=`${p?escapeHtml(p.name):'MINDWEAVER'} TURN<strong>${msg}</strong>`;$('#roll').disabled=!game.started||gameOver||!isHumanTurn()||game.turnRolled||onlineBusy;$('#roll').textContent=p?.jailed?'JAIL OPTIONS':'ROLL DICE';$('#endTurn').disabled=!game.started||gameOver||!isHumanTurn()||!game.turnRolled||onlineBusy;}
+function renderPlayers(){const el=$('#playerPanel');el.innerHTML=game.players.map((p,i)=>`<div class="playerChip ${i===game.active?'active':''}"><b style="color:${['#55c8ff','#ff647c','#8ce36b','#c69aff'][i]}">${escapeHtml(p.name)}</b>${fmt(p.cash)}${p.jailed?' · IN JAIL':''}</div>`).join('');}
+function syncUI(msg='ROLL TO MOVE'){renderPlayers();updateStatus(msg);}
+function propertyRent(prop){if(prop.hotel)return prop.investment*.20;if(prop.houses>0)return prop.investment*(prop.houses*.025);return 0;}
+function totalOwned(i){return Object.values(propertyData).filter(p=>p.owner===i).length;}
+function ownProps(i){return Object.values(propertyData).filter(p=>p.owner===i);}
+function pay(player,amount,recipient=null){const p=game.players[player];const paid=Math.min(p.cash,amount);p.cash-=paid;if(recipient!==null)game.players[recipient].cash+=paid;return paid;}
+function propertyInfo(i){return propertyData[i];}
+function propertyPopup(i,after){const p=propertyInfo(i),me=game.active;if(!p)return after?.();$('#propertyTitle').textContent=p.name;const owner=p.owner===null?'Unowned':game.players[p.owner]?.name||'Unknown';$('#propertyDetails').innerHTML=`<b>Purchase price:</b> ${fmt(p.price)}<br><b>Owner:</b> ${escapeHtml(owner)}<br><b>House cost (each):</b> ${fmt(p.houseCost)}<br><b>Hotel cost:</b> ${fmt(p.hotelCost)}<br><b>Improvements:</b> ${p.hotel?'Hotel':p.houses+' house(s)'}<br><b>Total investment:</b> ${fmt(p.investment)}<br><b>Current rent:</b> ${fmt(propertyRent(p))}<br><span class="small">Rent: 2.5% per house, 5% for two, 7.5% for three, 10% for four, 20% for a hotel. Unimproved land rent is currently set to ₦0 pending a base-rent rule.</span>`;
+const actions=$('#propertyActions');actions.innerHTML='';
+const add=(label,fn,cls='')=>{const b=document.createElement('button');b.textContent=label;if(cls)b.className=cls;b.onclick=fn;actions.appendChild(b);};
+if(p.owner===null){add('BUY PROPERTY',async()=>{if(game.players[me].cash<p.price){toast('Not enough money to buy this property.');return;}game.players[me].cash-=p.price;p.owner=me;p.investment=p.price;addLog(`${game.players[me].name} bought ${p.name}`);hideOverlay('propertyOverlay');await persistGame();syncUI();after?.();});}
+else if(p.owner===me&&!p.hotel){if(p.houses<4)add(`BUILD HOUSE · ${fmt(p.houseCost)}`,async()=>{if(game.players[me].cash<p.houseCost)return toast('Not enough money for a house.');game.players[me].cash-=p.houseCost;p.houses++;p.investment+=p.houseCost;addLog(`${game.players[me].name} built a house on ${p.name}`);hideOverlay('propertyOverlay');await persistGame();syncUI();after?.();});else add(`BUILD HOTEL · ${fmt(p.hotelCost)}`,async()=>{if(game.players[me].cash<p.hotelCost)return toast('Not enough money for a hotel.');game.players[me].cash-=p.hotelCost;p.hotel=true;p.houses=0;p.investment+=p.hotelCost;addLog(`${game.players[me].name} built a hotel on ${p.name}`);hideOverlay('propertyOverlay');await persistGame();syncUI();after?.();});}
+if(p.owner!==null&&p.owner!==me)add('PAY RENT',()=>{hideOverlay('propertyOverlay');const rent=propertyRent(p);if(rent){const got=pay(me,rent,p.owner);addLog(`${game.players[me].name} paid ${fmt(got)} rent to ${game.players[p.owner].name}`);persistGame();syncUI();}else toast('This property has no improvements, so no rent is due under the current rent rules.');after?.();},'secondary');
+if(p.owner===me)add('DONE',''.constructor==='x'?()=>{}:()=>{hideOverlay('propertyOverlay');after?.();},'secondary');
+showOverlay('propertyOverlay');}
+$('#closeProperty').onclick=()=>hideOverlay('propertyOverlay');
+function showPortfolio(){const items=ownProps(game.active);$('#portfolioList').innerHTML=items.length?items.map(p=>`<div style="padding:8px;border-bottom:1px solid #ffffff20"><b>${escapeHtml(p.name)}</b><br>Land ${fmt(p.price)} · ${p.hotel?'Hotel':p.houses+' houses'} · Investment ${fmt(p.investment)} · Rent ${fmt(propertyRent(p))}</div>`).join(''):'No properties owned yet.';showOverlay('portfolioOverlay');}
+$('#propertiesBtn').onclick=showPortfolio;$('#closePortfolio').onclick=()=>hideOverlay('portfolioOverlay');
+
+function showCard(title,message,amount,playerIndex,icon='🎁',label='MINDWEAVER BANK'){return new Promise(resolve=>{$('#cardTitle').textContent=title;$('#cardMessage').textContent=message;$('#cardAmount').textContent=amount||'';$('#cardIcon').textContent=icon;$('#cardLabel').textContent=label;$('#cardBalance').textContent=`${game.players[playerIndex].name} balance: ${fmt(game.players[playerIndex].cash)}`;$('#jailActions').style.display='none';$('#collectCard').style.display='inline-block';$('#collectCard').onclick=()=>{hideOverlay('cardOverlay');resolve();};showOverlay('cardOverlay');});}
+function jailOptions(i){return new Promise(resolve=>{$('#cardTitle').textContent='GO TO JAIL';$('#cardMessage').textContent=`${game.players[i].name} is in Jail. Choose how to proceed.`;$('#cardAmount').textContent='IN JAIL 👮';$('#cardIcon').textContent='🚔';$('#cardLabel').textContent='MINDWEAVER POLICE DEPARTMENT';$('#cardBalance').textContent=`Balance: ${fmt(game.players[i].cash)}`;$('#jailActions').style.display='flex';$('#collectCard').style.display='none';$('#payBail').onclick=()=>{if(game.players[i].cash<JAIL_BAIL)return toast('Insufficient funds to pay bail.');game.players[i].cash-=JAIL_BAIL;game.players[i].jailed=false;game.players[i].jailTurns=0;hideOverlay('cardOverlay');resolve('released');};$('#useJailCard').style.display=game.players[i].jailFree?'block':'none';$('#useJailCard').onclick=()=>{if(!game.players[i].jailFree)return;game.players[i].jailFree=false;game.players[i].jailed=false;game.players[i].jailTurns=0;hideOverlay('cardOverlay');resolve('released');};$('#serveJail').onclick=()=>{game.players[i].jailTurns++;hideOverlay('cardOverlay');resolve('served');};showOverlay('cardOverlay');});}
+async function resolveCard(i,isChance){const card=isChance?nextChance():communityCards[Math.floor(Math.random()*communityCards.length)];if(card.type==='jail'){sendToJail(i);if(!game.players[i].ai)await jailOptions(i);return;}if(card.type==='jailfree')game.players[i].jailFree=true;else game.players[i].cash+=card.amount;if(!game.players[i].ai)await showCard(isChance?'CHANCE':'COMMUNITY CHEST',card.message,card.type==='jailfree'?'GET OUT OF JAIL FREE':(card.amount>=0?'+':'−')+fmt(Math.abs(card.amount)),i,isChance?'🎲':'🎁',isChance?'MINDWEAVER CHANCE':'MINDWEAVER BANK');else addLog(`${game.players[i].name}: ${card.message}`);}
+function sendToJail(i){game.players[i].jailed=true;game.players[i].jailTurns=0;game.players[i].position=10;placeToken(i);addLog(`${game.players[i].name} was sent to Jail`);}
+async function resolveLanding(i){const s=game.players[i].position;if(s===30){sendToJail(i);await jailOptions(i);return;}if([2,17,33].includes(s)){await resolveCard(i,false);return;}if([7,22,36].includes(s)){await resolveCard(i,true);return;}if(propertyData[s]){const p=propertyData[s];if(p.owner===null){propertyPopup(s);return;}if(p.owner===i){propertyPopup(s);return;}if(p.owner!==i){const rent=propertyRent(p);if(rent){const paid=pay(i,rent,p.owner);addLog(`${game.players[i].name} paid ${fmt(paid)} rent to ${game.players[p.owner].name}`);}else toast('Unimproved property: no rent due under current rules.');}}else if(s===4||s===38){const tax=s===4?100000:150000;const paid=pay(i,tax);addLog(`${game.players[i].name} paid ${fmt(paid)} tax`);}else if([5,15,25,35].includes(s)){const own=Object.values(propertyData).find(p=>[5,15,25,35].includes(p.index)&&p.owner===i);if(own){const rent=100000*(Object.values(propertyData).filter(p=>[5,15,25,35].includes(p.index)&&p.owner===i).length);const paid=pay(i,rent,own.owner);addLog(`${game.players[i].name} paid ${fmt(paid)} station rent`);}}else if(s===12||s===28){const owned=Object.values(propertyData).filter(p=>[12,28].includes(p.index)&&p.owner===i).length;const amount=owned?50000:25000;const paid=pay(i,amount);addLog(`${game.players[i].name} paid utility charge ${fmt(paid)}`);}await persistGame();syncUI();}
+function movePlayer(i,steps){return new Promise(resolve=>{const token=playerTokens[i];let moved=0,from=token.position.clone(),start=performance.now();const duration=340;function stepFrame(now){const t=Math.min(1,(now-start)/duration),e=t*t*(3-2*t),prev=game.players[i].position,next=(prev+1)%40,p=positions[next],o=playerOffsets[i],target=new THREE.Vector3(p.x+o.x,.05,p.z+o.z);token.position.lerpVectors(from,target,e);token.position.y=.05+Math.abs(Math.sin(t*Math.PI*2))*.08;if(t<1){requestAnimationFrame(stepFrame);return;}token.position.copy(target);if(next<prev)game.players[i].cash+=200000;game.players[i].position=next;moved++;if(moved<steps){from=token.position.clone();start=performance.now();requestAnimationFrame(stepFrame);}else{resolveLanding(i).then(resolve);}}requestAnimationFrame(stepFrame);});}
+function makeDie(x,z){const g=new THREE.Group();g.position.set(x,.65,z);scene.add(g);const cube=new THREE.Mesh(new THREE.BoxGeometry(.72,.72,.72),mat(0xf5f1e8,.28));cube.castShadow=true;g.add(cube);const pipMat=mat(0x17202a,.35),layouts={1:[[0,0]],2:[[-.17,-.17],[.17,.17]],3:[[-.17,-.17],[0,0],[.17,.17]],4:[[-.17,-.17],[-.17,.17],[.17,-.17],[.17,.17]],5:[[-.17,-.17],[-.17,.17],[0,0],[.17,-.17],[.17,.17]],6:[[-.17,-.19],[-.17,0],[-.17,.19],[.17,-.19],[.17,0],[.17,.19]]};const faces=[[[0,0,1],[1,0,0],[0,1,0],1],[[0,0,-1],[-1,0,0],[0,1,0],6],[[1,0,0],[0,0,-1],[0,1,0],2],[[-1,0,0],[0,0,1],[0,1,0],5],[[0,1,0],[1,0,0],[0,0,-1],3],[[0,-1,0],[1,0,0],[0,0,1],4]];faces.forEach(f=>layouts[f[3]].forEach(([a,b])=>{const pip=new THREE.Mesh(new THREE.SphereGeometry(.052,12,8),pipMat);pip.position.set(f[0][0]*.366+f[1][0]*a+f[2][0]*b,f[0][1]*.366+f[1][1]*a+f[2][1]*b,f[0][2]*.366+f[1][2]*a+f[2][2]*b);g.add(pip);}));return g;}
 const dice=[makeDie(-1.3,0),makeDie(-.35,.4)];
-const rollStatus=document.querySelector('.status');
+function qTop(v){const normals={1:[0,0,1],6:[0,0,-1],2:[1,0,0],5:[-1,0,0],3:[0,1,0],4:[0,-1,0]};return new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(...normals[v]),new THREE.Vector3(0,1,0));}
+let rolling=false;
+async function rollDice(){if(rolling||!game.started||!isHumanTurn()||game.turnRolled||onlineBusy)return;if(current().jailed){const outcome=await jailOptions(game.active);if(outcome==='served'){game.active=(game.active+1)%game.players.length;if(game.active===0)game.round++;game.turnRolled=false;await persistGame();syncUI();scheduleAiIfNeeded();return;}syncUI();}rolling=true;$('#roll').disabled=true;const vals=[1+Math.floor(Math.random()*6),1+Math.floor(Math.random()*6)],sum=vals[0]+vals[1],start=performance.now(),from=dice.map(d=>d.quaternion.clone()),targets=vals.map(qTop),ends=targets.map((q,i)=>new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),Math.PI*(6+i)).multiply(q));function anim(now){const t=Math.min(1,(now-start)/1100),e=1-Math.pow(1-t,3);dice.forEach((d,i)=>{d.quaternion.slerpQuaternions(from[i],ends[i],e);d.position.y=.65+Math.sin(t*Math.PI*9)*(1-t)*.4;});if(t<1){requestAnimationFrame(anim);return;}dice.forEach((d,i)=>{d.quaternion.copy(targets[i]);d.position.y=.65;});rolling=false;game.turnRolled=true;addLog(`${current().name} rolled ${vals[0]} + ${vals[1]}`);awaitMove(sum);}
+requestAnimationFrame(anim);}
+async function awaitMove(sum){const i=game.active;updateStatus(`ROLLED ${sum} · MOVING`);await movePlayer(i,sum);game.turnRolled=true;syncUI('END TURN OR MANAGE PROPERTIES');await persistGame();if(game.mode==='ai')scheduleAiIfNeeded();}
+$('#roll').onclick=rollDice;
+async function endTurn(){if(!game.started||!isHumanTurn()||!game.turnRolled||onlineBusy)return;game.active=(game.active+1)%game.players.length;if(game.active===0)game.round++;game.turnRolled=false;syncUI();await persistGame();scheduleAiIfNeeded();}
+$('#endTurn').onclick=endTurn;
+async function scheduleAiIfNeeded(){if(game.mode!=='ai'||!game.started||!current()?.ai||aiBusy)return;aiBusy=true;await sleep(900);const p=current(),i=game.active;if(p.jailed){p.jailTurns++;if(p.cash>=JAIL_BAIL&&Math.random()<.45){p.cash-=JAIL_BAIL;p.jailed=false;p.jailTurns=0;}else if(p.jailFree){p.jailFree=false;p.jailed=false;p.jailTurns=0;}else{await sleep(450);finishAiTurn();return;}}if(!p.jailed){const vals=1+Math.floor(Math.random()*6),vals2=1+Math.floor(Math.random()*6);await movePlayer(i,vals+vals2);const landed=propertyData[p.position];if(landed&&landed.owner===null&&p.cash>landed.price+200000&&Math.random()<.82){p.cash-=landed.price;landed.owner=i;landed.investment=landed.price;addLog(`${p.name} bought ${landed.name}`);}const owned=ownProps(i).filter(x=>!x.hotel&&x.houses<4);if(owned.length&&Math.random()<.35){const x=owned[Math.floor(Math.random()*owned.length)];if(p.cash>x.houseCost+150000){p.cash-=x.houseCost;x.houses++;x.investment+=x.houseCost;addLog(`${p.name} built on ${x.name}`);}}if(Math.random()<.06&&p.cash>300000){const x=ownProps(i).find(x=>x.houses===4&&!x.hotel);if(x&&p.cash>x.hotelCost+150000){p.cash-=x.hotelCost;x.hotel=true;x.houses=0;x.investment+=x.hotelCost;}}}await sleep(500);finishAiTurn();}
+function finishAiTurn(){game.active=(game.active+1)%game.players.length;if(game.active===0)game.round++;game.turnRolled=false;aiBusy=false;syncUI();scheduleAiIfNeeded();}
+function resetBoardState(){for(const p of Object.values(propertyData)){p.owner=null;p.houses=0;p.hotel=false;p.investment=p.price;}gameOver=false;game.turnRolled=false;game.active=0;game.round=1;game.log=[];$('#turnLog').innerHTML='';}
+function beginGame(players,mode){resetBoardState();game.players=players.map((p,i)=>({id:p.id||`p${i}`,userId:p.userId||null,name:p.name||`PLAYER ${i+1}`,cash:2000000,position:0,jailed:false,jailTurns:0,jailFree:false,ai:!!p.ai}));game.mode=mode;game.started=true;for(let i=0;i<4;i++){playerTokens[i].visible=i<game.players.length; if(i<game.players.length)placeToken(i);}hideOverlay('startOverlay');syncUI();addLog('MINDWEAVER game started');scheduleAiIfNeeded();persistGame();}
+$('#startGame').onclick=()=>{const name=$('#displayName').value.trim()||'Player 1',mode=$('#gameMode').value;let players=[];if(mode==='ai'){players=[{name,ai:false}];for(let i=1;i<=+$(' #aiCount'.trim()).value;i++)players.push({name:['Atlas AI','Nova AI','Orion AI'][i-1],ai:true});}else if(mode==='local'){const n=+$(' #localCount'.trim()).value;for(let i=0;i<n;i++)players.push({name:i===0?name:`Player ${i+1}`,ai:false});}else return toast('Use the online room controls to create or join a room.');beginGame(players,mode);};
+$('#gameMode').onchange=()=>{const v=$('#gameMode').value;$('#aiOptions').style.display=v==='ai'?'block':'none';$('#localOptions').style.display=v==='local'?'block':'none';$('#onlineOptions').style.display=v==='online'?'block':'none';$('#startGame').style.display=v==='online'?'none':'block';};
+$('#reset').onclick=()=>{camera.position.set(0,21,25);controls.target.set(0,0,0);controls.update();};
 
-function orientationForTop(value){
- const face=({
-  1:new THREE.Vector3(0,0,1),
-  6:new THREE.Vector3(0,0,-1),
-  2:new THREE.Vector3(1,0,0),
-  5:new THREE.Vector3(-1,0,0),
-  3:new THREE.Vector3(0,1,0),
-  4:new THREE.Vector3(0,-1,0)
- })[value];
+// Supabase private room integration. State sync uses the existing room RPC and member-readable room row.
+async function getAuth(){const {data,error}=await supabase.auth.getSession();if(error)throw error;session=data.session;userId=session?.user?.id||null;return session;}
+async function roomAction(fn,args){const {data,error}=await supabase.rpc(fn,args);if(error)throw error;return data;}
+async function createOnlineRoom(){try{await getAuth();if(!session)return toast('Sign in to your existing Supabase account before creating a room.');const name=$('#displayName').value.trim()||'Player 1';$('#roomInfo').textContent='Creating room…';const data=await roomAction('create_game_room',{p_game_key:'monopoly',p_player_name:name,p_player_avatar:'🎮',p_max_players:4});const row=Array.isArray(data)?data[0]:data;currentRoomId=row.room_id;currentRoomCode=row.room_code;roomHost=true;$('#roomInfo').innerHTML=`ROOM CREATED <div class="bigCode">${escapeHtml(currentRoomCode)}</div>Share this code with friends.`;$('#startOnline').disabled=false;await refreshRoom();startRoomPolling();}catch(e){$('#roomInfo').textContent=e.message||'Could not create room.';}}
+async function joinOnlineRoom(){try{await getAuth();if(!session)return toast('Sign in to your existing Supabase account before joining a room.');const code=$('#roomCodeInput').value.trim().toUpperCase();if(!code)return toast('Enter your room code.');$('#roomInfo').textContent='Joining room…';const data=await roomAction('join_game_room',{p_room_code:code,p_player_name:$('#displayName').value.trim()||'Player',p_player_avatar:'🎮'});const row=Array.isArray(data)?data[0]:data;currentRoomId=row.room_id;currentRoomCode=row.room_code;roomHost=false;$('#roomInfo').textContent=`Joined room ${currentRoomCode}. Waiting for host.`;await refreshRoom();startRoomPolling();}catch(e){$('#roomInfo').textContent=e.message||'Could not join room.';}}
+async function refreshRoom(){if(!currentRoomId)return;const [{data:room,error:rerr},{data:members,error:merr}]=await Promise.all([supabase.from('game_rooms').select('*').eq('id',currentRoomId).maybeSingle(),supabase.from('room_players').select('*').eq('room_id',currentRoomId).order('joined_at')]);if(rerr)throw rerr;if(merr)throw merr;roomMembers=members||[];$('#roomPlayers').innerHTML='Players: '+roomMembers.map(x=>escapeHtml(x.player_name)).join(' · ');$('#startOnline').disabled=!roomHost||roomMembers.length<2||room.status==='playing';if(room.game_state?.mindweaver){const remote=room.game_state.mindweaver;if(!(game.mode==='online'&&current()?.userId===userId))applyRemoteState(remote);}if(room.status==='playing'&&room.game_state?.mindweaver&&!game.started){game=room.game_state.mindweaver;game.started=true;hydrateRemoteGame();hideOverlay('startOverlay');}return room;}
+function startRoomPolling(){if(roomPoll)clearInterval(roomPoll);roomPoll=setInterval(async()=>{try{if(!currentRoomId)return;const room=await refreshRoom();if(room.status==='finished'){toast('This room has finished.');clearInterval(roomPoll);}}catch(e){console.warn('Room sync:',e.message);}},1500);}
+function hydrateRemoteGame(){for(let i=0;i<4;i++){playerTokens[i].visible=i<game.players.length;if(i<game.players.length)placeToken(i);}syncUI();if(game.started)scheduleAiIfNeeded();}
+function applyRemoteState(remote){if(!remote||!remote.players)return;const wasStarted=game.started;game=remote;game.started=true;hydrateRemoteGame();if(!wasStarted)hideOverlay('startOverlay');}
+let lastPersist=0;
+async function persistGame(){if(game.mode!=='online'||!currentRoomId||!roomHost)return;try{const state={mindweaver:JSON.parse(JSON.stringify(game))};await roomAction('update_game_room_state',{p_room_id:currentRoomId,p_game_state:state,p_status:game.started?'playing':'waiting'});}catch(e){console.warn('Could not sync game:',e.message);toast('Game sync issue: '+e.message);}}
+async function startOnlineGame(){try{if(!roomHost)return toast('Only the room host can start the game.');await refreshRoom();if(roomMembers.length<2)return toast('At least two players are needed.');const players=roomMembers.slice(0,4).map((m,i)=>({id:m.user_id,userId:m.user_id,name:m.player_name||`Player ${i+1}`,ai:false}));resetBoardState();game.players=players.map(p=>({...p,cash:2000000,position:0,jailed:false,jailTurns:0,jailFree:false,ai:false}));game.mode='online';game.started=true;game.active=0;game.turnRolled=false;for(let i=0;i<4;i++){playerTokens[i].visible=i<players.length;if(i<players.length)placeToken(i);}await roomAction('update_game_room_state',{p_room_id:currentRoomId,p_game_state:{mindweaver:game},p_status:'playing'});hideOverlay('startOverlay');syncUI();addLog('Online MINDWEAVER match started');startRoomPolling();}catch(e){toast(e.message||'Could not start online game.');}}
+$('#createRoom').onclick=createOnlineRoom;$('#joinRoom').onclick=joinOnlineRoom;$('#startOnline').onclick=startOnlineGame;
 
- return new THREE.Quaternion().setFromUnitVectors(
-  face,new THREE.Vector3(0,1,0)
- );
-}
+// A non-host online player can roll only on their assigned turn; state writes are routed through the existing room RPC.
+const originalPersist=persistGame;
+async function persistGameOnlineSafe(){if(game.mode==='online'&&currentRoomId){try{await roomAction('update_game_room_state',{p_room_id:currentRoomId,p_game_state:{mindweaver:game},p_status:'playing'});}catch(e){console.warn(e);}}}
+const originalMovePlayer=movePlayer;
+const originalEndTurn=endTurn;
+async function onlineTurnCheck(){if(game.mode!=='online')return true;await getAuth();return current()?.userId===userId;}
+const baseRoll=rollDice;
+async function guardedRoll(){if(game.mode==='online'&&!await onlineTurnCheck())return toast('It is not your turn.');const oldMode=game.mode;if(oldMode==='online')roomHost=true;await baseRoll();}
+$('#roll').onclick=guardedRoll;
+$('#endTurn').onclick=async()=>{if(game.mode==='online'&&!await onlineTurnCheck())return toast('It is not your turn.');await originalEndTurn();if(game.mode==='online')await persistGameOnlineSafe();};
+const originalPropertyPopup=propertyPopup;
+// Make the room's player state available for each member and refresh from server after their action.
+const nativePersist=persistGame;
+persistGame=async()=>{if(game.mode==='online')await persistGameOnlineSafe();};
+const oldRefreshRoom=refreshRoom;
+window.addEventListener('beforeunload',()=>{if(roomPoll)clearInterval(roomPoll);});
 
-// Roll button
-document.querySelector('#roll').addEventListener('click',()=>{
- if(rolling||characterMoving)return;
-
- // A jailed player cannot roll or move.
- if(playerInJail[activePlayer]){
-  handleJailedTurn(activePlayer);
-  return;
- }
-
- rolling=true;
-
- const button=document.querySelector('#roll');
- button.disabled=true;
-
- const values=dice.map(()=>1+Math.floor(Math.random()*6));
- const total=values[0]+values[1];
-
- rollStatus.innerHTML=
-  `DICE RESULT<strong>${values[0]} + ${values[1]} = ${total}</strong>`;
-
- const start=performance.now();
- const duration=1350;
- const from=dice.map(d=>d.quaternion.clone());
- const targets=values.map(v=>orientationForTop(v));
-
- const spins=[
-  new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),Math.PI*6),
-  new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),Math.PI*7)
- ];
-
- const end=targets.map((q,i)=>spins[i].clone().multiply(q));
-
- function animateRoll(now){
-  const t=Math.min(1,(now-start)/duration);
-  const ease=1-Math.pow(1-t,3);
-
-  dice.forEach((d,i)=>{
-   const tumble=new THREE.Quaternion().slerpQuaternions(from[i],end[i],ease);
-   d.quaternion.copy(tumble);
-   d.position.y=.65+Math.sin(t*Math.PI*9)*(1-t)*.48;
-  });
-
-  if(t<1){
-   requestAnimationFrame(animateRoll);
-  }else{
-   dice.forEach((d,i)=>{
-    d.quaternion.copy(targets[i]);
-    d.position.y=.65;
-   });
-
-   rolling=false;
-
-   movePlayer(activePlayer,total).then(()=>{
-    button.disabled=false;
-   });
-  }
- }
-
- requestAnimationFrame(animateRoll);
-});
-
-document.querySelector('#reset').addEventListener('click',()=>{
- camera.position.set(0,21,25);
- controls.target.set(0,0,0);
- controls.update();
-});
-
-// Ground
-const floor=new THREE.Mesh(
- new THREE.PlaneGeometry(200,200),
- mat(0x080d12,.95)
-);
-floor.rotation.x=-Math.PI/2;
-floor.position.y=-.92;
-floor.receiveShadow=true;
-scene.add(floor);
-
-// Resize
-addEventListener('resize',()=>{
- camera.aspect=innerWidth/innerHeight;
- camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
-});
-
-// Animation loop
-function tick(){
- requestAnimationFrame(tick);
- controls.update();
- renderer.render(scene,camera);
-}
-
-tick();
-document.querySelector('#loading').classList.add('hidden');
-
+// Initial auth probe is informational only; game can still be played locally.
+getAuth().then(()=>console.log('MINDWEAVER Supabase session:',session?'available':'not signed in')).catch(e=>console.warn('Supabase session check:',e.message));
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+function tick(){requestAnimationFrame(tick);controls.update();renderer.render(scene,camera);}tick();
+$('#loading').classList.add('hidden');
 </script>
 </body>
 </html>
